@@ -15,6 +15,7 @@
   "author": "Merlyn Zawadi",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.20.3",
     "express": "^4.21.2",
     "morgan": "^1.10.0"
   },
