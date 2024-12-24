@@ -20,26 +20,31 @@ router.post('/', (req, res, next) => {
 
 
 router.get('/:productId', (req, res, next) => {
-    const id = req.params.productID;
-    if (id == 'special') {
+    const id = req.params.productId;
+    // Adding proper error handling and response
+    if (id) {
         res.status(200).json({
-            message: 'ID discovered',
-            id: id
+            message: 'Product details',
+            productId: id,
+            product: {
+                name: 'Sample Product',
+                price: 99.99,
+            }
         });
     } else {
-        res.status(200).json({
-            message: 'An ID has been passed'
-        });
+        const error = new Error('Product not found');
+        error.status = 404;
+        next(error);
     }
 });
 
-router.patch('/:productId', (res, req, next) => {
+router.patch('/:productId', (req, res, next) => {
     res.status(200).json({
         message: 'Updated product!'
     });
 });
 
-router.delete('/:productId', (res, req, next) => {
+router.delete('/:productId', (req, res, next) => {
     res.status(200).json({
         message: 'Deleted product!'
     });
