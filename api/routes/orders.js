@@ -2,13 +2,49 @@ const express = require('express');
 const router = express.Router();
 
 //Handle incoming ET requests to /orders
-router.get('/', (res, req, next) => {
-    res.status(200).json({
-        message: 'Orders fetched'
-    });
+router.get('/', (req, res, next) => {
+    try {
+        res.status(200).json({
+            message: 'Orders fetched successfully',
+            orders: [
+                {
+                    orderId: '123',
+                    productId: 'xyz',
+                    quantity: 2
+                },
+                {
+                    orderId: '456',
+                    productId: 'abc',
+                    quantity: 1
+                }
+            ]
+        });
+    } catch (error) {
+        next(error);
+    }
 });
 
-router.post('/', (res, req, next) => {
+
+router.get('/:orderId', (req, res, next) => {
+    const id = req.params.orderId;
+    // Adding proper error handling and response
+    if (id) {
+        res.status(200).json({
+            message: 'Order details',
+            orderId: id,
+            order: {
+                productId: 'sample-product-id',
+                quantity: 1,
+            }
+        });
+    } else {
+        const error = new Error('Order not found');
+        error.status = 404;
+        next(error);
+    }
+});
+
+router.post('/', (req, res, next) => {
     const order = {
         productId: req.body.productId,
         quantity: req.body.quantity
@@ -19,14 +55,14 @@ router.post('/', (res, req, next) => {
     });
 });
 
-router.get('/:orderId', (res, req, next) => {
+router.patch('/:orderId', (req, res, next) => {
     res.status(200).json({
-        message: 'Order details',
+        message: 'Order updated',
         orderId: req.params.orderId
     });
 });
 
-router.delete('/:orderId', (res, req, next) => {
+router.delete('/:orderId', (req, res, next) => {
     res.status(200).json({
         message: 'Order deleted',
         orderId: req.params.orderId
