@@ -1,21 +1,26 @@
+require('dotenv').config();
+const validateEnv = require('./utils/validate-env');
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 
-
+// Routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 
-
+// Database connection
 mongoose.connect(
-    "mongodb+srv://rest-shop:"+ process.env.MONGO_ATLAS_PW + "@cluster0.lifak.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+    "mongodb+srv://rest-shop:"+ process.env.MONGO_ATLAS_PW + "@cluster0.lifak.mongodb.net/")
     .then(() => console.log('MongoDB connected successfully'))
     .catch(err => console.log('MongoDB connection error:', err));
 
 mongoose.Promise = global.Promise;
+
+// Validate environment variables before starting the app
+validateEnv();
 
 app.get('/', (req, res, next) => {
     res.status(200).json({

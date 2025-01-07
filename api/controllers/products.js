@@ -1,6 +1,23 @@
+/**
+ * @module controllers/products
+ * @description Product management controller
+ */
+
 const mongoose = require('mongoose');
 const Product = require('../models/product');
 
+/**
+ * Retrieve all products
+ * @async
+ * @function products_get_all
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {500} - If server error occurs
+ * 
+ * @description Returns a list of all products with name, price, ID, and image path
+ */
 exports.products_get_all = (req, res, next) => {
     Product.find()
     .select('name price _id productImage')
@@ -10,7 +27,7 @@ exports.products_get_all = (req, res, next) => {
             count: docs.length,
             products: docs.map(doc => {
                 return {
-                    name : doc.name,
+                    name: doc.name,
                     price: doc.price,
                     productImage: doc.productImage,
                     _id: doc._id,
@@ -21,13 +38,7 @@ exports.products_get_all = (req, res, next) => {
                 }
             })
         };
-        //if (docs.length >= 0) {
-            res.status(200).json(response);
-        //} else {
-        //    res.status(404).json({
-        //        message: "No entries found"
-        //    });
-        //}
+        res.status(200).json(response);
     })
     .catch(err => {
         console.log(err);
@@ -37,38 +48,66 @@ exports.products_get_all = (req, res, next) => {
     });
 };
 
+/**
+ * Create a new product
+ * @async
+ * @function products_create_product
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.name - Product name
+ * @param {number} req.body.price - Product price
+ * @param {Object} req.file - Uploaded file object
+ * @param {string} req.file.path - Path to uploaded image
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {500} - If server error occurs
+ */
 exports.products_create_product = (req, res, next) => {
     const product = new Product({
-    _id: new mongoose.Types.ObjectId(),
-    name: req.body.name,
-    price: req.body.price,
-    productImage: req.file.path
-});
-product
-.save()
-.then(result => {
-    console.log(result);
-    res.status(201).json({
-        message: 'Product created successfully',
-        createdProduct: {
-            name: result.name,
-            price: result.price,
-            _id: result._id,
-            request: {
-                type: 'GET',
-                url: "http://localhost:3001/products" + result._id
+        _id: new mongoose.Types.ObjectId(),
+        name: req.body.name,
+        price: req.body.price,
+        productImage: req.file.path
+    });
+    product
+    .save()
+    .then(result => {
+        console.log(result);
+        res.status(201).json({
+            message: 'Product created successfully',
+            createdProduct: {
+                name: result.name,
+                price: result.price,
+                _id: result._id,
+                request: {
+                    type: 'GET',
+                    url: "http://localhost:3001/products" + result._id
+                }
             }
-        }
+        });
+    })
+    .catch(err => {
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
     });
-})
-.catch(err => {
-    console.log(err);
-    res.status(500).json({
-        error:err
-    });
-})
 };
 
+/**
+ * Get a specific product by ID
+ * @async
+ * @function products_get_product
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.productId - Product ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {404} - If product not found
+ * @throws {500} - If server error occurs
+ */
 exports.products_get_product = (req, res, next) => {
     const id = req.params.productId;
     Product.findById(id)
@@ -97,12 +136,21 @@ exports.products_get_product = (req, res, next) => {
     });
 };
 
+/**
+ * Update a product
+ * @async
+ * @function products_update_product
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.productId - Product ID
+ * @param {Object} req.body - Update data
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {500} - If server error occurs
+ */
 exports.products_update_product = (req, res, next) => {
     const id = req.params.productId;
-    //const updateOps = {};
-    //for (const ops of req.body) {
-    //    updateOps[ops.propName] = ops.value;
-    //}
     Product.updateOne(
         {_id: id },
         {$set: req.body }
@@ -115,9 +163,9 @@ exports.products_update_product = (req, res, next) => {
             request: {
                 type: "GET",
                 url: "http://localhost:3001/products/" + _id
-        }
-    });
-})
+            }
+        });
+    })
     .catch(err => {
         console.log(err);
         res.status(500).json({
@@ -126,6 +174,18 @@ exports.products_update_product = (req, res, next) => {
     });
 };
 
+/**
+ * Delete a product
+ * @async
+ * @function products_delete_product
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.productId - Product ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {500} - If server error occurs
+ */
 exports.products_delete_product = (req, res, next) => {
     const id = req.params.productId;
     Product.deleteOne({_id: id })
@@ -143,7 +203,7 @@ exports.products_delete_product = (req, res, next) => {
     .catch(err => {
         console.log(err);
         res.status(500).json({
-            error:err
+            error: err
         });
     });
 };
