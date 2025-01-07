@@ -1,7 +1,23 @@
+/**
+ * @module controllers/orders
+ * @description Order management controller
+ */
+
 const Order = require('../models/order');
 const Product = require('../models/product');
 const mongoose = require('mongoose');
 
+/**
+ * Retrieve all orders
+ * @async
+ * @function orders_get_all
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {500} - If server error occurs
+ * @description Returns a list of all orders with product details and quantity
+ */
 exports.orders_get_all = (req, res, next) => {
     Order.find()
     .select('product quantity _id')
@@ -16,8 +32,8 @@ exports.orders_get_all = (req, res, next) => {
                     product: doc.product,
                     quantity: doc.quantity,
                     requests: {
-                            type: 'GET',
-                            url: 'http://localhost:3001/orders/' + doc._id
+                        type: 'GET',
+                        url: 'http://localhost:3001/orders/' + doc._id
                     }
                 }
             })
@@ -30,6 +46,19 @@ exports.orders_get_all = (req, res, next) => {
     });
 };
 
+/**
+ * Get a specific order by ID
+ * @async
+ * @function orders_get_order
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.orderId - Order ID
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {404} - If order not found
+ * @throws {500} - If server error occurs
+ */
 exports.orders_get_order = (req, res, next) => {
     Order.findById(req.params.orderId)
     .populate('product')
@@ -55,6 +84,20 @@ exports.orders_get_order = (req, res, next) => {
     });
 };
 
+/**
+ * Create a new order
+ * @async
+ * @function orders_create_order
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.productId - ID of the product being ordered
+ * @param {number} req.body.quantity - Quantity of products to order
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {404} - If product not found
+ * @throws {500} - If server error occurs
+ */
 exports.orders_create_order = (req, res, next) => {
     Product.findById(req.body.productId)
     .then(product => {
@@ -93,6 +136,18 @@ exports.orders_create_order = (req, res, next) => {
     });
 };
 
+/**
+ * Delete an order
+ * @async
+ * @function orders_delete_order
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.orderId - Order ID to delete
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {500} - If server error occurs
+ */
 exports.orders_delete_order = (req, res, next) => {
     Order.remove({ _id: req.params.orderId })
     .exec()
