@@ -22,10 +22,40 @@ mongoose.Promise = global.Promise;
 // Validate environment variables before starting the app
 validateEnv();
 
-app.get('/', (req, res, next) => {
-    res.status(200).json({
-        message: 'API is running'
-    });
+//Detailed health check
+const mongoose = require('mongoose');
+
+/**
+ * @route GET /health
+ * @description Comprehensive health check endpoint
+ * @access Public
+ */
+app.get('/health', async (req, res) => {
+    try {
+        // Check database connection
+        const dbStatus = mongoose.connection.readyState === 1 ? 'connected' : 'disconnected';
+
+        res.status(200).json({
+            status: 'ok',
+            message: 'API is running',
+            timestamp: new Date().toISOString(),
+            uptime: process.uptime(),
+            database: {
+                status: dbStatus
+            },
+            memory: {
+                usage: process.memoryUsage(),
+                free: process.freemem(),
+                total: process.totalmem()
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            status: 'error',
+            message: 'Health check failed',
+            error: error.message
+        });
+    }
 });
 
 app.use(morgan('dev'));
