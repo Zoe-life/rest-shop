@@ -23,8 +23,6 @@ mongoose.Promise = global.Promise;
 validateEnv();
 
 //Detailed health check
-const mongoose = require('mongoose');
-
 /**
  * @route GET /health
  * @description Comprehensive health check endpoint
