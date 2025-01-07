@@ -25,4 +25,5 @@ pids/
 .idea/
 .vscode/
 *.swp
-*.swo
+*.swo.env
+nodemon.json
