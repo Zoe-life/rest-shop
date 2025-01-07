@@ -1,5 +1,5 @@
 const chai = require('chai');
-const expect = chai.expect;
+const {expect} = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const Product = require('../../api/models/product');
