@@ -1,0 +1,25 @@
+0000000000000000000000000000000000000000 e3b5e3c48e4134793ef6c5f0ffeeb86db1a967b7 Zoe-life <merlynzaw@gmail.com> 1733743608 +0300	clone: from https://github.com/Zoe-life/rest-shop.git
+e3b5e3c48e4134793ef6c5f0ffeeb86db1a967b7 df245cc3751f1b473bd5e2fdcefd1e2d6deee6fc Zoe-life <merlynzaw@gmail.com> 1733997520 +0300	commit: server and app.js
+df245cc3751f1b473bd5e2fdcefd1e2d6deee6fc 2eb5286ac9e7da40f5800a3dad3bbe80de917064 Zoe-life <merlyn@gmail.com> 1734530528 +0300	commit: Adding routes
+2eb5286ac9e7da40f5800a3dad3bbe80de917064 9934db759ce426232ac44edc4a17391b4addbebe Zoe-life <merlyn@gmail.com> 1734537869 +0300	commit: Handling errors
+9934db759ce426232ac44edc4a17391b4addbebe a32ba314ae3d42c565ac8a9afb9147cd79c2bca3 Zoe-life <merlyn@gmail.com> 1734538859 +0300	commit: Handling CORS Errors
+a32ba314ae3d42c565ac8a9afb9147cd79c2bca3 71762acf3fa38cf0882374b790556f4fe9117867 Zoe-life <merlyn@gmail.com> 1735028255 +0300	commit: Fix: Error handling
+71762acf3fa38cf0882374b790556f4fe9117867 d100ac5113b5cbacbd41951e40a48a54ccd6f251 Zoe-life <merlyn@gmail.com> 1736002417 +0300	commit: Add: JWT Route protection
+d100ac5113b5cbacbd41951e40a48a54ccd6f251 bd4ef45af07e1e22155a04a5c91d9c485cf6d559 Zoe-life <merlyn@gmail.com> 1736003047 +0300	commit: Removed licensing
+bd4ef45af07e1e22155a04a5c91d9c485cf6d559 92fc96bbbca774ec076a1fd0532df9bf9570765d Zoe-life <merlyn@gmail.com> 1736278342 +0300	commit: Add: unittests and authorization
+92fc96bbbca774ec076a1fd0532df9bf9570765d 0302814133ebbd78e6f689846408118a332bcc00 Zoe-life <merlyn@gmail.com> 1736281639 +0300	commit: Added .env and nodemon.json to .gitignore
+0302814133ebbd78e6f689846408118a332bcc00 f158c4d05d6336ae933601fc852a6e39448a886e Zoe-life <merlyn@gmail.com> 1736281750 +0300	commit: removed cached .env and nodemon.json
+f158c4d05d6336ae933601fc852a6e39448a886e 8a2e4a7e8323415edba8a5697fe778fd8ce6ec4c Zoe-life <merlyn@gmail.com> 1736281750 +0300	filter-branch: rewrite
+8a2e4a7e8323415edba8a5697fe778fd8ce6ec4c 6358cd0e41e832f66793886005548cc7ef9d2467 Zoe-life <merlyn@gmail.com> 1736281750 +0300	filter-branch: rewrite
+6358cd0e41e832f66793886005548cc7ef9d2467 9421b5662e7c6b56721d57786aef52efe3757efc Zoe-life <merlyn@gmail.com> 1736285089 +0300	commit: Add: comprehensive README.md instructions
+9421b5662e7c6b56721d57786aef52efe3757efc f158c4d05d6336ae933601fc852a6e39448a886e Zoe-life <merlyn@gmail.com> 1736285338 +0300	pull (start): checkout f158c4d05d6336ae933601fc852a6e39448a886e
+f158c4d05d6336ae933601fc852a6e39448a886e abf9ee0c21f17fde180b1954b52d8cdd6ff5e088 Zoe-life <merlyn@gmail.com> 1736285339 +0300	pull (pick): Add: comprehensive README.md instructions
+abf9ee0c21f17fde180b1954b52d8cdd6ff5e088 abf9ee0c21f17fde180b1954b52d8cdd6ff5e088 Zoe-life <merlyn@gmail.com> 1736285339 +0300	pull (finish): returning to refs/heads/main
+abf9ee0c21f17fde180b1954b52d8cdd6ff5e088 148ff0713b2bf97c32beb374f6412f31c2012f89 Zoe-life <merlyn@gmail.com> 1736290044 +0300	commit: Update: dotenv package in json
+148ff0713b2bf97c32beb374f6412f31c2012f89 65c238c337f7fb42f285804f2f4d59f1b98500d3 Zoe-life <merlyn@gmail.com> 1736291455 +0300	commit: Fix: fixed mongoose conflict
+65c238c337f7fb42f285804f2f4d59f1b98500d3 ed4b2fb8ac85d4a3e807e8ce131a9fc14182f654 Zoe-life <merlyn@gmail.com> 1736292612 +0300	commit: Update: controller tests
+ed4b2fb8ac85d4a3e807e8ce131a9fc14182f654 a4ef201814122c252fb8de1f0695d4a948e49bde Zoe-life <merlyn@gmail.com> 1736292661 +0300	pull (start): checkout a4ef201814122c252fb8de1f0695d4a948e49bde
+a4ef201814122c252fb8de1f0695d4a948e49bde a4ef201814122c252fb8de1f0695d4a948e49bde Zoe-life <merlyn@gmail.com> 1736292662 +0300	pull (finish): returning to refs/heads/main
+a4ef201814122c252fb8de1f0695d4a948e49bde dbd7b234696277daaecca13929e428749b695bfa Zoe-life <merlyn@gmail.com> 1736293606 +0300	commit: Add: dotenv
+dbd7b234696277daaecca13929e428749b695bfa 89f2eb6cc77b5dbccc7f8c2f77f558b9c550440f Zoe-life <merlyn@gmail.com> 1736294342 +0300	commit: Add: express rate limit package
+89f2eb6cc77b5dbccc7f8c2f77f558b9c550440f c9a9683234cdfff68908016ea7534c9e5fedda6d Zoe-life <merlyn@gmail.com> 1737769173 +0300	commit: Add: build scripts

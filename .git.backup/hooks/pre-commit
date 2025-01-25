@@ -1,0 +1,19 @@
+#!/bin/sh
+
+if git rev-parse --verify HEAD >/dev/null 2>&1
+then
+    against=HEAD
+else
+    against=$(git hash-object -t tree /dev/null)
+fi
+
+# Redirect output to stderr
+exec 1>&2
+
+# Check if .env file is staged for commit
+if git diff --cached --name-only | grep -q ".env$"; then
+    echo "ERROR: Attempt to commit .env file."
+    echo "Please remove .env file from staging area."
+    echo "Use: git reset .env"
+    exit 1
+fi 
