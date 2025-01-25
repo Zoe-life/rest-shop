@@ -8,7 +8,7 @@
     "test:watch": "mocha 'test/**/*.test.js' --watch",
     "start": "nodemon server.js",
     "create-admin": "node scripts/create-admin.js",
-    "build": "npm run clean && npm run compile"
+    "build": "npm run && npm run compile"
   },
   "keywords": [
     "node",
