@@ -15,7 +15,6 @@ const Product = require('../models/product');
  * @param {Function} next - Express next middleware
  * @returns {Promise<void>}
  * @throws {500} - If server error occurs
- * 
  * @description Returns a list of all products with name, price, ID, and image path
  */
 exports.products_get_all = (req, res, next) => {
@@ -81,7 +80,7 @@ exports.products_create_product = (req, res, next) => {
                 price: result.price,
                 _id: result._id,
                 request: {
-                    type: 'GET',
+                    type: 'POST',
                     url: "http://localhost:3001/products" + result._id
                 }
             }
@@ -157,12 +156,14 @@ exports.products_update_product = (req, res, next) => {
     )
     .exec()
     .then(result => {
-        console.log(result);
+        if (result.nModified === 0) {
+            return res.status(404).json({ message: "No valid entry found for update" });
+        };
         res.status(200).json({
             message: "Product updated",
             request: {
-                type: "GET",
-                url: "http://localhost:3001/products/" + _id
+                type: "PATCH"
+                //url: "http://localhost:3001/products/" + _id
             }
         });
     })
@@ -194,7 +195,7 @@ exports.products_delete_product = (req, res, next) => {
         res.status(200).json({
             message: 'Product deleted',
             request: {
-                type: 'POST',
+                type: 'DELETE',
                 url: 'http://localhost:3001/products',
                 data: { name: 'String', price: 'Number'}
             }

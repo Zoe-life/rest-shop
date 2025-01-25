@@ -10,10 +10,10 @@ const config = {
             windowMs: parseInt(process.env.LOGIN_WINDOW_MS) || 15 * 60 * 1000,
             max: parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5
         }
-    },
-    production: {
-        // Production config (similar to development but with different values)
     }
+    //production: {
+        // Production config (this is similar to development but with different values
+    //}
 };
 
 module.exports = config[process.env.NODE_ENV || 'development']; 
