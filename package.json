@@ -10,7 +10,6 @@
     "create-admin": "node scripts/create-admin.js",
     "clean": "rimraf dist && rm -rf coverage .nyc_output",
     "build": "npm run clean && npm run compile"
-
   },
   "keywords": [
     "node",
