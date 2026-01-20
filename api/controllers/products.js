@@ -17,11 +17,11 @@ const Product = require('../models/product');
  * @throws {500} - If server error occurs
  * @description Returns a list of all products with name, price, ID, and image path
  */
-exports.products_get_all = (req, res, next) => {
-    Product.find()
-    .select('name price _id productImage')
-    .exec()
-    .then(docs => {
+exports.products_get_all = async (req, res, next) => {
+    try {
+        const docs = await Product.find()
+            .select('name price _id productImage')
+            .exec();
         const response = {
             count: docs.length,
             products: docs.map(doc => {
@@ -38,13 +38,12 @@ exports.products_get_all = (req, res, next) => {
             })
         };
         res.status(200).json(response);
-    })
-    .catch(err => {
+    } catch (err) {
         console.log(err);
         res.status(500).json({
             error: err
         });
-    });
+    }
 };
 
 /**
@@ -63,6 +62,11 @@ exports.products_get_all = (req, res, next) => {
  * @throws {500} - If server error occurs
  */
 exports.products_create_product = (req, res, next) => {
+    if (!req.file) {
+        return res.status(400).json({
+            error: 'Product image is required'
+        });
+    }
     const product = new Product({
         _id: new mongoose.Types.ObjectId(),
         name: req.body.name,
@@ -156,7 +160,7 @@ exports.products_update_product = (req, res, next) => {
     )
     .exec()
     .then(result => {
-        if (result.nModified === 0) {
+        if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No valid entry found for update" });
         };
         res.status(200).json({

@@ -1,5 +1,5 @@
 const chai = require('chai');
-const {expect} = chai.expect;
+const expect = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
@@ -34,6 +34,8 @@ describe('User Controller', () => {
                 exec: sinon.stub().resolves([])
             });
 
+            const bcryptStub = sinon.stub(bcrypt, 'hash').yields(null, 'hashedpassword');
+
             const saveStub = sinon.stub(User.prototype, 'save')
                 .resolves({ _id: new mongoose.Types.ObjectId() });
 
@@ -66,6 +68,8 @@ describe('User Controller', () => {
                 }])
             });
 
+            const bcryptCompareStub = sinon.stub(bcrypt, 'compare').yields(null, true);
+
             await UserController.user_login(req, res, next);
 
             expect(res.status.calledWith(200)).to.be.true;
@@ -82,6 +86,8 @@ describe('User Controller', () => {
                     password: hashedPassword
                 }])
             });
+
+            const bcryptCompareStub = sinon.stub(bcrypt, 'compare').yields(null, false);
 
             await UserController.user_login(req, res, next);
 

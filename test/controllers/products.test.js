@@ -1,5 +1,5 @@
 const chai = require('chai');
-const {expect} = chai.expect;
+const expect = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const Product = require('../../api/models/product');
@@ -35,6 +35,7 @@ describe('Products Controller', () => {
             ];
 
             const findStub = sinon.stub(Product, 'find').returns({
+                select: sinon.stub().returnsThis(),
                 exec: sinon.stub().resolves(products)
             });
 
@@ -46,6 +47,7 @@ describe('Products Controller', () => {
 
         it('should handle errors when fetching products', async () => {
             const findStub = sinon.stub(Product, 'find').returns({
+                select: sinon.stub().returnsThis(),
                 exec: sinon.stub().rejects(new Error('Database error'))
             });
 

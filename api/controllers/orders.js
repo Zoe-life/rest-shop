@@ -98,9 +98,9 @@ exports.orders_get_order = (req, res, next) => {
  * @throws {404} - If product not found
  * @throws {500} - If server error occurs
  */
-exports.orders_create_order = (req, res, next) => {
-    Product.findById(req.body.productId)
-    .then(product => {
+exports.orders_create_order = async (req, res, next) => {
+    try {
+        const product = await Product.findById(req.body.productId);
         if (!product) {
             return res.status(404).json({
                 message: "Product not found"
@@ -111,9 +111,7 @@ exports.orders_create_order = (req, res, next) => {
             quantity: req.body.quantity,
             product: req.body.productId
         });
-        return order.save();
-    })
-    .then(result => {
+        const result = await order.save();
         console.log(result);
         res.status(201).json({
             message: 'Order saved',
@@ -127,13 +125,12 @@ exports.orders_create_order = (req, res, next) => {
                 url: 'http://localhost:3001/orders/' + result._id
             }
         });
-    })
-    .catch(err => {
+    } catch (err) {
         console.log(err)
         res.status(500).json({
             error: err
         });
-    });
+    }
 };
 
 /**
@@ -149,7 +146,7 @@ exports.orders_create_order = (req, res, next) => {
  * @throws {500} - If server error occurs
  */
 exports.orders_delete_order = (req, res, next) => {
-    Order.delete({ _id: req.params.orderId })
+    Order.deleteOne({ _id: req.params.orderId })
     .exec()
     .then(result => {
         res.status(200).json({
