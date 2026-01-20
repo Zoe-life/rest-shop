@@ -22,44 +22,45 @@ const User = require('../models/user');
  * @throws {409} - If email already exists
  * @throws {500} - If server error occurs
  */
-exports.user_signup = (req, res, next) => {
-    User.find({email: req.body.email})
-    .exec()
-    .then(user => {
+exports.user_signup = async (req, res, next) => {
+    try {
+        const user = await User.find({email: req.body.email}).exec();
         if (user.length >= 1) {
             return res.status(409).json({
                 message: 'User email already exists'
             });
-        } else {
-            bcrypt.hash(req.body.password, 10, (err, hash) => {
-                if (err) {
-                    return res.status(500).json({
-                        error: err
-                    });
-                } else {
-                    const user = new User({
-                        _id: new mongoose.Types.ObjectId(),
-                        email: req.body.email,
-                        password: hash
-                    });
-                    user
-                    .save()
-                    .then(result => {
-                        console.log(result);
-                        res.status(201).json({
-                            message: 'User created'
-                        })
-                    })
-                    .catch(err => {
-                        console.log(err);
-                        res.status(500).json({
-                            error: err
-                        });
-                    });
-                }
-            });
         }
-    });
+        
+        bcrypt.hash(req.body.password, 10, async (err, hash) => {
+            if (err) {
+                return res.status(500).json({
+                    error: err
+                });
+            }
+            const newUser = new User({
+                _id: new mongoose.Types.ObjectId(),
+                email: req.body.email,
+                password: hash
+            });
+            try {
+                const result = await newUser.save();
+                console.log(result);
+                res.status(201).json({
+                    message: 'User created'
+                })
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({
+                    error: err
+                });
+            }
+        });
+    } catch (err) {
+        console.log(err);
+        res.status(500).json({
+            error: err
+        });
+    }
 };
 
 /**
@@ -76,10 +77,9 @@ exports.user_signup = (req, res, next) => {
  * @throws {401} - If authentication fails
  * @throws {500} - If server error occurs
  */
-exports.user_login = (req, res, next) => {
-    User.find({ email: req.body.email })
-    .exec()
-    .then(user => {
+exports.user_login = async (req, res, next) => {
+    try {
+        const user = await User.find({ email: req.body.email }).exec();
         if (user.length < 1) {
             return res.status(401).json({
                 message: 'Auth failed'
@@ -108,13 +108,12 @@ exports.user_login = (req, res, next) => {
                 token: token
             });
         });
-    })
-    .catch(err => {
+    } catch (err) {
         console.log(err);
         res.status(500).json({
             error: err
         });
-    });
+    }
 };
 
 /**
@@ -130,7 +129,7 @@ exports.user_login = (req, res, next) => {
  * @throws {500} - If server error occurs
  */
 exports.user_delete = (req, res, next) => {
-    User.remove({ _id: req.params.userId })
+    User.deleteOne({ _id: req.params.userId })
     .exec()
     .then(result => {
         res.status(200).json({

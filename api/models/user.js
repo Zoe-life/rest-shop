@@ -10,8 +10,14 @@ const mongoose = require('mongoose');
  * @typedef {Object} UserSchema
  * @property {mongoose.Schema.Types.ObjectId} _id - Unique identifier
  * @property {string} email - User's email address (unique, required)
- * @property {string} password - Hashed password (min length: 8)
+ * @property {string} password - Hashed password (optional for OAuth users)
  * @property {('user'|'admin')} role - User's role in the system
+ * @property {string} googleId - Google OAuth ID (optional)
+ * @property {string} microsoftId - Microsoft OAuth ID (optional)
+ * @property {string} appleId - Apple OAuth ID (optional)
+ * @property {string} provider - Authentication provider (local, google, microsoft, apple)
+ * @property {string} displayName - User's display name
+ * @property {boolean} emailVerified - Whether email is verified
  */
 
 /**
@@ -28,14 +34,48 @@ const userSchema = mongoose.Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: function() {
+            // Password only required for local authentication
+            return this.provider === 'local' || !this.provider;
+        },
         minlength: 8
     },
     role: {
         type: String,
         enum: ['user', 'admin'],
         default: 'user'
+    },
+    // OAuth Provider IDs
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true // Allows null values while maintaining uniqueness
+    },
+    microsoftId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    appleId: {
+        type: String,
+        unique: true,
+        sparse: true
+    },
+    // Authentication metadata
+    provider: {
+        type: String,
+        enum: ['local', 'google', 'microsoft', 'apple'],
+        default: 'local'
+    },
+    displayName: {
+        type: String
+    },
+    emailVerified: {
+        type: Boolean,
+        default: false
     }
+}, {
+    timestamps: true // Adds createdAt and updatedAt fields
 });
 
 /**

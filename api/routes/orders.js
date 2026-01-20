@@ -8,6 +8,7 @@ const router = express.Router();
 const checkAuth = require('../middleware/check-auth');
 const checkRole = require('../middleware/check-role');
 const OrdersController = require('../controllers/orders');
+const { orderValidation, validateObjectId, handleValidationErrors } = require('../middleware/security');
 
 /**
  * @route GET /orders
@@ -26,13 +27,15 @@ router.get('/',
  * @route GET /orders/:orderId
  * @description Retrieve a specific order
  * @access Private
- * @middleware Authentication required
+ * @middleware Authentication required, ObjectId validation
  * @roles admin, user
  * @param {string} orderId - The ID of the order to retrieve
  */
 router.get('/:orderId',
     checkAuth,
     checkRole(['admin', 'user']),
+    validateObjectId('orderId'),
+    handleValidationErrors,
     OrdersController.orders_get_order
 );
 
@@ -40,12 +43,13 @@ router.get('/:orderId',
  * @route POST /orders
  * @description Create a new order
  * @access Private
- * @middleware Authentication required
+ * @middleware Authentication required, Input validation
  * @roles admin, user
  */
 router.post('/',
     checkAuth,
     checkRole(['admin', 'user']),
+    orderValidation.create,
     OrdersController.orders_create_order
 );
 
@@ -53,13 +57,15 @@ router.post('/',
  * @route DELETE /orders/:orderId
  * @description Delete a specific order
  * @access Private
- * @middleware Authentication required
+ * @middleware Authentication required, ObjectId validation
  * @roles admin
  * @param {string} orderId - The ID of the order to delete
  */
 router.delete('/:orderId',
     checkAuth,
     checkRole(['admin']),
+    validateObjectId('orderId'),
+    handleValidationErrors,
     OrdersController.orders_delete_order
 );
 

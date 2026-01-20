@@ -25,3 +25,11 @@ uploads/
 # Build output
 dist/
 build/
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Cloudflare
+.wrangler/
+wrangler.toml.backup

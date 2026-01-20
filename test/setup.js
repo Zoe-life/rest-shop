@@ -4,6 +4,9 @@ const jwt = require('jsonwebtoken');
 
 let mongoServer;
 
+// Set JWT_KEY for tests
+process.env.JWT_KEY = process.env.JWT_KEY || 'test_jwt_key';
+
 before(async () => {
     mongoServer = await MongoMemoryServer.create();
     const mongoUri = mongoServer.getUri();

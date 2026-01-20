@@ -1,5 +1,5 @@
 const chai = require('chai');
-const {expect} = chai.expect;
+const expect = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const Order = require('../../api/models/order');
@@ -36,6 +36,7 @@ describe('Orders Controller', () => {
             ];
 
             const findStub = sinon.stub(Order, 'find').returns({
+                select: sinon.stub().returnsThis(),
                 populate: sinon.stub().returnsThis(),
                 exec: sinon.stub().resolves(orders)
             });
@@ -54,11 +55,9 @@ describe('Orders Controller', () => {
                 quantity: 2
             };
 
-            const productStub = sinon.stub(Product, 'findById').returns({
-                exec: sinon.stub().resolves({
-                    _id: req.body.productId,
-                    name: 'Test Product'
-                })
+            const productStub = sinon.stub(Product, 'findById').resolves({
+                _id: req.body.productId,
+                name: 'Test Product'
             });
 
             const saveStub = sinon.stub(Order.prototype, 'save')
@@ -80,9 +79,7 @@ describe('Orders Controller', () => {
                 quantity: 2
             };
 
-            const productStub = sinon.stub(Product, 'findById').returns({
-                exec: sinon.stub().resolves(null)
-            });
+            const productStub = sinon.stub(Product, 'findById').resolves(null);
 
             await OrdersController.orders_create_order(req, res, next);
 
