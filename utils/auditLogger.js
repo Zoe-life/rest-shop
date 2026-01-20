@@ -21,29 +21,53 @@ const AuditEventTypes = {
 };
 
 /**
- * Audit log directory
+ * Audit log directory with security checks
  */
-const AUDIT_LOG_DIR = process.env.AUDIT_LOG_DIR || path.join(__dirname, '../logs');
+const DEFAULT_LOG_DIR = path.join(__dirname, '../logs');
+const AUDIT_LOG_DIR = (() => {
+    const envLogDir = process.env.AUDIT_LOG_DIR;
+    if (!envLogDir) return DEFAULT_LOG_DIR;
+    
+    // Validate and sanitize the log directory path
+    const resolvedPath = path.resolve(envLogDir);
+    const basePath = path.resolve(__dirname, '..');
+    
+    // Ensure the log directory is within the application directory
+    if (!resolvedPath.startsWith(basePath)) {
+        console.warn('AUDIT_LOG_DIR outside app directory, using default');
+        return DEFAULT_LOG_DIR;
+    }
+    
+    return resolvedPath;
+})();
+
 const AUDIT_LOG_FILE = path.join(AUDIT_LOG_DIR, 'audit.log');
 
 /**
- * Ensure audit log directory exists
+ * Ensure audit log directory exists with secure permissions
  */
 function ensureLogDirectory() {
     if (!fs.existsSync(AUDIT_LOG_DIR)) {
-        fs.mkdirSync(AUDIT_LOG_DIR, { recursive: true });
+        // Create directory with restricted permissions (owner only)
+        fs.mkdirSync(AUDIT_LOG_DIR, { recursive: true, mode: 0o700 });
     }
 }
 
 /**
- * Write audit log entry
+ * Write audit log entry asynchronously
  * @param {Object} entry - Audit log entry
  */
 function writeAuditLog(entry) {
     try {
         ensureLogDirectory();
         const logLine = JSON.stringify(entry) + '\n';
-        fs.appendFileSync(AUDIT_LOG_FILE, logLine, 'utf8');
+        
+        // Use async append to avoid blocking the event loop
+        fs.appendFile(AUDIT_LOG_FILE, logLine, 'utf8', (err) => {
+            if (err) {
+                console.error('Failed to write audit log:', err.message);
+            }
+        });
     } catch (error) {
         console.error('Failed to write audit log:', error.message);
     }

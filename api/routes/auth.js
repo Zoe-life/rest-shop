@@ -257,7 +257,8 @@ router.get('/logout', (req, res) => {
 /**
  * @route GET /auth/token
  * @description Get token from cookie - For frontend to retrieve token securely
- * @access Public
+ * @access Public (but requires cookie to be present)
+ * @note This endpoint should only be called from the same-origin frontend after OAuth redirect
  */
 router.get('/token', (req, res) => {
     const token = req.cookies?.authToken;
@@ -268,10 +269,27 @@ router.get('/token', (req, res) => {
         });
     }
     
-    // Return token to frontend (so it can be used in Authorization headers)
-    res.status(200).json({
-        token: token
-    });
+    // Verify the token is valid before returning it
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        
+        // Return token to frontend (so it can be used in Authorization headers)
+        // After frontend retrieves token, it should call /auth/logout to clear cookie
+        res.status(200).json({
+            token: token,
+            expiresAt: new Date(decoded.exp * 1000).toISOString()
+        });
+    } catch (error) {
+        // Token is invalid or expired
+        res.clearCookie('authToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax'
+        });
+        return res.status(401).json({
+            message: 'Invalid or expired token'
+        });
+    }
 });
 
 module.exports = router;

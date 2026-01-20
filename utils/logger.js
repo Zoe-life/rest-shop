@@ -71,12 +71,17 @@ function logInfo(message, data = null) {
 function logError(message, error = null) {
     const timestamp = new Date().toISOString();
     if (error) {
-        // Log error message and stack trace, but redact sensitive data from error object
+        // Log error message but sanitize stack trace in production
         const errorInfo = {
             message: error.message || 'Unknown error',
-            stack: error.stack || 'No stack trace',
             code: error.code || undefined
         };
+        
+        // Only include stack trace in non-production environments
+        if (process.env.NODE_ENV !== 'production') {
+            errorInfo.stack = error.stack || 'No stack trace';
+        }
+        
         console.error(`[${timestamp}] ERROR: ${message}`, JSON.stringify(errorInfo, null, 2));
     } else {
         console.error(`[${timestamp}] ERROR: ${message}`);

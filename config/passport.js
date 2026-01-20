@@ -268,9 +268,11 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
             }
 
             // Create new user with safe name handling
-            const displayName = profile.name && (profile.name.firstName || profile.name.lastName) 
-                ? `${profile.name.firstName || ''} ${profile.name.lastName || ''}`.trim()
-                : 'Apple User';
+            const nameParts = [
+                profile.name?.firstName,
+                profile.name?.lastName
+            ].filter(Boolean);
+            const displayName = nameParts.length > 0 ? nameParts.join(' ') : 'Apple User';
 
             user = new User({
                 _id: new mongoose.Types.ObjectId(),
