@@ -113,8 +113,8 @@ app.use(bodyParser.json());
 // Initialize Passport
 app.use(passport.initialize());
 
-// Apply rate limiting to all routes
-app.use('/api/', apiLimiter);
+// Apply rate limiting to all API routes
+app.use(apiLimiter);
 
 // Input sanitization middleware
 app.use(sanitizeInput);

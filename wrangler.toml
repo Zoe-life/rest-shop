@@ -27,10 +27,12 @@ PORT = "3001"
 # - ALLOWED_ORIGINS
 
 # Service bindings
+# Note: Replace YOUR_KV_NAMESPACE_ID with your actual KV namespace ID from Cloudflare dashboard
+# or set via: wrangler kv:namespace create "CACHE"
 [[kv_namespaces]]
 binding = "CACHE"
-id = "YOUR_KV_NAMESPACE_ID"
-preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"
+id = "YOUR_KV_NAMESPACE_ID"  # Replace with: wrangler kv:namespace create "CACHE"
+preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"  # Replace with: wrangler kv:namespace create "CACHE" --preview
 
 # Durable Objects (for MongoDB connection pooling)
 [[durable_objects.bindings]]

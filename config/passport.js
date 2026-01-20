@@ -77,6 +77,8 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
             done(error, null);
         }
     }));
+} else {
+    console.warn('⚠️  Google OAuth not configured. Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET to enable.');
 }
 
 /**
@@ -126,6 +128,8 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
             done(error, null);
         }
     }));
+} else {
+    console.warn('⚠️  Microsoft OAuth not configured. Set MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET to enable.');
 }
 
 /**
@@ -177,6 +181,8 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
             done(error, null);
         }
     }));
+} else {
+    console.warn('⚠️  Apple OAuth not configured. Set APPLE_CLIENT_ID, APPLE_TEAM_ID, and APPLE_KEY_ID to enable.');
 }
 
 module.exports = passport;
