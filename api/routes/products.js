@@ -66,12 +66,13 @@ router.get('/', ProductsController.products_get_all);
  * @route POST /products
  * @description Create a new product with image upload
  * @access Private
- * @middleware Authentication required, Admin role required, File upload
+ * @middleware Authentication required, Admin role required, Input validation, File upload
  */
 router.post('/', 
     checkAuth, 
     checkRole(['admin']), 
-    upload, 
+    upload,
+    require('../middleware/security').productValidation.create,
     ProductsController.products_create_product
 );
 
@@ -79,20 +80,26 @@ router.post('/',
  * @route GET /products/:productId
  * @description Retrieve a specific product
  * @access Public
+ * @middleware ObjectId validation
  * @param {string} productId - The ID of the product to retrieve
  */
-router.get('/:productId', ProductsController.products_get_product);
+router.get('/:productId', 
+    require('../middleware/security').validateObjectId('productId'),
+    ProductsController.products_get_product
+);
 
 /**
  * @route PATCH /products/:productId
  * @description Update a specific product
  * @access Private
- * @middleware Authentication required, Admin role required
+ * @middleware Authentication required, Admin role required, Input validation, ObjectId validation
  * @param {string} productId - The ID of the product to update
  */
 router.patch('/:productId', 
     checkAuth, 
-    checkRole(['admin']), 
+    checkRole(['admin']),
+    require('../middleware/security').validateObjectId('productId'),
+    require('../middleware/security').productValidation.update,
     ProductsController.products_update_product
 );
 
@@ -100,12 +107,13 @@ router.patch('/:productId',
  * @route DELETE /products/:productId
  * @description Delete a specific product
  * @access Private
- * @middleware Authentication required, Admin role required
+ * @middleware Authentication required, Admin role required, ObjectId validation
  * @param {string} productId - The ID of the product to delete
  */
 router.delete('/:productId', 
     checkAuth, 
-    checkRole(['admin']), 
+    checkRole(['admin']),
+    require('../middleware/security').validateObjectId('productId'),
     ProductsController.products_delete_product
 );
 

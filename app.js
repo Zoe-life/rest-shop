@@ -5,6 +5,8 @@ const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
+const cors = require('cors');
+const { helmetConfig, apiLimiter, sanitizeInput } = require('./api/middleware/security');
 
 // Routes
 const productRoutes = require('./api/routes/products');
@@ -21,6 +23,29 @@ mongoose.Promise = global.Promise;
 
 // Validate environment variables before starting the app
 validateEnv();
+
+// Security middleware
+app.use(helmetConfig);
+
+// CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS 
+    ? process.env.ALLOWED_ORIGINS.split(',')
+    : ['http://localhost:3001'];
+
+app.use(cors({
+    origin: function(origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.indexOf(origin) === -1) {
+            const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+            return callback(new Error(msg), false);
+        }
+        return callback(null, true);
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']
+}));
 
 //Detailed health check
 /**
@@ -61,16 +86,11 @@ app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
-app.use((req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-    );
-    if (req.method === 'OPTIONS') {
-        res.header('Access-Control-Allow-Methods', 'PUT, POST, PATCH, DELETE');
-        return res.status(200).json({});
-    }
-    next();
-});
+// Apply rate limiting to all routes
+app.use('/api/', apiLimiter);
+
+// Input sanitization middleware
+app.use(sanitizeInput);
 
 //Routes which should handle requests
 app.use('/products', productRoutes);
