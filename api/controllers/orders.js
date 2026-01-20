@@ -6,6 +6,7 @@
 const Order = require('../models/order');
 const Product = require('../models/product');
 const mongoose = require('mongoose');
+const { logInfo, logError } = require('../../utils/logger');
 
 /**
  * Retrieve all orders
@@ -40,8 +41,9 @@ exports.orders_get_all = (req, res, next) => {
         });
     })
     .catch(err => {
+        logError('Failed to fetch orders', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while fetching orders'
         })
     });
 };
@@ -78,8 +80,9 @@ exports.orders_get_order = (req, res, next) => {
         });
     })
     .catch(err => {
+        logError('Failed to fetch order', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while fetching order'
         })
     });
 };
@@ -112,7 +115,7 @@ exports.orders_create_order = async (req, res, next) => {
             product: req.body.productId
         });
         const result = await order.save();
-        console.log(result);
+        logInfo('Order created successfully', { orderId: result._id, productId: result.product });
         res.status(201).json({
             message: 'Order saved',
             createdOrder: {
@@ -126,9 +129,9 @@ exports.orders_create_order = async (req, res, next) => {
             }
         });
     } catch (err) {
-        console.log(err)
+        logError('Failed to create order', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while creating order'
         });
     }
 };
@@ -149,6 +152,7 @@ exports.orders_delete_order = (req, res, next) => {
     Order.deleteOne({ _id: req.params.orderId })
     .exec()
     .then(result => {
+        logInfo('Order deleted successfully', { orderId: req.params.orderId });
         res.status(200).json({
             message: 'Order deleted',
             request: {
@@ -159,8 +163,9 @@ exports.orders_delete_order = (req, res, next) => {
         });
     })
     .catch(err => {
+        logError('Failed to delete order', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while deleting order'
         });
     });
 };

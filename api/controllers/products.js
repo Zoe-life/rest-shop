@@ -5,6 +5,7 @@
 
 const mongoose = require('mongoose');
 const Product = require('../models/product');
+const { logInfo, logError } = require('../../utils/logger');
 
 /**
  * Retrieve all products
@@ -39,9 +40,9 @@ exports.products_get_all = async (req, res, next) => {
         };
         res.status(200).json(response);
     } catch (err) {
-        console.log(err);
+        logError('Failed to fetch products', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while fetching products'
         });
     }
 };
@@ -76,7 +77,7 @@ exports.products_create_product = (req, res, next) => {
     product
     .save()
     .then(result => {
-        console.log(result);
+        logInfo('Product created successfully', { productId: result._id, name: result.name });
         res.status(201).json({
             message: 'Product created successfully',
             createdProduct: {
@@ -91,9 +92,9 @@ exports.products_create_product = (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
+        logError('Failed to create product', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while creating product'
         });
     });
 };
@@ -117,8 +118,8 @@ exports.products_get_product = (req, res, next) => {
     .select('name price _id productImage')
     .exec()
     .then(doc => {
-        console.log("From database", doc);
         if (doc) {
+            logInfo('Product fetched successfully', { productId: id });
             res.status(200).json({
                 product: doc,
                 request: {
@@ -134,8 +135,10 @@ exports.products_get_product = (req, res, next) => {
         }
     })
     .catch(err => {
-        console.log(err);
-        res.status(500).json({error: err});
+        logError('Failed to fetch product', err);
+        res.status(500).json({
+            message: 'Server error occurred while fetching product'
+        });
     });
 };
 
@@ -163,6 +166,7 @@ exports.products_update_product = (req, res, next) => {
         if (result.modifiedCount === 0) {
             return res.status(404).json({ message: "No valid entry found for update" });
         };
+        logInfo('Product updated successfully', { productId: id });
         res.status(200).json({
             message: "Product updated",
             request: {
@@ -172,9 +176,9 @@ exports.products_update_product = (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
+        logError('Failed to update product', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while updating product'
         });
     });
 };
@@ -196,6 +200,7 @@ exports.products_delete_product = (req, res, next) => {
     Product.deleteOne({_id: id })
     .exec()
     .then(result => {
+        logInfo('Product deleted successfully', { productId: id });
         res.status(200).json({
             message: 'Product deleted',
             request: {
@@ -206,9 +211,9 @@ exports.products_delete_product = (req, res, next) => {
         });
     })
     .catch(err => {
-        console.log(err);
+        logError('Failed to delete product', err);
         res.status(500).json({
-            error: err
+            message: 'Server error occurred while deleting product'
         });
     });
 };
