@@ -13,11 +13,33 @@ const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 
-// Database connection
+// Database connection with optimized pooling and retry logic
+const mongooseOptions = {
+    maxPoolSize: 10,
+    minPoolSize: 2,
+    socketTimeoutMS: 45000,
+    serverSelectionTimeoutMS: 5000,
+    family: 4, // Use IPv4
+    retryWrites: true,
+    w: 'majority'
+};
+
 mongoose.connect(
-    "mongodb+srv://rest-shop:"+ process.env.MONGO_ATLAS_PW + "@cluster0.lifak.mongodb.net/")
+    "mongodb+srv://rest-shop:"+ process.env.MONGO_ATLAS_PW + "@cluster0.lifak.mongodb.net/",
+    mongooseOptions
+)
     .then(() => console.log('MongoDB connected successfully'))
-    .catch(err => console.log('MongoDB connection error:', err));
+    .catch(err => {
+        console.log('MongoDB connection error:', err);
+        // Retry connection after 5 seconds
+        setTimeout(() => {
+            console.log('Retrying MongoDB connection...');
+            mongoose.connect(
+                "mongodb+srv://rest-shop:"+ process.env.MONGO_ATLAS_PW + "@cluster0.lifak.mongodb.net/",
+                mongooseOptions
+            ).catch(retryErr => console.log('MongoDB retry failed:', retryErr));
+        }, 5000);
+    });
 
 mongoose.Promise = global.Promise;
 
