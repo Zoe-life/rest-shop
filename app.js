@@ -6,12 +6,14 @@ const morgan = require('morgan');
 const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./api/middleware/security');
 
 // Routes
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
+const authRoutes = require('./api/routes/auth');
 
 // Database connection with optimized pooling and retry logic
 const mongooseOptions = {
@@ -108,6 +110,9 @@ app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
+// Initialize Passport
+app.use(passport.initialize());
+
 // Apply rate limiting to all routes
 app.use('/api/', apiLimiter);
 
@@ -118,6 +123,7 @@ app.use(sanitizeInput);
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/user', userRoutes);
+app.use('/auth', authRoutes);
 
 app.use((req, res, next) => {
     const error = new Error('Not found');

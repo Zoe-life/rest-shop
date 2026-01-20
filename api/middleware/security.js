@@ -6,6 +6,7 @@
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const { body, param, query, validationResult } = require('express-validator');
+const xss = require('xss');
 
 /**
  * Configure Helmet for security headers
@@ -80,18 +81,27 @@ const handleValidationErrors = (req, res, next) => {
 
 /**
  * Sanitize input to prevent XSS and injection attacks
+ * Uses the 'xss' library for comprehensive XSS protection
  */
 const sanitizeInput = (req, res, next) => {
-    // Remove any potential script tags or malicious content
+    // Sanitize body
     if (req.body) {
         for (let key in req.body) {
             if (typeof req.body[key] === 'string') {
-                req.body[key] = req.body[key]
-                    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
-                    .trim();
+                req.body[key] = xss(req.body[key].trim());
             }
         }
     }
+    
+    // Sanitize query parameters
+    if (req.query) {
+        for (let key in req.query) {
+            if (typeof req.query[key] === 'string') {
+                req.query[key] = xss(req.query[key].trim());
+            }
+        }
+    }
+    
     next();
 };
 

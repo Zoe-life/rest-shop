@@ -25,6 +25,7 @@ This RESTful API provides a comprehensive, **production-ready** solution for man
 
 ## Features
 ✅ User authentication and management with JWT  
+✅ **OAuth 2.0 integration (Google, Microsoft, Apple)**  
 ✅ Product management (CRUD operations)  
 ✅ Order management (CRUD operations)  
 ✅ Role-based access control (Admin/User)  
@@ -46,10 +47,11 @@ This RESTful API provides a comprehensive, **production-ready** solution for man
   - Signup: 5 accounts/hour
 - **Input Validation**: express-validator on all routes
 - **Password Security**: Bcrypt hashing with strength requirements
-- **Request Sanitization**: XSS prevention
+- **Request Sanitization**: Comprehensive XSS prevention with xss library
 - **ObjectId Validation**: Prevents injection attacks
 - **JWT**: 1-hour token expiration
 - **Connection Pooling**: Optimized MongoDB connections
+- **OAuth 2.0**: Secure third-party authentication
 
 ### Password Requirements
 - Minimum 8 characters
@@ -62,8 +64,9 @@ This RESTful API provides a comprehensive, **production-ready** solution for man
 - **Runtime**: Node.js 18.x/20.x
 - **Framework**: Express.js 4.x
 - **Database**: MongoDB Atlas with Mongoose 8.x
-- **Authentication**: JWT (jsonwebtoken)
-- **Security**: Helmet, CORS, express-rate-limit, express-validator
+- **Authentication**: JWT (jsonwebtoken), Passport.js, OAuth 2.0
+- **OAuth Providers**: Google, Microsoft, Apple
+- **Security**: Helmet, CORS, express-rate-limit, express-validator, xss
 - **File Uploads**: Multer
 - **Testing**: Mocha, Chai, Sinon, Supertest
 - **Logging**: Morgan
@@ -149,7 +152,7 @@ Content-Type: application/json
 }
 ```
 
-#### Login
+#### Login (Local Authentication)
 ```http
 POST /user/login
 Content-Type: application/json
@@ -159,6 +162,31 @@ Content-Type: application/json
   "password": "SecurePass123!"
 }
 ```
+
+#### OAuth 2.0 Authentication
+
+**Sign in with Google**
+```http
+GET /auth/google
+# Redirects to Google login page
+# On success, redirects to: FRONTEND_URL/auth/success?token=<JWT>
+```
+
+**Sign in with Microsoft**
+```http
+GET /auth/microsoft
+# Redirects to Microsoft login page
+# On success, redirects to: FRONTEND_URL/auth/success?token=<JWT>
+```
+
+**Sign in with Apple**
+```http
+GET /auth/apple
+# Redirects to Apple login page
+# On success, redirects to: FRONTEND_URL/auth/success?token=<JWT>
+```
+
+See [OAuth Setup Guide](docs/OAUTH_SETUP.md) for detailed configuration instructions.
 
 #### Delete User (Admin Only)
 ```http

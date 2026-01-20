@@ -37,7 +37,7 @@ describe('User Controller', () => {
             const bcryptStub = sinon.stub(bcrypt, 'hash').yields(null, 'hashedpassword');
 
             const saveStub = sinon.stub(User.prototype, 'save')
-                .resolves({ _id: new mongoose.Types.ObjectId() });
+                .resolves({ _id: new mongoose.Types.ObjectId(), provider: 'local' });
 
             await UserController.user_signup(req, res, next);
 
