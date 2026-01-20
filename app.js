@@ -4,6 +4,7 @@ const express = require('express');
 const app = express();
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const passport = require('./config/passport');
@@ -109,6 +110,7 @@ app.use(morgan('dev'));
 app.use('/uploads', express.static('uploads'));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
+app.use(cookieParser()); // Add cookie parser middleware
 
 // Initialize Passport
 app.use(passport.initialize());
