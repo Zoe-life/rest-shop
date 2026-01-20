@@ -9,6 +9,8 @@ const MicrosoftStrategy = require('passport-microsoft').Strategy;
 const AppleStrategy = require('passport-apple');
 const User = require('../api/models/user');
 const mongoose = require('mongoose');
+const { logError, logInfo } = require('../utils/logger');
+const { logOAuthLogin, logAuthFailure } = require('../utils/auditLogger');
 
 /**
  * Serialize user for session
@@ -42,11 +44,24 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     },
     async (accessToken, refreshToken, profile, done) => {
         try {
+            // Validate that profile has required fields
+            if (!profile || !profile.id) {
+                logError('Google OAuth: Invalid profile data - missing profile ID');
+                return done(new Error('Invalid profile data received from Google'), null);
+            }
+
+            // Safely extract email with null checks
+            const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+            if (!email) {
+                logError('Google OAuth: No email provided in profile', { profileId: profile.id });
+                return done(new Error('Email not provided by Google'), null);
+            }
+
             // Check if user already exists
             let user = await User.findOne({ 
                 $or: [
                     { googleId: profile.id },
-                    { email: profile.emails[0].value }
+                    { email: email }
                 ]
             });
 
@@ -56,24 +71,50 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
                     user.googleId = profile.id;
                     await user.save();
                 }
+                
+                // Log successful OAuth login
+                logInfo('Google OAuth login successful', { userId: user._id, email: user.email });
+                logOAuthLogin({
+                    userId: user._id.toString(),
+                    email: user.email,
+                    outcome: 'success',
+                    metadata: { provider: 'google', action: 'existing_user' }
+                });
+                
                 return done(null, user);
             }
 
             // Create new user
             user = new User({
                 _id: new mongoose.Types.ObjectId(),
-                email: profile.emails[0].value,
+                email: email,
                 googleId: profile.id,
-                displayName: profile.displayName,
+                displayName: profile.displayName || 'Google User',
                 provider: 'google',
-                emailVerified: profile.emails[0].verified,
+                emailVerified: profile.emails[0].verified || false,
                 // No password for OAuth users
                 password: null
             });
 
             await user.save();
+            
+            // Log successful OAuth signup
+            logInfo('Google OAuth signup successful', { userId: user._id, email: user.email });
+            logOAuthLogin({
+                userId: user._id.toString(),
+                email: user.email,
+                outcome: 'success',
+                metadata: { provider: 'google', action: 'new_user' }
+            });
+            
             done(null, user);
         } catch (error) {
+            logError('Google OAuth error', error);
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth error',
+                metadata: { provider: 'google', error: error.message }
+            });
             done(error, null);
         }
     }));
@@ -94,11 +135,24 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
     },
     async (accessToken, refreshToken, profile, done) => {
         try {
+            // Validate that profile has required fields
+            if (!profile || !profile.id) {
+                logError('Microsoft OAuth: Invalid profile data - missing profile ID');
+                return done(new Error('Invalid profile data received from Microsoft'), null);
+            }
+
+            // Safely extract email with null checks
+            const email = profile.emails && profile.emails[0] && profile.emails[0].value;
+            if (!email) {
+                logError('Microsoft OAuth: No email provided in profile', { profileId: profile.id });
+                return done(new Error('Email not provided by Microsoft'), null);
+            }
+
             // Check if user already exists
             let user = await User.findOne({ 
                 $or: [
                     { microsoftId: profile.id },
-                    { email: profile.emails[0].value }
+                    { email: email }
                 ]
             });
 
@@ -108,23 +162,49 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
                     user.microsoftId = profile.id;
                     await user.save();
                 }
+                
+                // Log successful OAuth login
+                logInfo('Microsoft OAuth login successful', { userId: user._id, email: user.email });
+                logOAuthLogin({
+                    userId: user._id.toString(),
+                    email: user.email,
+                    outcome: 'success',
+                    metadata: { provider: 'microsoft', action: 'existing_user' }
+                });
+                
                 return done(null, user);
             }
 
             // Create new user
             user = new User({
                 _id: new mongoose.Types.ObjectId(),
-                email: profile.emails[0].value,
+                email: email,
                 microsoftId: profile.id,
-                displayName: profile.displayName,
+                displayName: profile.displayName || 'Microsoft User',
                 provider: 'microsoft',
                 emailVerified: true,
                 password: null
             });
 
             await user.save();
+            
+            // Log successful OAuth signup
+            logInfo('Microsoft OAuth signup successful', { userId: user._id, email: user.email });
+            logOAuthLogin({
+                userId: user._id.toString(),
+                email: user.email,
+                outcome: 'success',
+                metadata: { provider: 'microsoft', action: 'new_user' }
+            });
+            
             done(null, user);
         } catch (error) {
+            logError('Microsoft OAuth error', error);
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth error',
+                metadata: { provider: 'microsoft', error: error.message }
+            });
             done(error, null);
         }
     }));
@@ -147,11 +227,24 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
     },
     async (accessToken, refreshToken, idToken, profile, done) => {
         try {
+            // Validate that profile has required fields
+            if (!profile || !profile.id) {
+                logError('Apple OAuth: Invalid profile data - missing profile ID');
+                return done(new Error('Invalid profile data received from Apple'), null);
+            }
+
+            // Safely extract email with null checks
+            const email = profile.email;
+            if (!email) {
+                logError('Apple OAuth: No email provided in profile', { profileId: profile.id });
+                return done(new Error('Email not provided by Apple'), null);
+            }
+
             // Check if user already exists
             let user = await User.findOne({ 
                 $or: [
                     { appleId: profile.id },
-                    { email: profile.email }
+                    { email: email }
                 ]
             });
 
@@ -161,23 +254,53 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
                     user.appleId = profile.id;
                     await user.save();
                 }
+                
+                // Log successful OAuth login
+                logInfo('Apple OAuth login successful', { userId: user._id, email: user.email });
+                logOAuthLogin({
+                    userId: user._id.toString(),
+                    email: user.email,
+                    outcome: 'success',
+                    metadata: { provider: 'apple', action: 'existing_user' }
+                });
+                
                 return done(null, user);
             }
 
-            // Create new user
+            // Create new user with safe name handling
+            const displayName = profile.name && (profile.name.firstName || profile.name.lastName) 
+                ? `${profile.name.firstName || ''} ${profile.name.lastName || ''}`.trim()
+                : 'Apple User';
+
             user = new User({
                 _id: new mongoose.Types.ObjectId(),
-                email: profile.email,
+                email: email,
                 appleId: profile.id,
-                displayName: profile.name ? `${profile.name.firstName} ${profile.name.lastName}` : 'Apple User',
+                displayName: displayName,
                 provider: 'apple',
                 emailVerified: true,
                 password: null
             });
 
             await user.save();
+            
+            // Log successful OAuth signup
+            logInfo('Apple OAuth signup successful', { userId: user._id, email: user.email });
+            logOAuthLogin({
+                userId: user._id.toString(),
+                email: user.email,
+                outcome: 'success',
+                metadata: { provider: 'apple', action: 'new_user' }
+            });
+            
             done(null, user);
         } catch (error) {
+            logError('Apple OAuth error', error);
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth error',
+                metadata: { provider: 'apple', error: error.message }
+            });
             done(error, null);
         }
     }));

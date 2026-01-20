@@ -7,6 +7,32 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { logInfo, logError } = require('../../utils/logger');
+const { logUserSignup, logUserLogin, logAuthFailure, logUserDeleted } = require('../../utils/auditLogger');
+
+/**
+ * Safely extract IP address from request
+ * @param {Object} req - Express request object
+ * @returns {string} IP address or 'unknown'
+ */
+function getClientIp(req) {
+    return req.ip || 
+           (req.connection && req.connection.remoteAddress) || 
+           (req.socket && req.socket.remoteAddress) || 
+           'unknown';
+}
+
+/**
+ * Safely extract user agent from request
+ * @param {Object} req - Express request object
+ * @returns {string} User agent or 'unknown'
+ */
+function getUserAgent(req) {
+    if (typeof req.get === 'function') {
+        return req.get('user-agent') || 'unknown';
+    }
+    return (req.headers && req.headers['user-agent']) || 'unknown';
+}
 
 /**
  * Create a new user account
@@ -33,8 +59,9 @@ exports.user_signup = async (req, res, next) => {
         
         bcrypt.hash(req.body.password, 10, async (err, hash) => {
             if (err) {
+                logError('Password hashing failed', err);
                 return res.status(500).json({
-                    error: err
+                    message: 'Server error occurred during signup'
                 });
             }
             const newUser = new User({
@@ -44,21 +71,45 @@ exports.user_signup = async (req, res, next) => {
             });
             try {
                 const result = await newUser.save();
-                console.log(result);
+                
+                // Log successful signup with audit trail
+                logInfo('User created successfully', { userId: result._id, email: result.email });
+                logUserSignup({
+                    userId: result._id.toString(),
+                    email: result.email,
+                    ipAddress: getClientIp(req),
+                    userAgent: getUserAgent(req),
+                    outcome: 'success'
+                });
+                
                 res.status(201).json({
                     message: 'User created'
                 })
             } catch (err) {
-                console.log(err);
+                logError('User creation failed', err);
+                logUserSignup({
+                    email: req.body.email,
+                    ipAddress: getClientIp(req),
+                    userAgent: getUserAgent(req),
+                    outcome: 'failure',
+                    reason: err.code === 11000 ? 'Duplicate email' : 'Database error'
+                });
                 res.status(500).json({
-                    error: err
+                    message: 'Server error occurred during signup'
                 });
             }
         });
     } catch (err) {
-        console.log(err);
+        logError('User signup error', err);
+        logUserSignup({
+            email: req.body.email,
+            ipAddress: getClientIp(req),
+            userAgent: getUserAgent(req),
+            outcome: 'failure',
+            reason: 'Unexpected error'
+        });
         res.status(500).json({
-            error: err
+            message: 'Server error occurred during signup'
         });
     }
 };
@@ -87,6 +138,13 @@ exports.user_login = async (req, res, next) => {
         }
         bcrypt.compare(req.body.password, user[0].password, (err, result) => {
             if (err || !result) {
+                logAuthFailure({
+                    email: req.body.email,
+                    ipAddress: getClientIp(req),
+                    userAgent: getUserAgent(req),
+                    outcome: 'failure',
+                    reason: 'Invalid credentials'
+                });
                 return res.status(401).json({
                     message: 'Auth failed'
                 });
@@ -103,15 +161,33 @@ exports.user_login = async (req, res, next) => {
                     expiresIn: "1h"
                 }
             );
+            
+            // Log successful login with audit trail
+            logInfo('User logged in successfully', { userId: user[0]._id, email: user[0].email });
+            logUserLogin({
+                userId: user[0]._id.toString(),
+                email: user[0].email,
+                ipAddress: getClientIp(req),
+                userAgent: getUserAgent(req),
+                outcome: 'success'
+            });
+            
             return res.status(200).json({
                 message: 'Auth successful',
                 token: token
             });
         });
     } catch (err) {
-        console.log(err);
+        logError('User login error', err);
+        logAuthFailure({
+            email: req.body.email,
+            ipAddress: getClientIp(req),
+            userAgent: getUserAgent(req),
+            outcome: 'failure',
+            reason: 'Server error'
+        });
         res.status(500).json({
-            error: err
+            message: 'Server error occurred during login'
         });
     }
 };
@@ -132,14 +208,28 @@ exports.user_delete = (req, res, next) => {
     User.deleteOne({ _id: req.params.userId })
     .exec()
     .then(result => {
+        logInfo('User deleted successfully', { userId: req.params.userId });
+        logUserDeleted({
+            userId: req.params.userId,
+            ipAddress: getClientIp(req),
+            userAgent: getUserAgent(req),
+            outcome: 'success'
+        });
         res.status(200).json({
             message: 'User deleted'
         })
     })
     .catch(err => {
-        console.log(err);
+        logError('User deletion failed', err);
+        logUserDeleted({
+            userId: req.params.userId,
+            ipAddress: getClientIp(req),
+            userAgent: getUserAgent(req),
+            outcome: 'failure',
+            reason: 'Database error'
+        });
         res.status(500).json({
-            error: err
+            message: 'Server error occurred during user deletion'
         });
     });
 };
