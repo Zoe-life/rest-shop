@@ -28,7 +28,7 @@ export class DatabaseConnection extends DurableObject {
     return httpServerHandler((req, res) => {
       req.workerEnv = this.env; 
       return app(req, res);
-    })(request, this.env);
+    })(request);
   }
 }
 
