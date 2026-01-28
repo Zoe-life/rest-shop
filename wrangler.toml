@@ -50,4 +50,4 @@ fallthrough = true
 # Migrations
 [[migrations]]
 tag = "v2"
-new_classes = ["DatabaseConnection"]
+new_sqlite_classes = ["DatabaseConnection"]
