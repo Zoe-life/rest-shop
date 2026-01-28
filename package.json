@@ -54,6 +54,7 @@
       "mock-aws-s3",
       "aws-sdk",
       "nock",
+      "node-pre-gyp",
       "./node-pre-gyp"
     ]
   }
