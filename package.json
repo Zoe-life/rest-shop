@@ -49,10 +49,11 @@
     "supertest": "^6.3.3",
     "wrangler": "^4.61.0"
   },
-  "browserslist": [
-    "last 1 version"
-  ],
   "wrangler": {
-    "external": ["mock-aws-s3", "aws-sdk", "nock", "./node-pre-gyp"]
+    "external": [
+      "mock-aws-s3",
+      "aws-sdk",
+      "nock",
+      "./node-pre-gyp"
+    ]
   }
-}
