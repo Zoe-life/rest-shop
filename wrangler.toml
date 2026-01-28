@@ -3,8 +3,8 @@ name = "rest-shop-api"
 main = "src/worker.js"
 
 # Compatibility flags
-compatibility_flags = [ "nodejs_compat" ]
 compatibility_date = "2026-01-20"
+compatibility_flags = [ "nodejs_compat" ]
 
 # Account details (will be overridden by secrets in CI/CD)
 workers_dev = true
@@ -39,10 +39,6 @@ class_name = "DatabaseConnection"
 [build]
 command = "npm run build"
 watch_dirs = ["src"]
-
-# Compatibility flags
-[compatibility_flags]
-nodejs_compat = true
 
 [[migrations]]
 tag = "v2"
