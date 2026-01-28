@@ -37,10 +37,6 @@ id = "2b52b610274c4a078262f796b01bb7ec"  # Replace with: wrangler kv:namespace c
 name = "DB_CONNECTION"
 class_name = "DatabaseConnection"
 
-# Build configuration
-[build]
-command = "npm run build"
-
 # This tells the Wrangler to treat HTML files as plain text
 [[rules]]
 type = "Text"

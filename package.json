@@ -8,7 +8,7 @@
     "test:watch": "mocha 'test/**/*.test.js' --watch",
     "start": "nodemon server.js",
     "create-admin": "node scripts/create-admin.js",
-    "clean": "rimraf dist && rm -rf coverage .nyc_output && rm -rf node_modules/@mapbox/node-pre-gyp && rm -rf node_modules/iconv-lite",
+    "clean": "rimraf dist && rm -rf coverage .nyc_output",
     "build": "npm run clean"
   },
   "keywords": [
