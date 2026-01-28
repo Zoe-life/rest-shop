@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const morgan = require('morgan');
-const bodyParser = require('body-parser');
+// const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const passport = require('./config/passport');
@@ -16,8 +16,8 @@ const authRoutes = require('./api/routes/auth');
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
 app.use(morgan('dev'));
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(express.json());
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(apiLimiter);
