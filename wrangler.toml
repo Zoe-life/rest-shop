@@ -6,6 +6,8 @@ main = "src/worker.js"
 compatibility_date = "2026-01-20"
 compatibility_flags = [ "nodejs_compat" ]
 
+find_additional_modules = true
+
 # Account details (will be overridden by secrets in CI/CD)
 workers_dev = true
 
