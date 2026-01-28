@@ -48,7 +48,7 @@
     "sinon": "^15.1.0",
     "supertest": "^6.3.3",
     "wrangler": "^4.61.0"
-  }
+  },
   "browserslist": [
     "last 1 version"
   ],
