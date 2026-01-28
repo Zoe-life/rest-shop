@@ -6,14 +6,6 @@ compatibility_date = "2024-01-01"
 # Account details (will be overridden by secrets in CI/CD)
 workers_dev = true
 
-[env.production]
-name = "rest-shop-api-production"
-routes = [
-  { pattern = "api.yourdomain.com/*", zone_name = "yourdomain.com" }
-]
-
-[env.staging]
-name = "rest-shop-api-staging"
 
 # Environment variables (non-sensitive)
 [vars]
@@ -21,8 +13,8 @@ NODE_ENV = "production"
 PORT = "3001"
 
 # Add non-sensitive URLs here
-ALLOWED_ORIGINS = "https://your-frontend.pages.dev,http://localhost:3000,http://localhost:3001"
-FRONTEND_URL = "https://your-frontend.pages.dev"
+ALLOWED_ORIGINS = "https://rest-shop.pages.dev,http://localhost:3000,http://localhost:3001"
+FRONTEND_URL = "https://rest-shop.pages.dev"
 
 # Secrets (set via wrangler secret put or in Cloudflare dashboard)
 # - JWT_KEY
@@ -42,7 +34,7 @@ class_name = "DatabaseConnection"
 
 # Build configuration
 [build]
-command = "npm install && npm run build"
+command = "npm run build"
 watch_dirs = ["src"]
 
 # Compatibility flags
