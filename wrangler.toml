@@ -45,5 +45,5 @@ watch_dirs = ["src"]
 nodejs_compat = true
 
 [[migrations]]
-tag = "v1"
+tag = "v2"
 new_classes = ["DatabaseConnection"]
