@@ -33,4 +33,10 @@ coverage/
 
 # Cloudflare
 .wrangler/
-wrangler.toml.backup
+wrangler.toml.backupread_docx.js
+
+# Document generation scripts
+generate_logbook.py
+generate_report.py
+generate_documents.js
+read_docx.js
