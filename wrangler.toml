@@ -38,7 +38,9 @@ class_name = "DatabaseConnection"
 # Build configuration
 [build]
 command = "npm run build"
-watch_dirs = ["src"]
+
+[build.upload]
+format = "modules"
 
 [[migrations]]
 tag = "v2"
