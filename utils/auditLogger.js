@@ -22,11 +22,9 @@ const AuditEventTypes = {
 
 /**
  * Detect if running in Cloudflare Workers environment
- * In Workers with nodejs_compat, fs operations may be limited
+ * workerd is the runtime used by Cloudflare Workers
  */
-const isCloudflareWorker = typeof globalThis.caches !== 'undefined' && 
-                           typeof globalThis.navigator !== 'undefined' &&
-                           typeof process.versions?.workerd !== 'undefined';
+const isCloudflareWorker = typeof process.versions?.workerd !== 'undefined';
 
 /**
  * Audit log directory with security checks
@@ -37,14 +35,19 @@ let AUDIT_LOG_FILE = null;
 
 if (!isCloudflareWorker) {
     // Only set up file paths in Node.js environment
-    const DEFAULT_LOG_DIR = path.join(process.cwd(), 'logs');
+    // Use require.resolve to get the path to this module, then go up one level
+    const modulePath = require.resolve('./auditLogger.js');
+    const utilsDir = path.dirname(modulePath);
+    const projectRoot = path.dirname(utilsDir);
+    const DEFAULT_LOG_DIR = path.join(projectRoot, 'logs');
+    
     AUDIT_LOG_DIR = (() => {
         const envLogDir = process.env.AUDIT_LOG_DIR;
         if (!envLogDir) return DEFAULT_LOG_DIR;
         
         // Validate and sanitize the log directory path
         const resolvedPath = path.resolve(envLogDir);
-        const basePath = process.cwd();
+        const basePath = projectRoot;
         
         // Ensure the log directory is within the application directory
         if (!resolvedPath.startsWith(basePath)) {
