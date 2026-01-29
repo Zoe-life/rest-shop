@@ -98,7 +98,6 @@
   <text x="450" y="580" class="text">JSON Error Response</text>
   
   <!-- Response Format -->
-  <rect x="200" y="605" width="500" height="0" fill="none"/>
   <text x="450" y="625" class="label" style="font-weight: bold; font-size: 14px;">Standard Error Response Format:</text>
   
   <rect x="250" y="640" width="400" height="90" fill="#ecf0f1" stroke="#34495e" stroke-width="2" rx="5"/>
