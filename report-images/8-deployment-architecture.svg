@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <style>
+      .title { font: bold 20px sans-serif; fill: #2c3e50; }
+      .dev { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .cloud { fill: #27ae60; stroke: #229954; stroke-width: 2; }
+      .cdn { fill: #e74c3c; stroke: #c0392b; stroke-width: 2; }
+      .db { fill: #f39c12; stroke: #d68910; stroke-width: 2; }
+      .text { font: 13px sans-serif; fill: white; text-anchor: middle; }
+      .smalltext { font: 11px sans-serif; fill: white; text-anchor: middle; }
+      .label { font: 12px sans-serif; fill: #2c3e50; }
+      .arrow { stroke: #7f8c8d; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#7f8c8d" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="450" y="30" class="title">Deployment Architecture</text>
+  
+  <!-- Development Environment -->
+  <g>
+    <text x="150" y="70" class="label" style="font-weight: bold; font-size: 14px;">Development Environment</text>
+    
+    <rect x="50" y="85" width="200" height="100" class="dev" rx="5"/>
+    <text x="150" y="110" class="text" style="font-weight: bold;">Local Development</text>
+    <text x="150" y="130" class="smalltext">Node.js + Express</text>
+    <text x="150" y="145" class="smalltext">Nodemon (Hot Reload)</text>
+    <text x="150" y="160" class="smalltext">MongoDB Local/Atlas</text>
+    <text x="150" y="175" class="smalltext">Port: 3001</text>
+  </g>
+  
+  <!-- GitHub -->
+  <g>
+    <rect x="320" y="85" width="160" height="100" class="dev" rx="5"/>
+    <text x="400" y="110" class="text" style="font-weight: bold;">GitHub Repository</text>
+    <text x="400" y="130" class="smalltext">Version Control</text>
+    <text x="400" y="145" class="smalltext">Code Review</text>
+    <text x="400" y="160" class="smalltext">CI/CD Triggers</text>
+    <text x="400" y="175" class="smalltext">Actions Workflows</text>
+  </g>
+  
+  <!-- CI/CD Pipeline -->
+  <g>
+    <rect x="550" y="85" width="160" height="100" class="cdn" rx="5"/>
+    <text x="630" y="110" class="text" style="font-weight: bold;">GitHub Actions</text>
+    <text x="630" y="130" class="smalltext">Automated Testing</text>
+    <text x="630" y="145" class="smalltext">Security Scanning</text>
+    <text x="630" y="160" class="smalltext">Build Process</text>
+    <text x="630" y="175" class="smalltext">Deployment</text>
+  </g>
+  
+  <!-- Arrows -->
+  <path d="M 250 135 L 320 135" class="arrow"/>
+  <text x="285" y="130" class="label" style="font-size: 11px;">git push</text>
+  
+  <path d="M 480 135 L 550 135" class="arrow"/>
+  <text x="515" y="130" class="label" style="font-size: 11px;">trigger</text>
+  
+  <!-- Production Environment -->
+  <text x="450" y="230" class="label" style="font-weight: bold; font-size: 16px;">Production Environment</text>
+  
+  <!-- Cloudflare Workers -->
+  <g>
+    <rect x="100" y="260" width="250" height="120" class="cloud" rx="5"/>
+    <text x="225" y="290" class="text" style="font-size: 16px; font-weight: bold;">Cloudflare Workers</text>
+    <text x="225" y="315" class="smalltext">Edge Computing Platform</text>
+    <text x="225" y="333" class="smalltext">Global CDN Distribution</text>
+    <text x="225" y="351" class="smalltext">Serverless Runtime</text>
+    <text x="225" y="369" class="smalltext">Wrangler Deployment</text>
+  </g>
+  
+  <!-- MongoDB Atlas -->
+  <g>
+    <rect x="400" y="260" width="250" height="120" class="db" rx="5"/>
+    <text x="525" y="290" class="text" style="font-size: 16px; font-weight: bold;">MongoDB Atlas</text>
+    <text x="525" y="315" class="smalltext">Cloud Database</text>
+    <text x="525" y="333" class="smalltext">Replica Sets</text>
+    <text x="525" y="351" class="smalltext">Auto Backups</text>
+    <text x="525" y="369" class="smalltext">Connection Pooling</text>
+  </g>
+  
+  <!-- Connection -->
+  <path d="M 350 320 L 400 320" class="arrow"/>
+  <text x="375" y="315" class="label" style="font-size: 11px;">secure</text>
+  <text x="375" y="340" class="label" style="font-size: 11px;">connection</text>
+  
+  <!-- Deployment from CI/CD -->
+  <path d="M 630 185 L 225 260" class="arrow"/>
+  <text x="450" y="210" class="label" style="font-size: 11px;">wrangler deploy</text>
+  
+  <!-- Client Access -->
+  <rect x="250" y="420" width="400" height="60" class="cdn" rx="5"/>
+  <text x="450" y="445" class="text" style="font-size: 16px; font-weight: bold;">Global Client Access</text>
+  <text x="450" y="465" class="smalltext">Web, Mobile, Desktop Applications via HTTPS</text>
+  
+  <path d="M 225 380 L 360 420" class="arrow"/>
+  <path d="M 525 380 L 475 420" class="arrow"/>
+  
+  <!-- Deployment Details -->
+  <rect x="50" y="510" width="800" height="75" fill="#ecf0f1" stroke="#34495e" stroke-width="2" rx="5"/>
+  <text x="450" y="535" class="label" style="font-size: 14px; font-weight: bold;">Deployment Configuration</text>
+  
+  <g>
+    <text x="70" y="560" class="label" style="font-weight: bold;">Environment Variables:</text>
+    <text x="70" y="578" class="label" style="font-size: 11px;">• JWT_KEY (Secret)</text>
+    <text x="260" y="578" class="label" style="font-size: 11px;">• MONGODB_URI (Secret)</text>
+    <text x="460" y="578" class="label" style="font-size: 11px;">• ALLOWED_ORIGINS</text>
+    <text x="640" y="578" class="label" style="font-size: 11px;">• NODE_ENV=production</text>
+  </g>
+</svg>
