@@ -18,13 +18,13 @@ NODE_ENV = "production"
 PORT = "3001"
 
 # Add non-sensitive URLs here
-ALLOWED_ORIGINS = "https://rest-shop.pages.dev,http://localhost:3000,http://localhost:3001"
 FRONTEND_URL = "https://rest-shop.pages.dev"
 
 # Secrets (set via wrangler secret put or in Cloudflare dashboard)
+# These are uploaded via GitHub Actions secrets in CI/CD pipeline:
 # - JWT_KEY
 # - MONGODB_URI or MONGO_ATLAS_PW
-# - ALLOWED_ORIGINS
+# - ALLOWED_ORIGINS (managed as secret in GitHub Actions)
 
 # Service bindings
 [[kv_namespaces]]
