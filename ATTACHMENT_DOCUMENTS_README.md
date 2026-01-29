@@ -4,6 +4,40 @@ This directory contains the completed industrial attachment documentation based 
 
 ## Generated Documents
 
+### 0. Report and Log Book Images (NEW!)
+**Professional Diagrams for Documentation**
+- **Location**: `report-images/` directory
+- **Format**: SVG (Scalable Vector Graphics)
+- **Count**: 12 professional diagrams
+- **Purpose**: Visual aids for report and log book
+
+**Image Categories**:
+1. **Architecture Diagrams** (4 images)
+   - System Architecture Overview
+   - RESTful API Architecture
+   - Database Schema Design
+   - Deployment Architecture
+
+2. **Security & Authentication** (2 images)
+   - Authentication Flow (JWT & OAuth 2.0)
+   - Security Architecture (4-layer defense)
+
+3. **Workflows & Processes** (4 images)
+   - CI/CD Pipeline
+   - Request-Response Flow
+   - Order Management Flow
+   - Product Management Flow
+
+4. **Testing & Error Handling** (2 images)
+   - Testing Workflow & Strategy
+   - Error Handling Flow
+
+**Documentation**:
+- `report-images/README.md` - Detailed image descriptions
+- `report-images/IMAGE_INTEGRATION_GUIDE.md` - How to use images in documents
+
+**Integration**: These images are ready to be inserted into both the Engineering Log Book and Industrial Attachment Report. See the IMAGE_INTEGRATION_GUIDE.md for instructions on inserting them into Microsoft Word.
+
 ### 1. FILLED_Engineering_LogBook_Merlyn_Zawadi.docx
 **Engineering Log Book - Fully Completed**
 - **Format**: Microsoft Word 2007+ (.docx) - Fully Editable
