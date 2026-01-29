@@ -117,21 +117,16 @@ jobs:
           cache: 'npm'
       - name: Install dependencies
         run: npm ci
+      # Secrets (MONGO_ATLAS_PW, JWT_KEY, ALLOWED_ORIGINS) should be configured
+      # in Cloudflare dashboard or via `wrangler secret put` command.
+      # The secrets: parameter is removed to avoid "Binding name already in use" errors
+      # when secrets already exist from previous deployments.
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           command: deploy
-          # NECESSARY CHANGE: Syncs your GitHub secrets to Cloudflare env
-          secrets: |
-            MONGO_ATLAS_PW
-            JWT_KEY
-            ALLOWED_ORIGINS
-        env:
-          MONGO_ATLAS_PW: ${{ secrets.MONGO_ATLAS_PW }}
-          JWT_KEY: ${{ secrets.JWT_KEY }}
-          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
 
   # Job 6: CodeQL Analysis
   codeql:
