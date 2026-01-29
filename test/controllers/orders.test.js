@@ -38,8 +38,13 @@ describe('Orders Controller', () => {
             const findStub = sinon.stub(Order, 'find').returns({
                 select: sinon.stub().returnsThis(),
                 populate: sinon.stub().returnsThis(),
+                sort: sinon.stub().returnsThis(),
+                limit: sinon.stub().returnsThis(),
+                skip: sinon.stub().returnsThis(),
                 exec: sinon.stub().resolves(orders)
             });
+
+            sinon.stub(Order, 'countDocuments').resolves(2);
 
             await OrdersController.orders_get_all(req, res, next);
 
@@ -57,7 +62,8 @@ describe('Orders Controller', () => {
 
             const productStub = sinon.stub(Product, 'findById').resolves({
                 _id: req.body.productId,
-                name: 'Test Product'
+                name: 'Test Product',
+                price: 100
             });
 
             const saveStub = sinon.stub(Order.prototype, 'save')

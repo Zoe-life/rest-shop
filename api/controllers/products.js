@@ -16,27 +16,85 @@ const { logInfo, logError } = require('../../utils/logger');
  * @param {Function} next - Express next middleware
  * @returns {Promise<void>}
  * @throws {500} - If server error occurs
- * @description Returns a list of all products with name, price, ID, and image path
+ * @description Returns a list of all products with pagination, filtering, and search
  */
 exports.products_get_all = async (req, res, next) => {
     try {
-        const docs = await Product.find()
-            .select('name price _id productImage')
+        const page = parseInt(req.query?.page) || 1;
+        const limit = parseInt(req.query?.limit) || 20;
+        const skip = (page - 1) * limit;
+
+        // Build query filters
+        const query = {};
+        
+        // Only filter by isActive if the field exists (for backward compatibility)
+        if (req.query?.showInactive !== 'true') {
+            query.$or = [
+                { isActive: true },
+                { isActive: { $exists: false } }
+            ];
+        }
+        
+        if (req.query?.category) {
+            query.category = req.query.category;
+        }
+
+        if (req.query?.search) {
+            query.$text = { $search: req.query.search };
+        }
+
+        if (req.query?.minPrice || req.query?.maxPrice) {
+            query.price = {};
+            if (req.query.minPrice) {
+                query.price.$gte = parseFloat(req.query.minPrice);
+            }
+            if (req.query.maxPrice) {
+                query.price.$lte = parseFloat(req.query.maxPrice);
+            }
+        }
+
+        // Sort options
+        let sort = { createdAt: -1 };
+        if (req.query?.sort === 'price_asc') {
+            sort = { price: 1 };
+        } else if (req.query?.sort === 'price_desc') {
+            sort = { price: -1 };
+        } else if (req.query?.sort === 'name') {
+            sort = { name: 1 };
+        }
+
+        const docs = await Product.find(query)
+            .select('name price _id productImage description category stock')
+            .sort(sort)
+            .limit(limit)
+            .skip(skip)
             .exec();
+
+        const total = await Product.countDocuments(query);
+
         const response = {
             count: docs.length,
+            total,
             products: docs.map(doc => {
                 return {
                     name: doc.name,
                     price: doc.price,
                     productImage: doc.productImage,
+                    description: doc.description,
+                    category: doc.category,
+                    stock: doc.stock,
                     _id: doc._id,
                     request: {
                         type: 'GET',
                         url: 'http://localhost:3001/products/' + doc._id
                     }
                 }
-            })
+            }),
+            pagination: {
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
         };
         res.status(200).json(response);
     } catch (err) {
