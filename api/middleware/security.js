@@ -33,37 +33,83 @@ const helmetConfig = helmet({
 });
 
 /**
- * Rate limiter for API endpoints
+ * Cache for rate limiter instances to avoid recreating them on every request
  */
-const apiLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
-    message: 'Too many requests from this IP, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+let apiLimiterInstance = null;
+let authLimiterInstance = null;
+let signupLimiterInstance = null;
 
 /**
- * Strict rate limiter for authentication endpoints
+ * Factory function for API rate limiter
+ * Lazily initialized to avoid async operations in global scope (Cloudflare Workers requirement)
  */
-const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 5, // Limit each IP to 5 requests per windowMs
-    message: 'Too many authentication attempts, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+function getApiLimiter() {
+    if (!apiLimiterInstance) {
+        apiLimiterInstance = rateLimit({
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: 100, // Limit each IP to 100 requests per windowMs
+            message: 'Too many requests from this IP, please try again later.',
+            standardHeaders: true,
+            legacyHeaders: false,
+        });
+    }
+    return apiLimiterInstance;
+}
 
 /**
- * Rate limiter for signup endpoints
+ * Factory function for authentication rate limiter
+ * Lazily initialized to avoid async operations in global scope (Cloudflare Workers requirement)
  */
-const signupLimiter = rateLimit({
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 5, // Limit each IP to 5 signups per hour
-    message: 'Too many accounts created, please try again later.',
-    standardHeaders: true,
-    legacyHeaders: false,
-});
+function getAuthLimiter() {
+    if (!authLimiterInstance) {
+        authLimiterInstance = rateLimit({
+            windowMs: 15 * 60 * 1000, // 15 minutes
+            max: 5, // Limit each IP to 5 requests per windowMs
+            message: 'Too many authentication attempts, please try again later.',
+            standardHeaders: true,
+            legacyHeaders: false,
+        });
+    }
+    return authLimiterInstance;
+}
+
+/**
+ * Factory function for signup rate limiter
+ * Lazily initialized to avoid async operations in global scope (Cloudflare Workers requirement)
+ */
+function getSignupLimiter() {
+    if (!signupLimiterInstance) {
+        signupLimiterInstance = rateLimit({
+            windowMs: 60 * 60 * 1000, // 1 hour
+            max: 5, // Limit each IP to 5 signups per hour
+            message: 'Too many accounts created, please try again later.',
+            standardHeaders: true,
+            legacyHeaders: false,
+        });
+    }
+    return signupLimiterInstance;
+}
+
+/**
+ * Middleware wrapper for API rate limiter
+ */
+const apiLimiter = (req, res, next) => {
+    return getApiLimiter()(req, res, next);
+};
+
+/**
+ * Middleware wrapper for authentication rate limiter
+ */
+const authLimiter = (req, res, next) => {
+    return getAuthLimiter()(req, res, next);
+};
+
+/**
+ * Middleware wrapper for signup rate limiter
+ */
+const signupLimiter = (req, res, next) => {
+    return getSignupLimiter()(req, res, next);
+};
 
 /**
  * Validation error handler middleware
