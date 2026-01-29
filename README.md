@@ -271,7 +271,9 @@ Authorization: Bearer <token>
 
 ### Deploy to Cloudflare Workers
 
-See detailed guide: [Cloudflare Deployment Guide](docs/CLOUDFLARE_DEPLOYMENT.md)
+See detailed guides:
+- [Cloudflare Deployment Guide](docs/CLOUDFLARE_DEPLOYMENT.md)
+- [Cloudflare Secrets Setup Guide](docs/CLOUDFLARE_SECRETS_SETUP.md)
 
 Quick start:
 ```bash
@@ -281,14 +283,16 @@ npm install -g wrangler
 # Login to Cloudflare
 wrangler login
 
-# Configure secrets
+# Configure secrets (only needed once)
 wrangler secret put JWT_KEY
-wrangler secret put MONGODB_URI
 wrangler secret put MONGO_ATLAS_PW
+wrangler secret put ALLOWED_ORIGINS
 
 # Deploy
 wrangler deploy
 ```
+
+**Note**: Secrets are persistent and only need to be configured once. The CI/CD pipeline deploys code changes without re-uploading secrets.
 
 ### Alternative Deployments
 
