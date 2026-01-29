@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600">
+  <defs>
+    <style>
+      .title { font: bold 20px sans-serif; fill: #2c3e50; }
+      .error-type { fill: #e74c3c; stroke: #c0392b; stroke-width: 2; }
+      .handler { fill: #27ae60; stroke: #229954; stroke-width: 2; }
+      .response { fill: #3498db; stroke: #2980b9; stroke-width: 2; }
+      .text { font: 13px sans-serif; fill: white; text-anchor: middle; }
+      .smalltext { font: 11px sans-serif; fill: white; }
+      .label { font: 12px sans-serif; fill: #2c3e50; }
+      .arrow { stroke: #7f8c8d; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+      <polygon points="0 0, 10 3, 0 6" fill="#7f8c8d" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="450" y="30" class="title">Error Handling Flow</text>
+  
+  <!-- Request Entry -->
+  <rect x="350" y="60" width="200" height="50" class="response" rx="5"/>
+  <text x="450" y="90" class="text" style="font-weight: bold;">Incoming Request</text>
+  
+  <path d="M 450 110 L 450 135" class="arrow"/>
+  
+  <!-- Error Types -->
+  <text x="450" y="160" class="label" style="font-weight: bold; font-size: 14px;">Error Detection Points</text>
+  
+  <!-- Validation Error -->
+  <rect x="50" y="180" width="180" height="70" class="error-type" rx="5"/>
+  <text x="140" y="205" class="text" style="font-weight: bold;">Validation Error</text>
+  <text x="140" y="223" class="smalltext" style="fill: white; text-anchor: middle;">400 Bad Request</text>
+  <text x="60" y="240" class="smalltext" style="fill: white;">• Invalid input</text>
+  
+  <!-- Auth Error -->
+  <rect x="250" y="180" width="180" height="70" class="error-type" rx="5"/>
+  <text x="340" y="205" class="text" style="font-weight: bold;">Auth Error</text>
+  <text x="340" y="223" class="smalltext" style="fill: white; text-anchor: middle;">401 Unauthorized</text>
+  <text x="260" y="240" class="smalltext" style="fill: white;">• Missing/invalid token</text>
+  
+  <!-- Permission Error -->
+  <rect x="450" y="180" width="180" height="70" class="error-type" rx="5"/>
+  <text x="540" y="205" class="text" style="font-weight: bold;">Permission Error</text>
+  <text x="540" y="223" class="smalltext" style="fill: white; text-anchor: middle;">403 Forbidden</text>
+  <text x="460" y="240" class="smalltext" style="fill: white;">• Insufficient role</text>
+  
+  <!-- Not Found -->
+  <rect x="650" y="180" width="180" height="70" class="error-type" rx="5"/>
+  <text x="740" y="205" class="text" style="font-weight: bold;">Not Found</text>
+  <text x="740" y="223" class="smalltext" style="fill: white; text-anchor: middle;">404 Not Found</text>
+  <text x="660" y="240" class="smalltext" style="fill: white;">• Resource missing</text>
+  
+  <!-- More Error Types -->
+  <rect x="150" y="270" width="180" height="70" class="error-type" rx="5"/>
+  <text x="240" y="295" class="text" style="font-weight: bold;">Conflict Error</text>
+  <text x="240" y="313" class="smalltext" style="fill: white; text-anchor: middle;">409 Conflict</text>
+  <text x="160" y="330" class="smalltext" style="fill: white;">• Duplicate resource</text>
+  
+  <rect x="350" y="270" width="180" height="70" class="error-type" rx="5"/>
+  <text x="440" y="295" class="text" style="font-weight: bold;">Rate Limit</text>
+  <text x="440" y="313" class="smalltext" style="fill: white; text-anchor: middle;">429 Too Many</text>
+  <text x="360" y="330" class="smalltext" style="fill: white;">• Exceeded limit</text>
+  
+  <rect x="550" y="270" width="180" height="70" class="error-type" rx="5"/>
+  <text x="640" y="295" class="text" style="font-weight: bold;">Server Error</text>
+  <text x="640" y="313" class="smalltext" style="fill: white; text-anchor: middle;">500 Internal</text>
+  <text x="560" y="330" class="smalltext" style="fill: white;">• Unexpected error</text>
+  
+  <!-- Arrows to handler -->
+  <path d="M 140 250 L 350 370" class="arrow"/>
+  <path d="M 340 250 L 390 370" class="arrow"/>
+  <path d="M 540 250 L 470 370" class="arrow"/>
+  <path d="M 740 250 L 550 370" class="arrow"/>
+  <path d="M 240 340 L 370 370" class="arrow"/>
+  <path d="M 440 340 L 450 370" class="arrow"/>
+  <path d="M 640 340 L 530 370" class="arrow"/>
+  
+  <!-- Error Handler -->
+  <rect x="300" y="370" width="300" height="60" class="handler" rx="5"/>
+  <text x="450" y="395" class="text" style="font-size: 16px; font-weight: bold;">Error Handler Middleware</text>
+  <text x="450" y="415" class="smalltext" style="fill: white; text-anchor: middle;">Centralized Error Processing</text>
+  
+  <path d="M 450 430 L 450 455" class="arrow"/>
+  
+  <!-- Error Processing -->
+  <rect x="250" y="455" width="400" height="80" fill="#ecf0f1" stroke="#27ae60" stroke-width="2" rx="5"/>
+  <text x="450" y="478" class="label" style="font-weight: bold; font-size: 13px;">Error Processing Steps:</text>
+  <text x="270" y="498" class="label" style="font-size: 11px;">1. Extract error details (status, message, stack)</text>
+  <text x="270" y="513" class="label" style="font-size: 11px;">2. Log error (console.error in dev, logger in prod)</text>
+  <text x="270" y="528" class="label" style="font-size: 11px;">3. Sanitize sensitive data (remove stack traces in prod)</text>
+  
+  <path d="M 450 535 L 450 560" class="arrow"/>
+  
+  <!-- JSON Response -->
+  <rect x="300" y="560" width="300" height="30" class="response" rx="5"/>
+  <text x="450" y="580" class="text">JSON Error Response</text>
+  
+  <!-- Response Format -->
+  <rect x="200" y="605" width="500" height="0" fill="none"/>
+  <text x="450" y="625" class="label" style="font-weight: bold; font-size: 14px;">Standard Error Response Format:</text>
+  
+  <rect x="250" y="640" width="400" height="90" fill="#ecf0f1" stroke="#34495e" stroke-width="2" rx="5"/>
+  <text x="270" y="662" class="label" style="font-family: monospace; font-size: 11px;">{</text>
+  <text x="285" y="680" class="label" style="font-family: monospace; font-size: 11px;">  "error": {</text>
+  <text x="300" y="698" class="label" style="font-family: monospace; font-size: 11px;">    "message": "Descriptive error message",</text>
+  <text x="300" y="716" class="label" style="font-family: monospace; font-size: 11px;">    "status": 400 | 401 | 403 | 404 | 409 | 429 | 500</text>
+  <text x="285" y="734" class="label" style="font-family: monospace; font-size: 11px;">  }</text>
+  <text x="270" y="752" class="label" style="font-family: monospace; font-size: 11px;">}</text>
+  
+  <!-- Additional Notes -->
+  <rect x="50" y="770" width="800" height="20" fill="#2c3e50" rx="3"/>
+  <text x="450" y="786" class="text" style="font-size: 12px;">All errors pass through centralized handler • Consistent format • Security-aware logging</text>
+</svg>
