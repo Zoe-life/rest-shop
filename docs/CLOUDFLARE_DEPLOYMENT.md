@@ -136,7 +136,7 @@ For a serverless approach with better Node.js compatibility:
 
 The repository includes `.github/workflows/ci-cd.yml` which:
 
-1. **Runs on every push to main/develop**
+1. **Runs on every push to main**
 2. **Executes tests automatically**
 3. **Performs security scans**
 4. **Deploys to Cloudflare Workers**
@@ -148,11 +148,25 @@ Add these secrets in GitHub repository settings:
 ```
 CLOUDFLARE_API_TOKEN
 CLOUDFLARE_ACCOUNT_ID
-JWT_KEY
-MONGODB_URI
-MONGO_ATLAS_PW
-ALLOWED_ORIGINS
 ```
+
+**Important**: Worker secrets (JWT_KEY, MONGO_ATLAS_PW, ALLOWED_ORIGINS) should be configured directly in Cloudflare Workers, not via GitHub Actions. This prevents "Binding name already in use" errors during deployment.
+
+### Setting Up Worker Secrets
+
+Use one of these methods to configure secrets in Cloudflare:
+
+**Method 1: Wrangler CLI**
+```bash
+wrangler secret put JWT_KEY
+wrangler secret put MONGO_ATLAS_PW
+wrangler secret put ALLOWED_ORIGINS
+```
+
+**Method 2: Cloudflare Dashboard**
+1. Go to Workers & Pages > Your Worker > Settings > Variables
+2. Add each secret under "Environment Variables" section
+3. Mark them as "Encrypted" for sensitive values
 
 ## Environment Variables Summary
 
@@ -177,6 +191,13 @@ ALLOWED_ORIGINS
 - Set up alerts for connection issues
 
 ## Troubleshooting
+
+### Issue: "Binding name already in use"
+**Solution**: 
+- This error occurs when trying to upload secrets that already exist
+- Configure secrets directly in Cloudflare Workers (via CLI or dashboard)
+- Don't upload secrets during CI/CD deployment
+- Secrets persist across deployments and only need to be set once
 
 ### Issue: "MongoDB connection failed"
 **Solution**: 

@@ -21,10 +21,11 @@ PORT = "3001"
 FRONTEND_URL = "https://rest-shop.pages.dev"
 
 # Secrets (set via wrangler secret put or in Cloudflare dashboard)
-# These are uploaded via GitHub Actions secrets in CI/CD pipeline:
+# These should be configured once via Cloudflare dashboard or CLI:
 # - JWT_KEY
-# - MONGODB_URI or MONGO_ATLAS_PW
-# - ALLOWED_ORIGINS (managed as secret in GitHub Actions)
+# - MONGO_ATLAS_PW
+# - ALLOWED_ORIGINS
+# Note: Secrets are NOT uploaded during CI/CD deployment to avoid binding conflicts.
 
 # Service bindings
 [[kv_namespaces]]
