@@ -117,7 +117,7 @@ Figure 6: Request-Response Flow Diagram
 Detailed flow of a typical API request (POST /orders) showing all 12 steps from client through security checks, authentication, validation, controller logic, database operations, and response generation.
 
 Figure 7: Security Architecture
-Defense-in-depth security strategy with four layers: Network Security (HTTPS, CORS, Helmet, Rate Limiting), Authentication & Authorization (JWT, OAuth, RBAC), Input Validation & Sanitization, and Data Security (Bcrypt, MongoDB Auth, Audit Logging).
+Defense-in-depth security strategy with four layers: Network Security (HTTPS, CORS, Helmet, Rate Limiting), Authentication and Authorization (JWT, OAuth, RBAC), Input Validation and Sanitization, and Data Security (Bcrypt, MongoDB Auth, Audit Logging).
 
 Figure 8: Deployment Architecture
 Production deployment architecture showing development environment, GitHub repository, CI/CD pipeline, Cloudflare Workers edge computing platform, MongoDB Atlas cloud database, and global client access.
