@@ -18,7 +18,7 @@
   </defs>
   
   <!-- Title -->
-  <text x="450" y="30" class="title">Testing Workflow & Strategy</text>
+  <text x="450" y="30" class="title">Testing Workflow &amp; Strategy</text>
   
   <!-- Test Setup -->
   <text x="450" y="65" class="subtitle">Test Environment Setup</text>
@@ -78,7 +78,7 @@
   
   <rect x="100" y="420" width="130" height="50" fill="#3498db" stroke="#2980b9" stroke-width="2" rx="5"/>
   <text x="165" y="442" class="text">1. Setup</text>
-  <text x="165" y="458" class="smalltext" style="fill: white;">DB & Mocks</text>
+  <text x="165" y="458" class="smalltext" style="fill: white;">DB &amp; Mocks</text>
   
   <rect x="250" y="420" width="130" height="50" fill="#27ae60" stroke="#229954" stroke-width="2" rx="5"/>
   <text x="315" y="442" class="text">2. Execute</text>
@@ -98,7 +98,7 @@
   
   <!-- Testing Tools -->
   <rect x="50" y="500" width="800" height="130" fill="#ecf0f1" stroke="#34495e" stroke-width="2" rx="5"/>
-  <text x="450" y="525" class="subtitle">Testing Tools & Frameworks</text>
+  <text x="450" y="525" class="subtitle">Testing Tools &amp; Frameworks</text>
   
   <g>
     <text x="70" y="555" class="label" style="font-weight: bold;">Test Framework:</text>
@@ -108,8 +108,8 @@
   </g>
   
   <g>
-    <text x="280" y="555" class="label" style="font-weight: bold;">Mocking & Stubbing:</text>
-    <text x="280" y="573" class="label" style="font-size: 11px;">• Sinon - Spies & stubs</text>
+    <text x="280" y="555" class="label" style="font-weight: bold;">Mocking &amp; Stubbing:</text>
+    <text x="280" y="573" class="label" style="font-size: 11px;">• Sinon - Spies &amp; stubs</text>
     <text x="280" y="588" class="label" style="font-size: 11px;">• Mock external services</text>
     <text x="280" y="603" class="label" style="font-size: 11px;">• Isolate components</text>
   </g>
