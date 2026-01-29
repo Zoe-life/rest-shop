@@ -1,0 +1,24 @@
+diff --git a/node_modules/iconv-lite/lib/index.js b/node_modules/iconv-lite/lib/index.js
+index 5391919..8c6fa1a 100644
+--- a/node_modules/iconv-lite/lib/index.js
++++ b/node_modules/iconv-lite/lib/index.js
+@@ -141,11 +141,17 @@ if (nodeVer) {
+     // Load streaming support in Node v0.10+
+     var nodeVerArr = nodeVer.split(".").map(Number);
+     if (nodeVerArr[0] > 0 || nodeVerArr[1] >= 10) {
+-        require("./streams")(iconv);
++        var streamsModule = require("./streams");
++        if (typeof streamsModule === 'function') {
++            streamsModule(iconv);
++        }
+     }
+ 
+     // Load Node primitive extensions.
+-    require("./extend-node")(iconv);
++    var extendNodeModule = require("./extend-node");
++    if (typeof extendNodeModule === 'function') {
++        extendNodeModule(iconv);
++    }
+ }
+ 
+ if ("Ā" != "\u0100") {
