@@ -31,7 +31,7 @@
   
   <!-- Stage 1: Install & Setup -->
   <rect x="50" y="140" width="800" height="80" fill="#ecf0f1" stroke="#34495e" stroke-width="2" rx="5"/>
-  <text x="450" y="165" class="label" style="font-size: 16px; font-weight: bold;">Stage 1: Install & Setup</text>
+  <text x="450" y="165" class="label" style="font-size: 16px; font-weight: bold;">Stage 1: Install &amp; Setup</text>
   
   <rect x="70" y="180" width="180" height="30" class="stage" rx="3"/>
   <text x="160" y="200" class="text">Checkout Code</text>
@@ -125,10 +125,10 @@
   <g>
     <rect x="470" y="640" width="130" height="50" class="fail" rx="5"/>
     <text x="535" y="665" class="text" style="font-weight: bold;">✗ Failure</text>
-    <text x="535" y="680" class="smalltext">Rollback & Notify</text>
+    <text x="535" y="680" class="smalltext">Rollback &amp; Notify</text>
   </g>
   
   <!-- GitHub Actions Info -->
   <rect x="50" y="710" width="800" height="30" fill="#2c3e50" rx="5"/>
-  <text x="450" y="732" class="text" style="font-size: 14px;">GitHub Actions Workflow • Automated on Push to main • Matrix Testing: Node 18.x & 20.x</text>
+  <text x="450" y="732" class="text" style="font-size: 14px;">GitHub Actions Workflow • Automated on Push to main • Matrix Testing: Node 18.x &amp; 20.x</text>
 </svg>

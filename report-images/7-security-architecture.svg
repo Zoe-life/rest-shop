@@ -43,7 +43,7 @@
   
   <!-- Layer 2: Authentication & Authorization -->
   <rect x="50" y="180" width="700" height="80" class="layer" rx="5"/>
-  <text x="400" y="208" class="text" style="font-size: 16px; font-weight: bold;">Layer 2: Authentication & Authorization</text>
+  <text x="400" y="208" class="text" style="font-size: 16px; font-weight: bold;">Layer 2: Authentication &amp; Authorization</text>
   <g>
     <rect x="90" y="220" width="130" height="30" class="feature" rx="3"/>
     <text x="155" y="240" class="text">JWT Tokens</text>
@@ -62,7 +62,7 @@
   
   <!-- Layer 3: Input Validation -->
   <rect x="50" y="280" width="700" height="80" class="layer" rx="5"/>
-  <text x="400" y="308" class="text" style="font-size: 16px; font-weight: bold;">Layer 3: Input Validation & Sanitization</text>
+  <text x="400" y="308" class="text" style="font-size: 16px; font-weight: bold;">Layer 3: Input Validation &amp; Sanitization</text>
   <g>
     <rect x="70" y="320" width="150" height="30" class="feature" rx="3"/>
     <text x="145" y="340" class="text">express-validator</text>
@@ -114,7 +114,7 @@
   <g>
     <text x="280" y="530" class="label" style="font-weight: bold;">Password Security:</text>
     <text x="280" y="548" class="label" style="font-size: 11px;">• Min 8 characters</text>
-    <text x="280" y="563" class="label" style="font-size: 11px;">• Upper & lowercase required</text>
+    <text x="280" y="563" class="label" style="font-size: 11px;">• Upper &amp; lowercase required</text>
     <text x="280" y="578" class="label" style="font-size: 11px;">• Number required</text>
     <text x="280" y="593" class="label" style="font-size: 11px;">• Special char required</text>
     <text x="280" y="608" class="label" style="font-size: 11px;">• Bcrypt salt rounds: 12</text>
