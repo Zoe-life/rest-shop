@@ -22,12 +22,11 @@ const AuditEventTypes = {
 
 /**
  * Detect if running in Cloudflare Workers environment
+ * In Workers with nodejs_compat, fs operations may be limited
  */
 const isCloudflareWorker = typeof globalThis.caches !== 'undefined' && 
-                           typeof globalThis.fetch !== 'undefined' && 
-                           typeof process !== 'undefined' && 
-                           process.versions && 
-                           !process.versions.node;
+                           typeof globalThis.navigator !== 'undefined' &&
+                           typeof process.versions?.workerd !== 'undefined';
 
 /**
  * Audit log directory with security checks
