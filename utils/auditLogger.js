@@ -21,32 +21,52 @@ const AuditEventTypes = {
 };
 
 /**
- * Audit log directory with security checks
+ * Detect if running in Cloudflare Workers environment
+ * workerd is the runtime used by Cloudflare Workers
  */
-const DEFAULT_LOG_DIR = path.join(__dirname, '../logs');
-const AUDIT_LOG_DIR = (() => {
-    const envLogDir = process.env.AUDIT_LOG_DIR;
-    if (!envLogDir) return DEFAULT_LOG_DIR;
-    
-    // Validate and sanitize the log directory path
-    const resolvedPath = path.resolve(envLogDir);
-    const basePath = path.resolve(__dirname, '..');
-    
-    // Ensure the log directory is within the application directory
-    if (!resolvedPath.startsWith(basePath)) {
-        console.warn('AUDIT_LOG_DIR outside app directory, using default');
-        return DEFAULT_LOG_DIR;
-    }
-    
-    return resolvedPath;
-})();
+const isCloudflareWorker = typeof process !== 'undefined' && 
+                           typeof process.versions?.workerd !== 'undefined';
 
-const AUDIT_LOG_FILE = path.join(AUDIT_LOG_DIR, 'audit.log');
+/**
+ * Audit log directory with security checks
+ * Note: File system operations are only available in Node.js, not in Cloudflare Workers
+ */
+let AUDIT_LOG_DIR = null;
+let AUDIT_LOG_FILE = null;
+
+if (!isCloudflareWorker && typeof __filename !== 'undefined') {
+    // Only set up file paths in Node.js environment where __filename is available
+    // Use __filename to get the path to this module, then go up one level
+    const utilsDir = path.dirname(__filename);
+    const projectRoot = path.dirname(utilsDir);
+    const DEFAULT_LOG_DIR = path.join(projectRoot, 'logs');
+    
+    AUDIT_LOG_DIR = (() => {
+        const envLogDir = process.env.AUDIT_LOG_DIR;
+        if (!envLogDir) return DEFAULT_LOG_DIR;
+        
+        // Validate and sanitize the log directory path
+        const resolvedPath = path.resolve(envLogDir);
+        const basePath = path.resolve(projectRoot);
+        
+        // Ensure the log directory is within the application directory
+        if (!resolvedPath.startsWith(basePath)) {
+            console.warn('AUDIT_LOG_DIR outside app directory, using default');
+            return DEFAULT_LOG_DIR;
+        }
+        
+        return resolvedPath;
+    })();
+    
+    AUDIT_LOG_FILE = path.join(AUDIT_LOG_DIR, 'audit.log');
+}
 
 /**
  * Ensure audit log directory exists with secure permissions
  */
 function ensureLogDirectory() {
+    if (isCloudflareWorker || !AUDIT_LOG_DIR) return;
+    
     if (!fs.existsSync(AUDIT_LOG_DIR)) {
         // Create directory with restricted permissions (owner only)
         fs.mkdirSync(AUDIT_LOG_DIR, { recursive: true, mode: 0o700 });
@@ -59,6 +79,11 @@ function ensureLogDirectory() {
  */
 function writeAuditLog(entry) {
     try {
+        // In Cloudflare Workers, only console logging is available
+        if (isCloudflareWorker || !AUDIT_LOG_FILE) {
+            return; // Console logging is handled in logAuditEvent
+        }
+        
         ensureLogDirectory();
         const logLine = JSON.stringify(entry) + '\n';
         
