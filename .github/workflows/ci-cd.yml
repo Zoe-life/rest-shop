@@ -26,7 +26,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install #npm ci
+        run: npm ci
       - name: Check for security vulnerabilities
         run: npm audit --audit-level=moderate || true
       - name: Run ESLint
@@ -72,7 +72,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install  #npm ci
+        run: npm ci
       - name: Run tests
         run: npm test
         env:
@@ -93,7 +93,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install  #npm ci
+        run: npm ci
       - name: Build project
         run: |
           if grep -q '"build"' package.json; then
@@ -116,7 +116,7 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - name: Install dependencies
-        run: npm install #npm ci
+        run: npm ci
       - name: Deploy to Cloudflare Workers
         uses: cloudflare/wrangler-action@v3
         with:
