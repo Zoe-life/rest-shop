@@ -7,15 +7,28 @@ let mongoServer;
 // Set JWT_KEY for tests
 process.env.JWT_KEY = process.env.JWT_KEY || 'test_jwt_key';
 
-before(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const mongoUri = mongoServer.getUri();
-    await mongoose.connect(mongoUri);
+before(async function() {
+    // Increase timeout for MongoDB download
+    this.timeout(60000);
+    
+    try {
+        mongoServer = await MongoMemoryServer.create();
+        const mongoUri = mongoServer.getUri();
+        await mongoose.connect(mongoUri);
+    } catch (error) {
+        console.warn('Warning: Could not start MongoDB Memory Server. Tests that require database will fail.');
+        console.warn('Error:', error.message);
+        // Don't fail - some tests don't need MongoDB
+    }
 });
 
 after(async () => {
-    await mongoose.disconnect();
-    await mongoServer.stop();
+    if (mongoose.connection.readyState !== 0) {
+        await mongoose.disconnect();
+    }
+    if (mongoServer) {
+        await mongoServer.stop();
+    }
 });
 
 // Helper function to generate test JWT tokens
