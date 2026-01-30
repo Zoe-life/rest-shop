@@ -9,6 +9,7 @@ const { body, param } = require('express-validator');
 const PaymentsController = require('../controllers/payments');
 const checkAuth = require('../middleware/check-auth');
 const checkRole = require('../middleware/check-role');
+const { validateMpesaWebhook } = require('../middleware/validate-webhook');
 
 /**
  * @route POST /payments/initiate
@@ -83,6 +84,13 @@ router.get(
  * @route POST /payments/mpesa/callback
  * @desc Handle M-Pesa payment callback (webhook)
  * @access Public (called by M-Pesa servers)
+ * @note This endpoint is secured with IP whitelisting via validateMpesaWebhook middleware
+ * @note Configure MPESA_ALLOWED_IPS environment variable with M-Pesa server IPs in production
+ * @note M-Pesa production IPs should be obtained from Safaricom documentation
+ */
+router.post(
+    '/mpesa/callback',
+    validateMpesaWebhook,
  * @note This endpoint should be secured with IP whitelisting in production
  */
 router.post(
