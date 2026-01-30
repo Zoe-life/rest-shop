@@ -14,7 +14,12 @@ const SENSITIVE_FIELDS = [
     'refreshToken',
     'secret',
     'apiKey',
-    'privateKey'
+    'privateKey',
+    'phoneNumber',
+    'phone',
+    'mpesaReceiptNumber',
+    'transactionId',
+    'checkoutRequestId'
 ];
 
 /**

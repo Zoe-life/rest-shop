@@ -91,6 +91,11 @@ router.get(
 router.post(
     '/mpesa/callback',
     validateMpesaWebhook,
+ * @note This endpoint should be secured with IP whitelisting in production
+ */
+router.post(
+    '/mpesa/callback',
+    validateMpesaWebhook,
     PaymentsController.payments_mpesa_callback
 );
 

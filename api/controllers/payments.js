@@ -151,6 +151,13 @@ exports.payments_verify = async (req, res) => {
             });
         }
 
+        // Authorization check: user must own the payment or be an admin
+        if (payment.userId.toString() !== req.userData.userId && req.userData.role !== 'admin') {
+            return res.status(403).json({
+                message: 'Access denied. You do not have permission to verify this payment.'
+            });
+        }
+
         // Get payment service
         const paymentService = PaymentFactory.getPaymentService(payment.paymentMethod);
 
@@ -177,6 +184,7 @@ exports.payments_verify = async (req, res) => {
             userId: req.userData.userId,
             status: result.status,
             outcome: 'success'
+            status: result.status
         });
 
         res.status(200).json({
@@ -253,6 +261,7 @@ exports.payments_mpesa_callback = async (req, res) => {
             hasBody: !!callbackData,
             bodyKeys: callbackData ? Object.keys(callbackData) : []
         });
+        logInfo('M-Pesa callback received', callbackData);
 
         // Process callback
         const mpesaService = PaymentFactory.getPaymentService('mpesa');
@@ -273,6 +282,8 @@ exports.payments_mpesa_callback = async (req, res) => {
                 transactionDate: result.transactionDate,
                 // Do not store phone number or full callback data
                 callbackProcessed: true
+                phoneNumber: result.phoneNumber,
+                callbackData: result
             };
             await payment.save();
 
@@ -288,6 +299,12 @@ exports.payments_mpesa_callback = async (req, res) => {
 
             logInfo('M-Pesa payment updated', {
                 paymentId: payment._id,
+                status: result.status,
+                outcome: 'success'
+            });
+        } else {
+            logInfo('M-Pesa payment not found', {
+                outcome: 'payment_not_found'
                 status: result.status
             });
         }
