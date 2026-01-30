@@ -102,9 +102,7 @@ exports.payments_initiate = async (req, res) => {
         logInfo('Payment initiated successfully', {
             paymentId: payment._id,
             orderId,
-            paymentMethod,
-            userId: req.userData.userId,
-            outcome: 'success'
+            paymentMethod
         });
 
         res.status(201).json({
@@ -127,7 +125,8 @@ exports.payments_initiate = async (req, res) => {
     } catch (error) {
         logError('Failed to initiate payment', error);
         res.status(500).json({
-            message: 'Server error occurred while initiating payment'
+            message: 'Server error occurred while initiating payment',
+            error: error.message
         });
     }
 };
@@ -185,6 +184,7 @@ exports.payments_verify = async (req, res) => {
             userId: req.userData.userId,
             status: result.status,
             outcome: 'success'
+            status: result.status
         });
 
         res.status(200).json({
@@ -199,7 +199,8 @@ exports.payments_verify = async (req, res) => {
     } catch (error) {
         logError('Failed to verify payment', error);
         res.status(500).json({
-            message: 'Server error occurred while verifying payment'
+            message: 'Server error occurred while verifying payment',
+            error: error.message
         });
     }
 };
@@ -260,6 +261,7 @@ exports.payments_mpesa_callback = async (req, res) => {
             hasBody: !!callbackData,
             bodyKeys: callbackData ? Object.keys(callbackData) : []
         });
+        logInfo('M-Pesa callback received', callbackData);
 
         // Process callback
         const mpesaService = PaymentFactory.getPaymentService('mpesa');
@@ -280,6 +282,8 @@ exports.payments_mpesa_callback = async (req, res) => {
                 transactionDate: result.transactionDate,
                 // Do not store phone number or full callback data
                 callbackProcessed: true
+                phoneNumber: result.phoneNumber,
+                callbackData: result
             };
             await payment.save();
 
@@ -301,6 +305,7 @@ exports.payments_mpesa_callback = async (req, res) => {
         } else {
             logInfo('M-Pesa payment not found', {
                 outcome: 'payment_not_found'
+                status: result.status
             });
         }
 
