@@ -13,20 +13,26 @@ const crypto = require('crypto');
  * @returns {string} - Client IP address
  */
 function getClientIP(req) {
-    // Check common proxy headers
-    const forwarded = req.headers['x-forwarded-for'];
-    if (forwarded) {
-        // x-forwarded-for can contain multiple IPs, get the first one
-        return forwarded.split(',')[0].trim();
+    // Only trust proxy headers if TRUST_PROXY is explicitly set to 'true'
+    const trustProxy = process.env.TRUST_PROXY === 'true';
+    
+    if (trustProxy) {
+        // Check common proxy headers
+        const forwarded = req.headers['x-forwarded-for'];
+        if (forwarded) {
+            // x-forwarded-for can contain multiple IPs, get the first one
+            return forwarded.split(',')[0].trim();
+        }
+        
+        const realIP = req.headers['x-real-ip'];
+        if (realIP) {
+            return realIP.trim();
+        }
     }
     
-    const realIP = req.headers['x-real-ip'];
-    if (realIP) {
-        return realIP.trim();
-    }
-    
-    // Fallback to connection remote address
-    return req.connection.remoteAddress || 
+    // Fallback to direct connection IP
+    return req.ip ||
+           req.connection.remoteAddress || 
            req.socket.remoteAddress || 
            req.connection.socket?.remoteAddress ||
            'unknown';
@@ -46,21 +52,33 @@ function validateMpesaWebhook(req, res, next) {
     // Get allowed IPs from environment variable
     const allowedIPsEnv = process.env.MPESA_ALLOWED_IPS;
     
-    // If no IPs are configured, log warning but allow the request
-    // This is for development/testing - in production, IPs should be configured
+    // If no IPs are configured
     if (!allowedIPsEnv || allowedIPsEnv.trim() === '') {
         if (process.env.NODE_ENV === 'production') {
             logWarn('M-Pesa webhook IP allowlist not configured in production', {
                 clientIP,
                 environment: process.env.NODE_ENV
             });
+            // In production, block requests when no IPs are configured
+            return res.status(403).json({
+                ResultCode: 1,
+                ResultDesc: 'Access denied'
+            });
         }
-        // Allow request to proceed with warning
+        // In development, allow request to proceed with warning
         return next();
     }
     
     // Parse allowed IPs
     const allowedIPs = allowedIPsEnv.split(',').map(ip => ip.trim()).filter(ip => ip);
+    
+    // If allowlist is empty after parsing, block the request
+    if (allowedIPs.length === 0) {
+        return res.status(403).json({
+            ResultCode: 1,
+            ResultDesc: 'Access denied'
+        });
+    }
     
     // Check if client IP is in allowlist
     if (!allowedIPs.includes(clientIP)) {
@@ -70,8 +88,7 @@ function validateMpesaWebhook(req, res, next) {
         });
         
         return res.status(403).json({
-            ResultCode: 1,
-            ResultDesc: 'Access denied'
+            message: 'Webhook access denied'
         });
     }
     
@@ -99,25 +116,55 @@ function validateWebhookSignature(secret) {
             });
         }
         
-        // Compute expected signature
-        const payload = JSON.stringify(req.body);
-        const expectedSignature = crypto
-            .createHmac('sha256', secret)
-            .update(payload)
-            .digest('hex');
-        
-        // Compare signatures (constant-time comparison to prevent timing attacks)
-        if (!crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(expectedSignature))) {
-            logWarn('Invalid webhook signature', {
-                receivedSignature: signature.substring(0, 10) + '...'
-            });
+        try {
+            // Compute expected signature
+            const payload = JSON.stringify(req.body);
+            const expectedSignature = crypto
+                .createHmac('sha256', secret)
+                .update(payload)
+                .digest('hex');
+            
+            // Check if signatures have same length before comparing (DoS protection)
+            if (signature.length !== expectedSignature.length) {
+                logWarn('Invalid webhook signature', {
+                    receivedSignature: signature.substring(0, 10) + '...'
+                });
+                return res.status(403).json({
+                    message: 'Invalid webhook signature'
+                });
+            }
+            
+            // Compare signatures (constant-time comparison to prevent timing attacks)
+            const signatureBuffer = Buffer.from(signature, 'hex');
+            const expectedBuffer = Buffer.from(expectedSignature, 'hex');
+            
+            // Verify buffers have same length (additional safety check)
+            if (signatureBuffer.length !== expectedBuffer.length) {
+                logWarn('Invalid webhook signature', {
+                    receivedSignature: signature.substring(0, 10) + '...'
+                });
+                return res.status(403).json({
+                    message: 'Invalid webhook signature'
+                });
+            }
+            
+            if (!crypto.timingSafeEqual(signatureBuffer, expectedBuffer)) {
+                logWarn('Invalid webhook signature', {
+                    receivedSignature: signature.substring(0, 10) + '...'
+                });
+                return res.status(403).json({
+                    message: 'Invalid webhook signature'
+                });
+            }
+            
+            // Signature is valid
+            next();
+        } catch (error) {
+            logError('Error validating webhook signature', error);
             return res.status(403).json({
                 message: 'Invalid webhook signature'
             });
         }
-        
-        // Signature is valid
-        next();
     };
 }
 

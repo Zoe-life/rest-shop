@@ -41,7 +41,13 @@ module.exports = (req, res, next) => {
          * @property {string} email - Email of the authenticated user
          * @property {string} role - Role of the authenticated user
          */
-        const decoded = jwt.verify(token, process.env.JWT_KEY);
+        const jwtKey = process.env.JWT_KEY;
+        if (!jwtKey) {
+            return res.status(500).json({
+                message: 'JWT key not configured'
+            });
+        }
+        const decoded = jwt.verify(token, jwtKey);
         req.userData = decoded;
         next();
     } catch (error) {
