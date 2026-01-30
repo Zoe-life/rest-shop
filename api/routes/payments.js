@@ -95,6 +95,7 @@ router.post(
  */
 router.post(
     '/mpesa/callback',
+    validateMpesaWebhook,
     PaymentsController.payments_mpesa_callback
 );
 
