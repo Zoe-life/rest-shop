@@ -21,20 +21,44 @@
 - [Contributing](#contributing)
 
 ## Overview
-This RESTful API provides a comprehensive, **production-ready** solution for managing users, products, and orders in an e-commerce application. It includes enterprise-grade security features, comprehensive testing, and CI/CD pipeline for deployment to Cloudflare Workers.
+This RESTful API provides a comprehensive, **professional-grade e-commerce platform** with integrated payment processing for managing users, products, orders, and payments. It includes enterprise-grade security features, multiple payment gateways (Stripe, PayPal, M-Pesa), comprehensive testing, and CI/CD pipeline for deployment.
 
 ## Features
 ✅ User authentication and management with JWT  
 ✅ **OAuth 2.0 integration (Google, Microsoft, Apple)**  
-✅ Product management (CRUD operations)  
-✅ Order management (CRUD operations)  
+✅ **Multi-Gateway Payment Processing (Stripe, PayPal, M-Pesa)**  
+✅ **M-Pesa Integration for Kenyan Users**  
+✅ Product management with search, filtering, and pagination  
+✅ Advanced order management with status tracking  
 ✅ Role-based access control (Admin/User)  
 ✅ File upload for product images  
+✅ Inventory tracking (stock levels, SKU)  
+✅ Payment history and transaction logging  
+✅ Webhook handling for payment callbacks  
 ✅ Comprehensive error handling  
 ✅ Health check endpoint for monitoring  
 ✅ Automated testing with Mocha/Chai  
 ✅ CI/CD pipeline with GitHub Actions  
-✅ Cloudflare Workers deployment ready
+✅ Cloudflare Workers deployment ready  
+✅ High scalability with database indexing and pagination
+
+## Payment Integration
+
+### Supported Payment Methods
+- **💳 Stripe**: Credit/Debit card payments (Global)
+- **🅿️ PayPal**: PayPal account payments (Global)
+- **📱 M-Pesa**: Mobile money for Kenyan users (Kenya-specific)
+
+### Payment Features
+- **Secure Transaction Processing**: PCI-compliant payment handling
+- **Real-time Payment Verification**: Instant payment status updates
+- **Webhook Integration**: Automatic callback processing
+- **Multi-Currency Support**: USD, EUR, GBP, KES
+- **Transaction Logging**: Complete audit trail
+- **Payment Status Tracking**: Real-time order updates
+- **Refund Support**: Built-in refund capabilities (Stripe, PayPal)
+
+See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pesa Setup Guide](docs/MPESA_SETUP_GUIDE.md) for detailed integration instructions.
 
 ## Security Features
 
@@ -52,6 +76,15 @@ This RESTful API provides a comprehensive, **production-ready** solution for man
 - **JWT**: 1-hour token expiration
 - **Connection Pooling**: Optimized MongoDB connections
 - **OAuth 2.0**: Secure third-party authentication
+- **Payment Security**: Encrypted payment data, transaction logging
+- **PCI Compliance Ready**: No card data storage on servers
+
+### Payment Security
+- **Tokenization**: Card details never stored (Stripe tokens)
+- **Webhook Verification**: Cryptographic signature validation
+- **IP Whitelisting**: Restrict payment callbacks to gateway IPs
+- **Transaction Encryption**: Sensitive payment metadata encrypted
+- **Audit Logging**: Complete transaction history
 
 ### Password Requirements
 - Minimum 8 characters
@@ -63,13 +96,18 @@ This RESTful API provides a comprehensive, **production-ready** solution for man
 ## Technologies Used
 - **Runtime**: Node.js 18.x/20.x
 - **Framework**: Express.js 4.x
-- **Database**: MongoDB Atlas with Mongoose 8.x
+- **Database**: MongoDB Atlas with Mongoose 8.x (with indexing for scalability)
 - **Authentication**: JWT (jsonwebtoken), Passport.js, OAuth 2.0
 - **OAuth Providers**: Google, Microsoft, Apple
+- **Payment Gateways**: 
+  - Stripe (Credit/Debit cards)
+  - PayPal (PayPal accounts)
+  - M-Pesa Daraja API (Mobile money - Kenya)
+- **HTTP Client**: Axios (for payment gateway APIs)
 - **Security**: Helmet, CORS, express-rate-limit, express-validator, xss
-- **File Uploads**: Multer
+- **File Uploads**: Multer, Cloudinary
 - **Testing**: Mocha, Chai, Sinon, Supertest
-- **Logging**: Morgan
+- **Logging**: Morgan, Custom transaction logging
 - **Environment**: dotenv
 - **Deployment**: Cloudflare Workers (Wrangler)
 - **CI/CD**: GitHub Actions
@@ -266,6 +304,66 @@ Content-Type: application/json
 DELETE /orders/:orderId
 Authorization: Bearer <token>
 ```
+
+#### Update Order Status (Admin Only)
+```http
+PATCH /orders/:orderId/status
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "status": "shipped"
+}
+```
+
+### Payment Endpoints
+
+#### Initiate Payment
+```http
+POST /payments/initiate
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "orderId": "507f1f77bcf86cd799439011",
+  "paymentMethod": "mpesa",
+  "paymentData": {
+    "phoneNumber": "254712345678"
+  }
+}
+```
+
+**Supported Payment Methods**: `stripe`, `card`, `paypal`, `mpesa`
+
+#### Verify Payment
+```http
+GET /payments/verify/:paymentId
+Authorization: Bearer <token>
+```
+
+#### Get Payment Details
+```http
+GET /payments/:paymentId
+Authorization: Bearer <token>
+```
+
+#### Get Payment History
+```http
+GET /payments/history?page=1&limit=10
+Authorization: Bearer <token>
+```
+
+#### M-Pesa Callback (Webhook)
+```http
+POST /payments/mpesa/callback
+Content-Type: application/json
+
+(Called automatically by M-Pesa servers)
+```
+
+**For complete payment API documentation, see:**
+- [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md)
+- [M-Pesa Setup Guide](docs/MPESA_SETUP_GUIDE.md)
 
 ## Deployment
 

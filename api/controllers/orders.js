@@ -17,35 +17,71 @@ const { logInfo, logError } = require('../../utils/logger');
  * @param {Function} next - Express next middleware
  * @returns {Promise<void>}
  * @throws {500} - If server error occurs
- * @description Returns a list of all orders with product details and quantity
+ * @description Returns a list of all orders with product details, quantity, and pagination
  */
-exports.orders_get_all = (req, res, next) => {
-    Order.find()
-    .select('product quantity _id')
-    .populate('product', 'name')
-    .exec()
-    .then(docs => {
+exports.orders_get_all = async (req, res, next) => {
+    try {
+        const page = parseInt(req.query?.page) || 1;
+        const limit = parseInt(req.query?.limit) || 10;
+        const skip = (page - 1) * limit;
+
+        // Build query filters
+        const query = {};
+        if (req.query?.status) {
+            query.status = req.query.status;
+        }
+        if (req.query?.paymentStatus) {
+            query.paymentStatus = req.query.paymentStatus;
+        }
+        if (req.userData && req.userData.role !== 'admin') {
+            // Non-admin users can only see their own orders
+            query.userId = req.userData.userId;
+        }
+
+        const orders = await Order.find(query)
+            .select('product quantity userId status totalAmount currency paymentStatus paymentMethod createdAt _id')
+            .populate('product', 'name price')
+            .populate('userId', 'email')
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .skip(skip)
+            .exec();
+
+        const total = await Order.countDocuments(query);
+
         res.status(200).json({
-            count: docs.length,
-            orders: docs.map(doc => {
+            count: orders.length,
+            total,
+            orders: orders.map(doc => {
                 return {
                     _id: doc._id,
                     product: doc.product,
                     quantity: doc.quantity,
+                    userId: doc.userId,
+                    status: doc.status,
+                    totalAmount: doc.totalAmount,
+                    currency: doc.currency,
+                    paymentStatus: doc.paymentStatus,
+                    paymentMethod: doc.paymentMethod,
+                    createdAt: doc.createdAt,
                     requests: {
                         type: 'GET',
                         url: 'http://localhost:3001/orders/' + doc._id
                     }
                 }
-            })
+            }),
+            pagination: {
+                page,
+                limit,
+                pages: Math.ceil(total / limit)
+            }
         });
-    })
-    .catch(err => {
+    } catch (err) {
         logError('Failed to fetch orders', err);
         res.status(500).json({
             message: 'Server error occurred while fetching orders'
         })
-    });
+    }
 };
 
 /**
@@ -109,19 +145,45 @@ exports.orders_create_order = async (req, res, next) => {
                 message: "Product not found"
             });
         }
+
+        // Check stock if available
+        if (product.stock !== undefined && product.stock < (req.body.quantity || 1)) {
+            return res.status(400).json({
+                message: "Insufficient stock",
+                available: product.stock,
+                requested: req.body.quantity || 1
+            });
+        }
+
+        // Calculate total amount
+        const quantity = req.body.quantity || 1;
+        const totalAmount = product.price * quantity;
+
         const order = new Order ({
             _id: new mongoose.Types.ObjectId(),
-            quantity: req.body.quantity,
-            product: req.body.productId
+            quantity,
+            product: req.body.productId,
+            userId: req.userData ? req.userData.userId : undefined,
+            totalAmount,
+            currency: req.body.currency || 'USD',
+            status: 'pending',
+            paymentStatus: 'pending',
+            shippingAddress: req.body.shippingAddress
         });
+
         const result = await order.save();
         logInfo('Order created successfully', { orderId: result._id, productId: result.product });
+
         res.status(201).json({
             message: 'Order saved',
             createdOrder: {
                 _id: result._id,
                 product: result.product,
-                quantity: result.quantity
+                quantity: result.quantity,
+                totalAmount: result.totalAmount,
+                currency: result.currency,
+                status: result.status,
+                paymentStatus: result.paymentStatus
             },
             request: {
                 type: 'GET',
@@ -168,4 +230,60 @@ exports.orders_delete_order = (req, res, next) => {
             message: 'Server error occurred while deleting order'
         });
     });
+};
+
+/**
+ * Update order status
+ * @async
+ * @function orders_update_status
+ * @param {Object} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.orderId - Order ID to update
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.status - New order status
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware
+ * @returns {Promise<void>}
+ * @throws {404} - If order not found
+ * @throws {500} - If server error occurs
+ */
+exports.orders_update_status = async (req, res, next) => {
+    try {
+        const { status } = req.body;
+        
+        const validStatuses = ['pending', 'processing', 'confirmed', 'shipped', 'delivered', 'cancelled'];
+        if (!validStatuses.includes(status)) {
+            return res.status(400).json({
+                message: 'Invalid status',
+                validStatuses
+            });
+        }
+
+        const order = await Order.findById(req.params.orderId);
+        if (!order) {
+            return res.status(404).json({
+                message: 'Order not found'
+            });
+        }
+
+        order.status = status;
+        order.updatedAt = Date.now();
+        await order.save();
+
+        logInfo('Order status updated', { orderId: order._id, status });
+
+        res.status(200).json({
+            message: 'Order status updated successfully',
+            order: {
+                _id: order._id,
+                status: order.status,
+                updatedAt: order.updatedAt
+            }
+        });
+    } catch (err) {
+        logError('Failed to update order status', err);
+        res.status(500).json({
+            message: 'Server error occurred while updating order status'
+        });
+    }
 };

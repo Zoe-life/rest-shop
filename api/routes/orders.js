@@ -69,4 +69,20 @@ router.delete('/:orderId',
     OrdersController.orders_delete_order
 );
 
+/**
+ * @route PATCH /orders/:orderId/status
+ * @description Update order status
+ * @access Private
+ * @middleware Authentication required, ObjectId validation
+ * @roles admin
+ * @param {string} orderId - The ID of the order to update
+ */
+router.patch('/:orderId/status',
+    checkAuth,
+    checkRole(['admin']),
+    validateObjectId('orderId'),
+    handleValidationErrors,
+    OrdersController.orders_update_status
+);
+
 module.exports = router;

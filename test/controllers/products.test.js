@@ -36,8 +36,13 @@ describe('Products Controller', () => {
 
             const findStub = sinon.stub(Product, 'find').returns({
                 select: sinon.stub().returnsThis(),
+                sort: sinon.stub().returnsThis(),
+                limit: sinon.stub().returnsThis(),
+                skip: sinon.stub().returnsThis(),
                 exec: sinon.stub().resolves(products)
             });
+
+            sinon.stub(Product, 'countDocuments').resolves(2);
 
             await ProductsController.products_get_all(req, res, next);
 
@@ -48,6 +53,9 @@ describe('Products Controller', () => {
         it('should handle errors when fetching products', async () => {
             const findStub = sinon.stub(Product, 'find').returns({
                 select: sinon.stub().returnsThis(),
+                sort: sinon.stub().returnsThis(),
+                limit: sinon.stub().returnsThis(),
+                skip: sinon.stub().returnsThis(),
                 exec: sinon.stub().rejects(new Error('Database error'))
             });
 
