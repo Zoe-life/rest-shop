@@ -51,6 +51,9 @@ class PaymentFactory {
      * @returns {boolean} - True if supported, false otherwise
      */
     static isMethodSupported(paymentMethod) {
+        if (!paymentMethod || typeof paymentMethod !== 'string') {
+            return false;
+        }
         return this.getSupportedMethods().includes(paymentMethod.toLowerCase());
     }
 }

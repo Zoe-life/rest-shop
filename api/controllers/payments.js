@@ -102,7 +102,9 @@ exports.payments_initiate = async (req, res) => {
         logInfo('Payment initiated successfully', {
             paymentId: payment._id,
             orderId,
-            paymentMethod
+            paymentMethod,
+            userId: req.userData.userId,
+            outcome: 'success'
         });
 
         res.status(201).json({
@@ -125,8 +127,7 @@ exports.payments_initiate = async (req, res) => {
     } catch (error) {
         logError('Failed to initiate payment', error);
         res.status(500).json({
-            message: 'Server error occurred while initiating payment',
-            error: error.message
+            message: 'Server error occurred while initiating payment'
         });
     }
 };
@@ -148,6 +149,13 @@ exports.payments_verify = async (req, res) => {
         if (!payment) {
             return res.status(404).json({
                 message: 'Payment not found'
+            });
+        }
+
+        // Authorization check: user must own the payment or be an admin
+        if (payment.userId.toString() !== req.userData.userId && req.userData.role !== 'admin') {
+            return res.status(403).json({
+                message: 'Access denied. You do not have permission to verify this payment.'
             });
         }
 
@@ -174,7 +182,9 @@ exports.payments_verify = async (req, res) => {
 
         logInfo('Payment verified', {
             paymentId: payment._id,
-            status: result.status
+            userId: req.userData.userId,
+            status: result.status,
+            outcome: 'success'
         });
 
         res.status(200).json({
@@ -189,8 +199,7 @@ exports.payments_verify = async (req, res) => {
     } catch (error) {
         logError('Failed to verify payment', error);
         res.status(500).json({
-            message: 'Server error occurred while verifying payment',
-            error: error.message
+            message: 'Server error occurred while verifying payment'
         });
     }
 };
@@ -246,7 +255,11 @@ exports.payments_mpesa_callback = async (req, res) => {
     try {
         const callbackData = req.body;
         
-        logInfo('M-Pesa callback received', callbackData);
+        // Log sanitized callback info (not the full payload with PII)
+        logInfo('M-Pesa callback received', {
+            hasBody: !!callbackData,
+            bodyKeys: callbackData ? Object.keys(callbackData) : []
+        });
 
         // Process callback
         const mpesaService = PaymentFactory.getPaymentService('mpesa');
@@ -260,12 +273,13 @@ exports.payments_mpesa_callback = async (req, res) => {
         if (payment) {
             // Update payment status
             payment.status = result.status;
+            // Store only non-sensitive metadata
             payment.metadata = {
                 ...payment.metadata,
                 mpesaReceiptNumber: result.mpesaReceiptNumber,
                 transactionDate: result.transactionDate,
-                phoneNumber: result.phoneNumber,
-                callbackData: result
+                // Do not store phone number or full callback data
+                callbackProcessed: true
             };
             await payment.save();
 
@@ -281,7 +295,12 @@ exports.payments_mpesa_callback = async (req, res) => {
 
             logInfo('M-Pesa payment updated', {
                 paymentId: payment._id,
-                status: result.status
+                status: result.status,
+                outcome: 'success'
+            });
+        } else {
+            logInfo('M-Pesa payment not found', {
+                outcome: 'payment_not_found'
             });
         }
 
