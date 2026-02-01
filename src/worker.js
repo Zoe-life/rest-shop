@@ -1,5 +1,14 @@
 import { DurableObject } from 'cloudflare:workers';
 import { httpServerHandler } from 'cloudflare:node';
+
+// Polyfill process.emitWarning for Cloudflare Workers
+// Mongoose uses this for deprecation warnings, but it's not available in Workers
+if (typeof process !== 'undefined' && !process.emitWarning) {
+  process.emitWarning = function(warning, type, code, ctor) {
+    console.warn(`[${type || 'Warning'}]${code ? ` (${code})` : ''}: ${warning}`);
+  };
+}
+
 import mongoose from 'mongoose';
 import app from '../app.js';
 
