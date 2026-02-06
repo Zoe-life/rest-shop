@@ -18,7 +18,7 @@ if (!fs.existsSync(mongooseBrowserPath)) {
 const polyfill = `// Polyfill for Cloudflare Workers compatibility
 if (typeof process !== 'undefined' && typeof process.emitWarning !== 'function') {
   process.emitWarning = function(warning, type, code) {
-    console.warn('[' + (type || 'Warning') + ']' + (code ? ' (' + code + ')' : '') + ': ' + warning);
+    console.warn(\`[\${type || 'Warning'}]\${code ? \` (\${code})\` : ''}: \${warning}\`);
   };
 }
 
