@@ -4,6 +4,7 @@ const app = require('./app');
 const mongoose = require('mongoose');
 
 const port = process.env.PORT || 3001;
+const GRACEFUL_SHUTDOWN_TIMEOUT_MS = 10000; // 10 seconds
 
 const server = http.createServer(app);
 
@@ -57,8 +58,8 @@ const gracefulShutdown = async (signal) => {
     try {
         await new Promise((resolve, reject) => {
             const timeout = setTimeout(() => {
-                reject(new Error('Server close timeout after 10 seconds'));
-            }, 10000);
+                reject(new Error(`Server close timeout after ${GRACEFUL_SHUTDOWN_TIMEOUT_MS / 1000} seconds`));
+            }, GRACEFUL_SHUTDOWN_TIMEOUT_MS);
             
             server.close((err) => {
                 clearTimeout(timeout);
