@@ -50,18 +50,40 @@ mongoose.connection.on('disconnected', () => {
 const gracefulShutdown = async (signal) => {
     console.log(`\n🛑 ${signal} received. Starting graceful shutdown...`);
     
-    // Close server to stop accepting new connections
-    server.close(() => {
-        console.log('🔒 HTTP server closed');
-    });
+    let serverClosed = false;
     
-    // Close database connection
+    // Close server to stop accepting new connections
+    // server.close() waits for all connections to finish before calling the callback
+    try {
+        await new Promise((resolve, reject) => {
+            const timeout = setTimeout(() => {
+                reject(new Error('Server close timeout after 10 seconds'));
+            }, 10000);
+            
+            server.close((err) => {
+                clearTimeout(timeout);
+                if (err) {
+                    console.error('❌ Error closing HTTP server:', err);
+                    reject(err);
+                } else {
+                    console.log('🔒 HTTP server closed (all connections finished)');
+                    resolve();
+                }
+            });
+        });
+        serverClosed = true;
+    } catch (err) {
+        console.error('❌ Failed to close HTTP server gracefully:', err.message);
+        // Continue to close database connection even if server close failed
+    }
+    
+    // Close database connection after server is closed (or timeout)
     try {
         await mongoose.connection.close();
         console.log('🔌 MongoDB connection closed');
-        process.exit(0);
+        process.exit(serverClosed ? 0 : 1);
     } catch (err) {
-        console.error('❌ Error during graceful shutdown:', err);
+        console.error('❌ Error closing MongoDB connection:', err);
         process.exit(1);
     }
 };
