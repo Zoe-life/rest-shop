@@ -97,6 +97,8 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 - **Runtime**: Node.js 18.x/20.x
 - **Framework**: Express.js 4.x
 - **Database**: MongoDB Atlas with Mongoose 8.x (with indexing for scalability)
+  - See [Database Migration Analysis](docs/DATABASE_MIGRATION_ANALYSIS.md) for alternative options
+  - See [Mongoose Troubleshooting Guide](docs/MONGOOSE_TROUBLESHOOTING.md) for common issues
 - **Authentication**: JWT (jsonwebtoken), Passport.js, OAuth 2.0
 - **OAuth Providers**: Google, Microsoft, Apple
 - **Payment Gateways**: 
@@ -148,6 +150,9 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
    - Add your IP to the IP Access List
    - Create a database user
    - Get your connection string
+
+**Troubleshooting Database Connection:**
+If you encounter issues connecting to MongoDB, see the [Mongoose Troubleshooting Guide](docs/MONGOOSE_TROUBLESHOOTING.md) for common solutions.
 
 ### Running the Application
 
