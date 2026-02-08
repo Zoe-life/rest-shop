@@ -19,8 +19,9 @@ function getBaseUrl(req) {
     }
     
     // Construct from request (supports both HTTP and HTTPS)
+    // Handle cases where req.get might not be available (e.g., in tests)
     const protocol = req.protocol || 'http';
-    const host = req.get('host') || 'localhost:3001';
+    const host = (typeof req.get === 'function' ? req.get('host') : req.headers?.host) || 'localhost:3001';
     return `${protocol}://${host}`;
 }
 
