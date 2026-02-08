@@ -178,8 +178,8 @@ exports.user_login = async (req, res, next) => {
                 }
             );
             
-            // Log successful login with audit trail
-            logInfo('User logged in successfully', { userId: user[0]._id, email: user[0].email });
+            // Log successful login with audit trail (without exposing email in logs)
+            logInfo('User logged in successfully', { userId: user[0]._id });
             logUserLogin({
                 userId: user[0]._id.toString(),
                 email: user[0].email,
@@ -221,6 +221,17 @@ exports.user_login = async (req, res, next) => {
  * @throws {500} - If server error occurs
  */
 exports.user_delete = (req, res, next) => {
+    // Security: Verify user can only delete their own account (unless admin)
+    if (req.userData.userId !== req.params.userId && req.userData.role !== 'admin') {
+        logError('Unauthorized user deletion attempt', { 
+            requestedBy: req.userData.userId, 
+            targetUser: req.params.userId 
+        });
+        return res.status(403).json({
+            message: 'Forbidden: You can only delete your own account'
+        });
+    }
+
     User.deleteOne({ _id: req.params.userId })
     .exec()
     .then(result => {

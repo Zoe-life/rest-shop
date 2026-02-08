@@ -6,6 +6,22 @@ const mongoose = require('mongoose');
 const port = process.env.PORT || 3001;
 const GRACEFUL_SHUTDOWN_TIMEOUT_MS = 10000; // 10 seconds
 
+// Security: Validate critical environment variables on startup
+if (!process.env.JWT_KEY) {
+    console.error('❌ CRITICAL: JWT_KEY environment variable is not set');
+    process.exit(1);
+}
+
+if (process.env.JWT_KEY.length < 32) {
+    console.error('❌ CRITICAL: JWT_KEY must be at least 32 characters long for security');
+    process.exit(1);
+}
+
+if (!process.env.MONGODB_URI) {
+    console.error('❌ CRITICAL: MONGODB_URI environment variable is not set');
+    process.exit(1);
+}
+
 const server = http.createServer(app);
 
 // MongoDB Connection Configuration

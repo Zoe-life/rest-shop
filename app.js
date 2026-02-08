@@ -31,8 +31,12 @@ app.use((req, res, next) => {
         : ['http://localhost:3001'];
     
     const origin = req.headers.origin;
-    // Never allow wildcard or null origins when credentials are enabled.
-    const isOriginAllowed = origin && origin !== 'null' && allowedOrigins.includes(origin);
+    // Security: Reject null, undefined, and the string 'null' origins when credentials are enabled
+    // Some browsers send the string 'null' for file:// URLs or sandboxed iframes
+    const isOriginAllowed = origin && 
+                           origin !== 'null' && 
+                           origin.toLowerCase() !== 'null' &&
+                           allowedOrigins.includes(origin);
     if (isOriginAllowed) {
         res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Access-Control-Allow-Credentials', 'true');

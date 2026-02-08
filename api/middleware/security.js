@@ -128,24 +128,37 @@ const handleValidationErrors = (req, res, next) => {
 /**
  * Sanitize input to prevent XSS and injection attacks
  * Uses the 'xss' library for comprehensive XSS protection
+ * Recursively sanitizes nested objects and arrays
  */
 const sanitizeInput = (req, res, next) => {
+    /**
+     * Recursively sanitize values (handles nested objects and arrays)
+     * @param {*} value - Value to sanitize
+     * @returns {*} Sanitized value
+     */
+    const sanitizeValue = (value) => {
+        if (typeof value === 'string') {
+            return xss(value.trim());
+        } else if (Array.isArray(value)) {
+            return value.map(item => sanitizeValue(item));
+        } else if (value !== null && typeof value === 'object') {
+            const sanitizedObj = {};
+            for (let key in value) {
+                sanitizedObj[key] = sanitizeValue(value[key]);
+            }
+            return sanitizedObj;
+        }
+        return value;
+    };
+
     // Sanitize body
     if (req.body) {
-        for (let key in req.body) {
-            if (typeof req.body[key] === 'string') {
-                req.body[key] = xss(req.body[key].trim());
-            }
-        }
+        req.body = sanitizeValue(req.body);
     }
     
     // Sanitize query parameters
     if (req.query) {
-        for (let key in req.query) {
-            if (typeof req.query[key] === 'string') {
-                req.query[key] = xss(req.query[key].trim());
-            }
-        }
+        req.query = sanitizeValue(req.query);
     }
     
     next();
