@@ -32,8 +32,10 @@ app.use((req, res, next) => {
         : ['http://localhost:3001'];
     
     const origin = req.headers.origin;
-    if (allowedOrigins.includes(origin) || !origin) {
-        res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    // Never allow wildcard or null origins when credentials are enabled.
+    const isOriginAllowed = origin && origin !== 'null' && allowedOrigins.includes(origin);
+    if (isOriginAllowed) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
         res.setHeader('Access-Control-Allow-Credentials', 'true');
         res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
         res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
