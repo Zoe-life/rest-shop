@@ -6,6 +6,7 @@
 
 const PaymentService = require('./paymentService');
 const { logInfo, logError } = require('../../utils/logger');
+const crypto = require('crypto');
 
 /**
  * Stripe Payment Service
@@ -46,7 +47,7 @@ class StripeService extends PaymentService {
             logInfo('Stripe payment initiated', { amount: paymentData.amount });
 
             // Mock successful response
-            const mockTransactionId = `pi_mock_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            const mockTransactionId = `pi_mock_${Date.now()}_${crypto.randomBytes(6).toString('hex')}`;
             
             return {
                 success: true,
