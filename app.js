@@ -54,6 +54,11 @@ app.get('/health', (req, res) => {
 });
 
 // 4. Shop Routes (Payment routes handled by payment-worker.js)
+// Support both versioned and non-versioned routes for backward compatibility
+const v1Routes = require('./api/v1/routes');
+app.use('/api/v1', v1Routes);
+
+// Legacy non-versioned routes (backward compatibility)
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/user', userRoutes);

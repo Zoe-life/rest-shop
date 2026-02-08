@@ -259,7 +259,7 @@ exports.orders_update_status = async (req, res, next) => {
             });
         }
 
-        const order = await Order.findById(req.params.orderId);
+        const order = await Order.findById(req.params.orderId).populate('userId', 'email');
         if (!order) {
             return res.status(404).json({
                 message: 'Order not found'
@@ -271,6 +271,37 @@ exports.orders_update_status = async (req, res, next) => {
         await order.save();
 
         logInfo('Order status updated', { orderId: order._id, status });
+
+        // Send real-time notification via WebSocket
+        try {
+            const socketService = require('../services/socketService');
+            if (order.userId && order.userId._id) {
+                socketService.notifyUser(order.userId._id.toString(), 'order:status-updated', {
+                    orderId: order._id,
+                    status: order.status,
+                    message: `Your order status has been updated to ${status}`
+                });
+            }
+        } catch (err) {
+            // Socket notification is optional - don't break the request
+            logError('Failed to send socket notification', err);
+        }
+
+        // Send email notification
+        try {
+            const emailService = require('../services/emailService');
+            if (order.userId && order.userId.email) {
+                await emailService.sendOrderNotification(order.userId.email, {
+                    orderId: order._id,
+                    status: order.status,
+                    totalAmount: order.totalAmount,
+                    currency: order.currency || 'USD'
+                });
+            }
+        } catch (err) {
+            // Email notification is optional - don't break the request
+            logError('Failed to send email notification', err);
+        }
 
         res.status(200).json({
             message: 'Order status updated successfully',

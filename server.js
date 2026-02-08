@@ -27,6 +27,15 @@ mongoose.connect(process.env.MONGODB_URI, mongoOptions)
         server.listen(port, () => {
             console.log(`🚀 Server is running on port ${port}`);
             console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+            
+            // Initialize WebSocket server
+            try {
+                const socketService = require('./api/services/socketService');
+                socketService.initializeSocket(server);
+                console.log('🔌 WebSocket server initialized');
+            } catch (err) {
+                console.error('⚠️  WebSocket initialization failed:', err.message);
+            }
         });
     })
     .catch((error) => {
