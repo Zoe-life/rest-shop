@@ -268,7 +268,7 @@ exports.payments_mpesa_callback = async (req, res) => {
 
         // Find payment by checkout request ID
         const payment = await Payment.findOne({
-            transactionId: result.checkoutRequestId
+            transactionId: { $eq: result.checkoutRequestId }
         });
 
         if (payment) {
