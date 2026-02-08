@@ -32,6 +32,7 @@ name = "DB_CONNECTION"
 class_name = "DatabaseConnection"
 
 # Build configuration
+# Note: Minification is enabled via --minify flag in deploy command (wrangler.toml minify field is deprecated in v4)
 [build]
 command = "npm run build"
 
