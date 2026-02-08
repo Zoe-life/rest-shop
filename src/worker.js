@@ -2,8 +2,12 @@ import { DurableObject } from 'cloudflare:workers';
 import { httpServerHandler } from 'cloudflare:node';
 
 // Pre-emptive strike against Mongoose Node-isms
-globalThis.process = globalThis.process || {};
-globalThis.process.emitWarning = () => {};
+if (typeof globalThis.process === 'undefined') {
+  globalThis.process = {};
+}
+if (typeof globalThis.process.emitWarning !== 'function') {
+  globalThis.process.emitWarning = () => {};
+}
 
 import mongoose from 'mongoose';
 import app from '../app.js';

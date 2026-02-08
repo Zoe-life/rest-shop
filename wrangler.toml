@@ -2,6 +2,12 @@
 name = "rest-shop-api"
 main = "src/worker.js"
 
+# IMPORTANT: Bundle Size Notice
+# This application uses Mongoose + Express which creates a ~2 MB bundle.
+# Cloudflare Free Tier limit: 1 MB | Paid Tier limit: 10 MB
+# See BUNDLE_SIZE_ANALYSIS.md for details and options.
+# Current bundle: ~2 MB (minified) - REQUIRES PAID PLAN
+
 # Compatibility flags
 compatibility_date = "2026-01-20"
 compatibility_flags = [ "nodejs_compat" ]
@@ -32,9 +38,9 @@ name = "DB_CONNECTION"
 class_name = "DatabaseConnection"
 
 # Build configuration
+# Note: Minification is enabled via --minify flag in deploy command (wrangler.toml minify field is deprecated in v4)
 [build]
 command = "npm run build"
-minify = true
 
 # This tells the Wrangler to treat HTML files as plain text
 [[rules]]
