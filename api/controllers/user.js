@@ -130,6 +130,22 @@ exports.user_signup = async (req, res, next) => {
  */
 exports.user_login = async (req, res, next) => {
     try {
+        const email = req.body && req.body.email;
+        if (typeof email !== 'string' || email.trim() === '') {
+            logAuthFailure({
+                email: email,
+                ipAddress: getClientIp(req),
+                userAgent: getUserAgent(req),
+                outcome: 'failure',
+                reason: 'Invalid email format'
+            });
+            return res.status(400).json({
+                message: 'Invalid credentials'
+            });
+        }
+        // normalize email to a trimmed string to avoid passing non-primitive values into the query
+        req.body.email = email.trim();
+
         const user = await User.find({ email: req.body.email }).exec();
         if (user.length < 1) {
             return res.status(401).json({
@@ -180,7 +196,7 @@ exports.user_login = async (req, res, next) => {
     } catch (err) {
         logError('User login error', err);
         logAuthFailure({
-            email: req.body.email,
+            email: req.body && req.body.email,
             ipAddress: getClientIp(req),
             userAgent: getUserAgent(req),
             outcome: 'failure',
