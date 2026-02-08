@@ -20,18 +20,11 @@ PORT = "3001"
 # Add non-sensitive URLs here
 FRONTEND_URL = "https://rest-shop.pages.dev"
 
-# Secrets (set via wrangler secret put or in Cloudflare dashboard)
-# These should be configured once via Cloudflare dashboard or CLI:
-# - JWT_KEY
-# - MONGO_ATLAS_PW
-# - ALLOWED_ORIGINS
-# Note: Secrets are NOT uploaded during CI/CD deployment to avoid binding conflicts.
 
 # Service bindings
 [[kv_namespaces]]
 binding = "CACHE"
 id = "2b52b610274c4a078262f796b01bb7ec"  # Replace with: wrangler kv:namespace create "CACHE"
-#preview_id = "YOUR_PREVIEW_KV_NAMESPACE_ID"  # Replace with: wrangler kv:namespace create "CACHE" --preview
 
 # Durable Objects (for MongoDB connection pooling)
 [[durable_objects.bindings]]
@@ -41,6 +34,7 @@ class_name = "DatabaseConnection"
 # Build configuration
 [build]
 command = "npm run build"
+minify = true
 
 # This tells the Wrangler to treat HTML files as plain text
 [[rules]]
