@@ -266,6 +266,19 @@ exports.payments_mpesa_callback = async (req, res) => {
         const mpesaService = PaymentFactory.getPaymentService('mpesa');
         const result = await mpesaService.handleCallback(callbackData);
 
+        // Validate checkoutRequestId to prevent NoSQL injection
+        // Reject null, undefined, objects, numbers, etc. - only accept non-empty strings
+        if (typeof result.checkoutRequestId !== 'string' || result.checkoutRequestId.length === 0) {
+            logError('Invalid checkoutRequestId in M-Pesa callback', {
+                checkoutRequestId: result.checkoutRequestId,
+                type: typeof result.checkoutRequestId
+            });
+            return res.status(200).json({
+                ResultCode: 0,
+                ResultDesc: 'Accepted'
+            });
+        }
+
         // Find payment by checkout request ID
         const payment = await Payment.findOne({
             transactionId: { $eq: result.checkoutRequestId }
