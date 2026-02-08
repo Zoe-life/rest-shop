@@ -8,6 +8,24 @@ const Product = require('../models/product');
 const { logInfo, logError } = require('../../utils/logger');
 
 /**
+ * Helper function to construct base URL dynamically
+ * @param {Object} req - Express request object
+ * @returns {string} Base URL
+ */
+function getBaseUrl(req) {
+    // Use environment variable if available, otherwise construct from request
+    if (process.env.API_BASE_URL) {
+        return process.env.API_BASE_URL;
+    }
+    
+    // Construct from request (supports both HTTP and HTTPS)
+    // Handle cases where req.get might not be available (e.g., in tests)
+    const protocol = req.protocol || 'http';
+    const host = (typeof req.get === 'function' ? req.get('host') : req.headers?.host) || 'localhost:3001';
+    return `${protocol}://${host}`;
+}
+
+/**
  * Retrieve all products
  * @async
  * @function products_get_all
@@ -86,7 +104,7 @@ exports.products_get_all = async (req, res, next) => {
                     _id: doc._id,
                     request: {
                         type: 'GET',
-                        url: 'http://localhost:3001/products/' + doc._id
+                        url: `${getBaseUrl(req)}/products/${doc._id}`
                     }
                 }
             }),
@@ -144,7 +162,7 @@ exports.products_create_product = (req, res, next) => {
                 _id: result._id,
                 request: {
                     type: 'POST',
-                    url: "http://localhost:3001/products" + result._id
+                    url: `${getBaseUrl(req)}/products/${result._id}`
                 }
             }
         });
@@ -183,7 +201,7 @@ exports.products_get_product = (req, res, next) => {
                 request: {
                     type: 'GET',
                     description: 'Get all products',
-                    url: 'http:/localhost:3001/products'
+                    url: `${getBaseUrl(req)}/products`
                 }
             });
         } else {
@@ -263,7 +281,7 @@ exports.products_delete_product = (req, res, next) => {
             message: 'Product deleted',
             request: {
                 type: 'DELETE',
-                url: 'http://localhost:3001/products',
+                url: `${getBaseUrl(req)}/products`,
                 data: { name: 'String', price: 'Number'}
             }
         });

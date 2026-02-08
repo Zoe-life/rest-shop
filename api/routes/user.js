@@ -66,8 +66,9 @@ router.post('/request-password-reset', authLimiter, AuthController.requestPasswo
  * @route POST /reset-password/:token
  * @description Reset password with token
  * @access Public
+ * @middleware Rate limiter to prevent brute-force token attacks
  */
-router.post('/reset-password/:token', AuthController.resetPassword);
+router.post('/reset-password/:token', authLimiter, AuthController.resetPassword);
 
 /**
  * @route POST /2fa/setup
