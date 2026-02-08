@@ -8,7 +8,9 @@
 - [Overview](#overview)
 - [Architecture](#architecture)
 - [Features](#features)
-- [Security Features](#security-features)
+  - [Enhanced Features](#enhanced-features)
+  - [Security Features](#security-features)
+  - [Performance Features](#performance-features)
 - [Technologies Used](#technologies-used)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
@@ -16,9 +18,11 @@
   - [Configuration](#configuration)
   - [Running the Application](#running-the-application)
 - [API Endpoints](#api-endpoints)
+- [Documentation](#documentation)
 - [Deployment](#deployment)
 - [CI/CD Pipeline](#cicd-pipeline)
 - [Testing](#testing)
+- [Monitoring and Observability](#monitoring-and-observability)
 - [Contributing](#contributing)
 
 ## Overview
@@ -53,15 +57,11 @@ npm run deploy:gateway   # Gateway (main entry point)
 ```
 
 ## Features
+
+### Core Features
 ✅ User authentication and management with JWT  
 ✅ **OAuth 2.0 integration (Google, Microsoft, Apple)**  
-✅ **Email Verification and Password Reset**  
-✅ **Two-Factor Authentication (2FA) with TOTP and Backup Codes**  
 ✅ **Multi-Gateway Payment Processing (Stripe, PayPal, M-Pesa)**  
-✅ **M-Pesa Integration for Kenyan Users**  
-✅ **Real-time Notifications via WebSockets**  
-✅ **Response Caching with Redis for Performance**  
-✅ **API Versioning for Backward Compatibility**  
 ✅ Product management with search, filtering, and pagination  
 ✅ Advanced order management with status tracking  
 ✅ Role-based access control (Admin/User)  
@@ -70,12 +70,46 @@ npm run deploy:gateway   # Gateway (main entry point)
 ✅ Payment history and transaction logging  
 ✅ Webhook handling for payment callbacks  
 ✅ Comprehensive error handling  
-✅ Health check endpoint for monitoring  
-✅ Automated testing with Mocha/Chai  
-✅ **Load Testing with Artillery**  
 ✅ CI/CD pipeline with GitHub Actions  
 ✅ Cloudflare Workers deployment ready  
-✅ High scalability with database indexing and pagination
+
+### Enhanced Features
+
+#### 🔐 Security Enhancements
+- **Email Verification**: Secure email verification with time-limited tokens (24-hour expiry)
+- **Password Reset**: Secure password reset functionality with email notifications (1-hour expiry)
+- **Two-Factor Authentication (2FA)**: TOTP-based 2FA with authenticator apps (Google Authenticator, Authy)
+  - QR code generation for easy setup
+  - 10 backup codes for account recovery
+  - Time-based one-time passwords (RFC 6238 compliant)
+- **API Versioning**: `/api/v1` endpoints with backward compatibility for legacy routes
+
+#### ⚡ Performance Features
+- **Redis Caching**: Automatic response caching for GET requests
+  - Configurable TTL per endpoint
+  - Automatic cache invalidation on mutations
+  - Graceful degradation if Redis unavailable
+- **Database Indexing**: Optimized indexes for frequently queried fields
+- **Lazy Loading**: Selective field loading with Mongoose populate
+- **CDN Integration**: Cloudinary for optimized image delivery
+
+#### 🔔 Real-Time Features
+- **WebSocket Notifications**: Instant order and payment status updates
+  - User-specific notification channels
+  - CORS-protected WebSocket connections
+  - Automatic reconnection handling
+- **Email Notifications**: Automated email alerts for order status changes
+
+#### 🧪 Testing & Quality
+- **Automated Testing**: Comprehensive test suite with Mocha/Chai
+- **Load Testing**: Artillery-based performance testing scenarios
+- **Integration Tests**: Full workflow testing
+- **Security Testing**: npm audit, Snyk, CodeQL integration
+
+**📚 For detailed documentation, see:**
+- [Enhanced Features Guide](docs/ENHANCED_FEATURES.md) - Complete setup and usage guide
+- [Monitoring & Observability](docs/MONITORING_OBSERVABILITY.md) - APM, metrics, and alerting
+- [Testing Guide](docs/TESTING_GUIDE.md) - Comprehensive testing documentation
 
 ## Payment Integration
 
@@ -172,12 +206,45 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 ### Configuration
 1. Create a `.env` file in the root directory:
    ```env
+   # Core Configuration
    MONGODB_URI=mongodb+srv://username:password@cluster0.lifak.mongodb.net/
    MONGO_ATLAS_PW=your_mongo_password
    JWT_KEY=your_jwt_secret_key
    NODE_ENV=development
    ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
    PORT=3001
+   
+   # Email Service (for verification & password reset)
+   SMTP_HOST=smtp.example.com
+   SMTP_PORT=587
+   SMTP_SECURE=false
+   SMTP_USER=your-email@example.com
+   SMTP_PASS=your-smtp-password
+   EMAIL_FROM=noreply@rest-shop.com
+   FRONTEND_URL=http://localhost:3000
+   
+   # Redis Cache (optional - for performance optimization)
+   REDIS_URL=redis://localhost:6379
+   # OR use individual settings:
+   REDIS_HOST=localhost
+   REDIS_PORT=6379
+   REDIS_PASSWORD=your-redis-password
+   
+   # OAuth (optional - for social login)
+   GOOGLE_CLIENT_ID=your-google-client-id
+   GOOGLE_CLIENT_SECRET=your-google-client-secret
+   MICROSOFT_CLIENT_ID=your-microsoft-client-id
+   MICROSOFT_CLIENT_SECRET=your-microsoft-client-secret
+   APPLE_CLIENT_ID=your-apple-client-id
+   APPLE_TEAM_ID=your-apple-team-id
+   APPLE_KEY_ID=your-apple-key-id
+   
+   # Payment Gateways (optional - for payment processing)
+   STRIPE_SECRET_KEY=your-stripe-secret-key
+   PAYPAL_CLIENT_ID=your-paypal-client-id
+   PAYPAL_CLIENT_SECRET=your-paypal-client-secret
+   MPESA_CONSUMER_KEY=your-mpesa-consumer-key
+   MPESA_CONSUMER_SECRET=your-mpesa-consumer-secret
    ```
 
 2. Configure MongoDB Atlas:
@@ -185,6 +252,12 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
    - Add your IP to the IP Access List
    - Create a database user
    - Get your connection string
+
+**📚 Configuration Guides:**
+- [OAuth Setup Guide](docs/OAUTH_SETUP.md) - Configure social login
+- [Payment Setup](docs/PAYMENT_API_DOCUMENTATION.md) - Payment gateway configuration
+- [M-Pesa Setup](docs/MPESA_SETUP_GUIDE.md) - M-Pesa integration
+- [Enhanced Features](docs/ENHANCED_FEATURES.md) - Email, 2FA, WebSocket, Redis setup
 
 **Troubleshooting Database Connection:**
 If you encounter issues connecting to MongoDB, see the [Mongoose Troubleshooting Guide](docs/MONGOOSE_TROUBLESHOOTING.md) for common solutions.
@@ -467,6 +540,58 @@ Content-Type: application/json
 - [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md)
 - [M-Pesa Setup Guide](docs/MPESA_SETUP_GUIDE.md)
 
+## Documentation
+
+### 📖 Complete Documentation Library
+
+#### Getting Started
+- [Installation & Configuration](#getting-started) - Setup and configuration guide
+- [OAuth Setup Guide](docs/OAUTH_SETUP.md) - Configure Google, Microsoft, and Apple OAuth
+
+#### Architecture & Deployment
+- [Microservices Architecture](docs/MICROSERVICES_ARCHITECTURE.md) - Detailed architecture overview
+- [Microservices Quickstart](docs/MICROSERVICES_QUICKSTART.md) - Quick deployment guide
+- [Cloudflare Deployment](docs/CLOUDFLARE_DEPLOYMENT.md) - Deploy to Cloudflare Workers
+- [Cloudflare Secrets Setup](docs/CLOUDFLARE_SECRETS_SETUP.md) - Configure secrets
+
+#### Enhanced Features
+- **[Enhanced Features Guide](docs/ENHANCED_FEATURES.md)** - Complete guide for:
+  - Email verification and password reset
+  - Two-factor authentication (2FA) setup
+  - Real-time WebSocket notifications
+  - Redis caching configuration
+  - API versioning usage
+
+#### Payment Integration
+- [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) - Complete payment API reference
+- [M-Pesa Setup Guide](docs/MPESA_SETUP_GUIDE.md) - M-Pesa integration guide
+
+#### Monitoring & Operations
+- **[Monitoring & Observability](docs/MONITORING_OBSERVABILITY.md)** - Comprehensive guide for:
+  - Application Performance Monitoring (APM) integration
+  - Distributed tracing setup
+  - Custom metrics and dashboards
+  - Alerting configuration
+  - Health checks and probes
+
+#### Testing
+- **[Testing Guide](docs/TESTING_GUIDE.md)** - Complete testing documentation:
+  - Unit and integration testing
+  - Load testing with Artillery
+  - End-to-end testing with Cypress
+  - Contract testing
+  - Test coverage strategies
+
+#### Database
+- [Database Migration Analysis](docs/DATABASE_MIGRATION_ANALYSIS.md) - Database options
+- [MongoDB Cloudflare Strategy](docs/MONGODB_CLOUDFLARE_STRATEGY.md) - MongoDB on Cloudflare
+- [Mongoose Troubleshooting](docs/MONGOOSE_TROUBLESHOOTING.md) - Common issues and solutions
+
+#### Troubleshooting
+- [Troubleshooting Guide](docs/TROUBLESHOOTING.md) - Common issues and solutions
+- [Implementation Summary](docs/IMPLEMENTATION_SUMMARY.md) - Technical implementation details
+- [Before/After Comparison](docs/BEFORE_AFTER_COMPARISON.md) - Feature evolution
+
 ## Deployment
 
 ### Deploy to Cloudflare Workers
@@ -540,36 +665,100 @@ npm audit
 
 ## Testing
 
-### Test Structure
-```
-test/
-├── setup.js                    # MongoDB Memory Server setup
-├── controllers/
-│   ├── user.test.js           # User controller tests
-│   ├── products.test.js       # Products controller tests
-│   └── orders.test.js         # Orders controller tests
-└── middleware/
-    └── check-auth.test.js     # Auth middleware tests
-```
+### Test Suite Overview
 
-### Running Tests
+The project includes comprehensive testing at multiple levels:
+
+#### Unit & Integration Tests
 ```bash
 # Run all tests
 npm test
 
 # Run tests in watch mode
 npm run test:watch
+```
 
-# Run with coverage
-npm run coverage
+#### Load Testing with Artillery
+```bash
+# Product endpoint load test
+npm run test:load
+
+# Authenticated user journey
+npm run test:load:auth
+
+# Spike test (sudden load increase)
+npm run test:load:spike
+```
+
+### Test Structure
+```
+test/
+├── setup.js                    # MongoDB Memory Server setup
+├── controllers/
+│   ├── user.test.js           # User authentication tests
+│   ├── products.test.js       # Product CRUD tests
+│   ├── orders.test.js         # Order management tests
+│   ├── payments.test.js       # Payment processing tests
+│   ├── auth.test.js           # Email verification & password reset
+│   └── twoFactor.test.js      # 2FA functionality tests
+└── middleware/
+    └── check-auth.test.js     # Authentication middleware tests
+
+tests/load/
+├── products-load-test.yml     # Product browsing scenarios
+├── auth-load-test.yml         # Authenticated user flows
+└── spike-test.yml             # Sudden traffic spike test
 ```
 
 ### Test Coverage
-- ✅ User authentication (signup, login, delete)
-- ✅ Product CRUD operations
-- ✅ Order management
-- ✅ JWT middleware
-- ✅ Error handling
+- ✅ User authentication (signup, login, delete, email verification, password reset)
+- ✅ Two-factor authentication (setup, enable, verify, disable)
+- ✅ Product CRUD operations with caching
+- ✅ Order management with real-time notifications
+- ✅ Payment processing (Stripe, PayPal, M-Pesa)
+- ✅ JWT middleware and authorization
+- ✅ WebSocket connections and notifications
+- ✅ Error handling and security
+- ✅ Load testing scenarios
+- **Target Coverage**: > 90%
+
+**📚 For complete testing documentation, see [Testing Guide](docs/TESTING_GUIDE.md)**
+
+## Monitoring and Observability
+
+### Available Monitoring Features
+
+#### Application Monitoring
+- **Health Check Endpoint**: `/health` - System health and database status
+- **Structured Logging**: JSON-formatted logs with trace IDs
+- **Audit Logging**: Security event tracking (logins, signups, failures)
+
+#### Performance Metrics
+- Response time tracking
+- Request throughput
+- Error rate monitoring
+- Cache hit/miss rates
+- WebSocket connection counts
+
+#### APM Integration Support
+- New Relic
+- Datadog APM
+- Elastic APM
+- Prometheus/Grafana
+
+#### Distributed Tracing
+- Trace ID propagation across services
+- Request correlation
+- Performance bottleneck identification
+
+#### Alerting
+- High error rate alerts
+- Slow response time notifications
+- Database connection failures
+- Payment gateway issues
+- Memory and CPU usage warnings
+
+**📚 For complete monitoring setup, see [Monitoring & Observability Guide](docs/MONITORING_OBSERVABILITY.md)**
 
 ## Middleware
 
