@@ -710,6 +710,13 @@ tests/load/
 └── spike-test.yml             # Sudden traffic spike test
 ```
 
+### Prerequisites for Testing
+- **MongoDB Memory Server**: Tests use an in-memory MongoDB instance
+- **Node.js**: v20.x or higher
+- **Ubuntu 22.04+**: Configured for OpenSSL 3.x compatibility (MongoDB 7.0.14)
+
+> **Note**: If you encounter "libcrypto.so.1.1" errors, the project is pre-configured to use MongoDB 7.0.14 which supports OpenSSL 3.x. This is set in `package.json` under `config.mongodbMemoryServer.version`.
+
 ### Test Coverage
 - ✅ User authentication (signup, login, delete, email verification, password reset)
 - ✅ Two-factor authentication (setup, enable, verify, disable)
