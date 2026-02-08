@@ -267,7 +267,8 @@ exports.payments_mpesa_callback = async (req, res) => {
         const result = await mpesaService.handleCallback(callbackData);
 
         // Validate checkoutRequestId to prevent NoSQL injection
-        if (!result.checkoutRequestId || typeof result.checkoutRequestId !== 'string') {
+        // Reject null, undefined, objects, numbers, etc. - only accept non-empty strings
+        if (typeof result.checkoutRequestId !== 'string' || result.checkoutRequestId.length === 0) {
             logError('Invalid checkoutRequestId in M-Pesa callback', {
                 checkoutRequestId: result.checkoutRequestId,
                 type: typeof result.checkoutRequestId

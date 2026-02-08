@@ -1,5 +1,4 @@
-const chai = require('chai');
-const expect = chai.expect;
+const { expect } = require('chai');
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const Payment = require('../../api/models/payment');
@@ -222,6 +221,43 @@ describe('Payments Controller', () => {
             await PaymentsController.payments_mpesa_callback(req, res, next);
 
             // Should not call Payment.findOne
+            expect(findOneStub.called).to.be.false;
+            
+            // Should return success to M-Pesa
+            expect(res.status.calledWith(200)).to.be.true;
+            expect(res.json.calledWith({
+                ResultCode: 0,
+                ResultDesc: 'Accepted'
+            })).to.be.true;
+        });
+
+        it('should reject M-Pesa callback with empty string checkoutRequestId', async () => {
+            const callbackData = {
+                Body: {
+                    stkCallback: {
+                        ResultCode: 0,
+                        CheckoutRequestID: '',
+                        MerchantRequestID: 'test-merchant-id',
+                        ResultDesc: 'Success'
+                    }
+                }
+            };
+
+            req.body = callbackData;
+
+            const mockMpesaService = {
+                handleCallback: sinon.stub().resolves({
+                    checkoutRequestId: '',
+                    status: 'completed'
+                })
+            };
+
+            sinon.stub(PaymentFactory, 'getPaymentService').returns(mockMpesaService);
+            const findOneStub = sinon.stub(Payment, 'findOne');
+
+            await PaymentsController.payments_mpesa_callback(req, res, next);
+
+            // Should not call Payment.findOne with empty string
             expect(findOneStub.called).to.be.false;
             
             // Should return success to M-Pesa
