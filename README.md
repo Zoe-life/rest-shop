@@ -6,6 +6,7 @@
 
 ## Table of Contents
 - [Overview](#overview)
+- [Architecture](#architecture)
 - [Features](#features)
 - [Security Features](#security-features)
 - [Technologies Used](#technologies-used)
@@ -22,6 +23,34 @@
 
 ## Overview
 This RESTful API provides a comprehensive, **professional-grade e-commerce platform** with integrated payment processing for managing users, products, orders, and payments. It includes enterprise-grade security features, multiple payment gateways (Stripe, PayPal, M-Pesa), comprehensive testing, and CI/CD pipeline for deployment.
+
+## Architecture
+
+### Microservices Architecture
+The application uses a **microservices architecture** deployed on Cloudflare Workers to solve bundle size limitations and improve scalability:
+
+- **Gateway Worker** (~50KB): Lightweight router that directs traffic to appropriate services
+- **Payment Service** (~600-800KB): Dedicated worker for payment processing (Stripe, PayPal, M-Pesa)
+- **Base Service** (~1.2-1.5MB): Core functionality (products, orders, users, auth)
+
+**Benefits:**
+- ✅ Each service stays under Cloudflare's 1MB free tier limit
+- ✅ Independent deployment and scaling per service
+- ✅ Zero-latency service-to-service communication via Service Bindings
+- ✅ Better separation of concerns and maintainability
+
+See [Microservices Architecture Documentation](docs/MICROSERVICES_ARCHITECTURE.md) for detailed information.
+
+### Deployment Commands
+```bash
+# Deploy all services
+npm run deploy:all
+
+# Deploy individual services
+npm run deploy:base      # Base service
+npm run deploy:payments  # Payment service
+npm run deploy:gateway   # Gateway (main entry point)
+```
 
 ## Features
 ✅ User authentication and management with JWT  

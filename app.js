@@ -7,12 +7,11 @@ const mongoose = require('mongoose');
 const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./api/middleware/security');
 
-// Routes
+// Routes (Payment routes moved to payment-worker.js for microservices architecture)
 const productRoutes = require('./api/routes/products');
 const orderRoutes = require('./api/routes/orders');
 const userRoutes = require('./api/routes/user');
 const authRoutes = require('./api/routes/auth');
-const paymentRoutes = require('./api/routes/payments');
 
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
@@ -54,12 +53,11 @@ app.get('/health', (req, res) => {
     });
 });
 
-// 4. Shop Routes
+// 4. Shop Routes (Payment routes handled by payment-worker.js)
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
-app.use('/payments', paymentRoutes);
 
 // 5. Static Files (Note: Cloudflare handles this better via R2, but keeping for compatibility)
 app.use('/uploads', express.static('uploads'));

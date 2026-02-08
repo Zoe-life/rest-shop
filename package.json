@@ -10,7 +10,11 @@
     "create-admin": "node scripts/create-admin.js",
     "clean": "rimraf dist && rm -rf coverage .nyc_output && rm -rf node_modules/@mapbox/node-pre-gyp",
     "build": "npm run clean; node scripts/patch-mongoose-browser.js",
-    "postinstall": "patch-package"
+    "postinstall": "patch-package",
+    "deploy:base": "wrangler deploy --config wrangler.toml",
+    "deploy:payments": "wrangler deploy --config wrangler-payments.toml",
+    "deploy:gateway": "wrangler deploy --config wrangler-gateway.toml",
+    "deploy:all": "bash scripts/deploy-microservices.sh"
   },
   "keywords": [
     "node",

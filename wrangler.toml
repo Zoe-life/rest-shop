@@ -1,12 +1,15 @@
-# Cloudflare Workers Configuration
+# Cloudflare Workers Configuration - Base Service
 name = "rest-shop-api"
 main = "src/worker.js"
 
-# IMPORTANT: Bundle Size Notice
-# This application uses Mongoose + Express which creates a ~2 MB bundle.
-# Cloudflare Free Tier limit: 1 MB | Paid Tier limit: 10 MB
-# See BUNDLE_SIZE_ANALYSIS.md for details and options.
-# Current bundle: ~2 MB (minified) - REQUIRES PAID PLAN
+# Base Service Worker (Products, Orders, User, Auth)
+# Payment routes have been moved to rest-shop-payments worker
+# See wrangler-gateway.toml for the main entry point
+# 
+# Microservices Architecture:
+# - Gateway Worker (wrangler-gateway.toml) - Main entry point, routes traffic
+# - Payment Service (wrangler-payments.toml) - Handles all payment operations
+# - Base Service (this file) - Handles products, orders, user, auth
 
 # Compatibility flags
 compatibility_date = "2026-01-20"
