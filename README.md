@@ -55,8 +55,13 @@ npm run deploy:gateway   # Gateway (main entry point)
 ## Features
 ✅ User authentication and management with JWT  
 ✅ **OAuth 2.0 integration (Google, Microsoft, Apple)**  
+✅ **Email Verification and Password Reset**  
+✅ **Two-Factor Authentication (2FA) with TOTP and Backup Codes**  
 ✅ **Multi-Gateway Payment Processing (Stripe, PayPal, M-Pesa)**  
 ✅ **M-Pesa Integration for Kenyan Users**  
+✅ **Real-time Notifications via WebSockets**  
+✅ **Response Caching with Redis for Performance**  
+✅ **API Versioning for Backward Compatibility**  
 ✅ Product management with search, filtering, and pagination  
 ✅ Advanced order management with status tracking  
 ✅ Role-based access control (Admin/User)  
@@ -67,6 +72,7 @@ npm run deploy:gateway   # Gateway (main entry point)
 ✅ Comprehensive error handling  
 ✅ Health check endpoint for monitoring  
 ✅ Automated testing with Mocha/Chai  
+✅ **Load Testing with Artillery**  
 ✅ CI/CD pipeline with GitHub Actions  
 ✅ Cloudflare Workers deployment ready  
 ✅ High scalability with database indexing and pagination
@@ -259,6 +265,68 @@ GET /auth/apple
 ```
 
 See [OAuth Setup Guide](docs/OAUTH_SETUP.md) for detailed configuration instructions.
+
+#### Email Verification
+```http
+POST /user/request-verification
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+
+GET /user/verify-email/:token
+```
+
+#### Password Reset
+```http
+POST /user/request-password-reset
+Content-Type: application/json
+
+{
+  "email": "user@example.com"
+}
+
+POST /user/reset-password/:token
+Content-Type: application/json
+
+{
+  "password": "NewSecurePassword123!"
+}
+```
+
+#### Two-Factor Authentication (2FA)
+```http
+# Setup 2FA
+POST /user/2fa/setup
+Authorization: Bearer <token>
+
+# Enable 2FA
+POST /user/2fa/enable
+Authorization: Bearer <token>
+Content-Type: application/json
+{
+  "token": "123456"
+}
+
+# Verify 2FA
+POST /user/2fa/verify
+Content-Type: application/json
+{
+  "userId": "user_id",
+  "token": "123456"
+}
+
+# Disable 2FA
+POST /user/2fa/disable
+Authorization: Bearer <token>
+Content-Type: application/json
+{
+  "password": "YourPassword123!"
+}
+```
+
+See [Enhanced Features Documentation](docs/ENHANCED_FEATURES.md) for complete details.
 
 #### Delete User (Admin Only)
 ```http

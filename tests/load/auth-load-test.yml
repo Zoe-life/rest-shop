@@ -1,0 +1,49 @@
+# Authenticated User Journey Load Test
+# Run with: npx artillery run tests/load/auth-load-test.yml
+
+config:
+  target: "http://localhost:3001"
+  phases:
+    - duration: 60
+      arrivalRate: 10
+      name: "Steady load"
+    - duration: 120
+      arrivalRate: 20
+      name: "Peak load"
+
+  processor: "./tests/load/processor.js"
+
+scenarios:
+  # Login and create order scenario
+  - name: "Authenticated user journey"
+    flow:
+      # Login
+      - post:
+          url: "/user/login"
+          json:
+            email: "loadtest@example.com"
+            password: "TestPassword123!"
+          capture:
+            - json: "$.token"
+              as: "authToken"
+      
+      # Browse products
+      - get:
+          url: "/products"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      
+      # View orders
+      - get:
+          url: "/orders"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+      
+      # Create order
+      - post:
+          url: "/orders"
+          headers:
+            Authorization: "Bearer {{ authToken }}"
+          json:
+            productId: "{{ $randomString() }}"
+            quantity: "{{ $randomNumber(1, 5) }}"
