@@ -139,7 +139,7 @@ describe('Gateway Worker Routing Logic', () => {
             expect(data.service).to.equal('payment');
         });
 
-        it('should handle paths that contain "payments" but dont start with it', async () => {
+        it('should handle paths that contain "payments" but don\'t start with it', async () => {
             const env = createMockEnv();
             const response = await routeRequest('https://example.com/api/user/payments', env);
             const data = await response.json();
