@@ -73,7 +73,34 @@ const userSchema = mongoose.Schema({
     emailVerified: {
         type: Boolean,
         default: false
-    }
+    },
+    // Email verification
+    emailVerificationToken: {
+        type: String,
+        sparse: true
+    },
+    emailVerificationExpires: {
+        type: Date
+    },
+    // Password reset
+    passwordResetToken: {
+        type: String,
+        sparse: true
+    },
+    passwordResetExpires: {
+        type: Date
+    },
+    // Two-Factor Authentication
+    twoFactorEnabled: {
+        type: Boolean,
+        default: false
+    },
+    twoFactorSecret: {
+        type: String
+    },
+    twoFactorBackupCodes: [{
+        type: String
+    }]
 }, {
     timestamps: true // Adds createdAt and updatedAt fields
 });
