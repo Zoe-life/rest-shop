@@ -10,19 +10,18 @@ if (typeof globalThis.process.emitWarning !== 'function') {
 }
 
 import mongoose from 'mongoose';
-import express from 'express';
-import morgan from 'morgan';
-import cookieParser from 'cookie-parser';
-
-// Import only payment-related dependencies
-const app = express();
+const express = require('express');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
 
 // Import middleware
-import { helmetConfig, apiLimiter, sanitizeInput } from '../api/middleware/security.js';
-import checkAuth from '../api/middleware/check-auth.js';
+const { helmetConfig, apiLimiter, sanitizeInput } = require('../api/middleware/security');
 
-// Import only payment routes and controllers
-import paymentRoutes from '../api/routes/payments.js';
+// Import only payment routes
+const paymentRoutes = require('../api/routes/payments');
+
+// Create Express app for payment service
+const app = express();
 
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
@@ -62,7 +61,7 @@ app.get('/health', (req, res) => {
     });
 });
 
-// 4. Payment Routes (mounted at root since gateway will prefix with /api/payments)
+// 4. Payment Routes (mounted at root since gateway will prefix with /payments)
 app.use('/', paymentRoutes);
 
 // 5. Error Handling
