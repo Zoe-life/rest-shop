@@ -212,9 +212,28 @@ class MpesaService extends PaymentService {
      */
     async handleCallback(callbackData) {
         try {
+            if (
+                !callbackData ||
+                typeof callbackData !== 'object' ||
+                !callbackData.Body ||
+                typeof callbackData.Body !== 'object' ||
+                !callbackData.Body.stkCallback ||
+                typeof callbackData.Body.stkCallback !== 'object'
+            ) {
+                logError('Invalid M-Pesa callback structure', { callbackData });
+                throw new Error('Invalid M-Pesa callback structure');
+            }
+
             const body = callbackData.Body.stkCallback;
             const resultCode = body.ResultCode;
             const checkoutRequestId = body.CheckoutRequestID;
+
+            if (typeof checkoutRequestId !== 'string') {
+                logError('Invalid CheckoutRequestID type in M-Pesa callback', {
+                    checkoutRequestIdType: typeof checkoutRequestId
+                });
+                throw new Error('Invalid CheckoutRequestID in M-Pesa callback');
+            }
             
             logInfo('M-Pesa callback received', {
                 checkoutRequestId,
