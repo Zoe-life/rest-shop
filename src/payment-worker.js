@@ -1,17 +1,27 @@
-const express = require('express');
-const app = express();
-const morgan = require('morgan');
-// const bodyParser = require('body-parser');
-const cookieParser = require('cookie-parser');
-const mongoose = require('mongoose');
-const passport = require('./config/passport');
-const { helmetConfig, apiLimiter, sanitizeInput } = require('./api/middleware/security');
+import { DurableObject } from 'cloudflare:workers';
+import { httpServerHandler } from 'cloudflare:node';
 
-// Routes (Payment routes moved to payment-worker.js for microservices architecture)
-const productRoutes = require('./api/routes/products');
-const orderRoutes = require('./api/routes/orders');
-const userRoutes = require('./api/routes/user');
-const authRoutes = require('./api/routes/auth');
+// Pre-emptive strike against Mongoose Node-isms
+if (typeof globalThis.process === 'undefined') {
+  globalThis.process = {};
+}
+if (typeof globalThis.process.emitWarning !== 'function') {
+  globalThis.process.emitWarning = () => {};
+}
+
+import mongoose from 'mongoose';
+const express = require('express');
+const morgan = require('morgan');
+const cookieParser = require('cookie-parser');
+
+// Import middleware
+const { helmetConfig, apiLimiter, sanitizeInput } = require('../api/middleware/security');
+
+// Import only payment routes
+const paymentRoutes = require('../api/routes/payments');
+
+// Create Express app for payment service
+const app = express();
 
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
@@ -19,19 +29,16 @@ app.use(morgan('dev'));
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
-app.use(passport.initialize());
 app.use(apiLimiter);
 app.use(sanitizeInput);
 
 // 2. CORS Logic (Adapted for Cloudflare)
 app.use((req, res, next) => {
-    // We get the secrets passed from worker.js via req.workerEnv
     const allowedOrigins = req.workerEnv?.ALLOWED_ORIGINS 
         ? req.workerEnv.ALLOWED_ORIGINS.split(',') 
         : ['http://localhost:3001'];
     
     const origin = req.headers.origin;
-    // Never allow wildcard or null origins when credentials are enabled.
     const isOriginAllowed = origin && origin !== 'null' && allowedOrigins.includes(origin);
     if (isOriginAllowed) {
         res.setHeader('Access-Control-Allow-Origin', origin);
@@ -44,25 +51,20 @@ app.use((req, res, next) => {
     next();
 });
 
-// 3. Health Check (Simplified for Serverless)
+// 3. Health Check
 app.get('/health', (req, res) => {
     res.status(200).json({
         status: 'ok',
+        service: 'payment-service',
         database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
         environment: req.workerEnv?.NODE_ENV || 'production'
     });
 });
 
-// 4. Shop Routes (Payment routes handled by payment-worker.js)
-app.use('/products', productRoutes);
-app.use('/orders', orderRoutes);
-app.use('/user', userRoutes);
-app.use('/auth', authRoutes);
+// 4. Payment Routes (mounted at root since gateway will prefix with /payments)
+app.use('/', paymentRoutes);
 
-// 5. Static Files (Note: Cloudflare handles this better via R2, but keeping for compatibility)
-app.use('/uploads', express.static('uploads'));
-
-// 6. Error Handling
+// 5. Error Handling
 app.use((req, res, next) => {
     const error = new Error('Not found');
     error.status = 404;
@@ -75,4 +77,36 @@ app.use((error, req, res, next) => {
     });
 });
 
-module.exports = app;
+export class PaymentDatabaseConnection extends DurableObject {
+  constructor(ctx, env) {
+    super(ctx, env);
+    this.env = env;
+  }
+
+  async connect() {
+    if (mongoose.connection.readyState === 1) return;
+    
+    const uri = `mongodb+srv://rest-shop:${this.env.MONGO_ATLAS_PW}@cluster0.lifak.mongodb.net/`;
+    
+    await mongoose.connect(uri, {
+      serverSelectionTimeoutMS: 5000,
+    });
+  }
+
+  async fetch(request) {
+    await this.connect();
+
+    return httpServerHandler((req, res) => {
+      req.workerEnv = this.env; 
+      return app(req, res);
+    })(request);
+  }
+}
+
+export default {
+  async fetch(request, env) {
+    const id = env.PAYMENT_DB_CONNECTION.idFromName('payment-global');
+    const stub = env.PAYMENT_DB_CONNECTION.get(id);
+    return stub.fetch(request);
+  }
+};
