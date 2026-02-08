@@ -34,7 +34,6 @@ class_name = "DatabaseConnection"
 # Build configuration
 [build]
 command = "npm run build"
-minify = true
 
 # This tells the Wrangler to treat HTML files as plain text
 [[rules]]
