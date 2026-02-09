@@ -2,6 +2,12 @@ const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const jwt = require('jsonwebtoken');
 const fs = require('fs');
+const chai = require('chai');
+const chaiHttp = require('chai-http');
+
+// Configure chai
+chai.use(chaiHttp.default);
+chai.should();
 
 let mongoServer;
 
