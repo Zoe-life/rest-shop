@@ -5,7 +5,7 @@
  */
 
 const PaymentService = require('./paymentService');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 const crypto = require('crypto');
 
 /**

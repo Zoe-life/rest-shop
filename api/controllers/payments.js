@@ -7,7 +7,7 @@ const Payment = require('../models/payment');
 const Order = require('../models/order');
 const PaymentFactory = require('../services/paymentFactory');
 const mongoose = require('mongoose');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 /**
  * Initiate a payment

@@ -5,10 +5,10 @@
 
 const express = require('express');
 const router = express.Router();
-const passport = require('../../config/passport');
+const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
 const { logInfo, logError } = require('../../utils/logger');
-const { logTokenGenerated, logAuthFailure } = require('../../utils/auditLogger');
+const { logTokenGenerated, logAuthFailure } = require('../utils/auditLogger');
 
 /**
  * Safely extract IP address from request

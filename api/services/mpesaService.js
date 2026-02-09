@@ -6,7 +6,7 @@
 
 const PaymentService = require('./paymentService');
 const axios = require('axios');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 /**
  * M-Pesa Payment Service

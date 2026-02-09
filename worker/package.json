@@ -1,0 +1,19 @@
+{
+  "name": "rest-shop-worker",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for REST Shop API",
+  "main": "src/index.js",
+  "scripts": {
+    "deploy": "wrangler deploy"
+  },
+  "keywords": [
+    "cloudflare",
+    "worker",
+    "edge"
+  ],
+  "author": "Merlyn Zawadi",
+  "license": "ISC",
+  "devDependencies": {
+    "wrangler": "^4.61.0"
+  }
+}

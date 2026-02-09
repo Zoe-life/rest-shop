@@ -5,7 +5,7 @@
 
 const mongoose = require('mongoose');
 const Product = require('../models/product');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 /**
  * Helper function to construct base URL dynamically
