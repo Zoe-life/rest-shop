@@ -28,7 +28,8 @@ const Orders: React.FC = () => {
       return;
     }
     fetchOrders();
-  }, [user, navigate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const fetchOrders = async () => {
     try {
