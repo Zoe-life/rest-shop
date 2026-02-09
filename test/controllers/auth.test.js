@@ -15,7 +15,12 @@ describe('Auth Controller', () => {
     let verificationToken;
     let resetToken;
 
-    beforeEach(async () => {
+    beforeEach(async function() {
+        // Skip all tests if MongoDB is not connected
+        if (mongoose.connection.readyState !== 1) {
+            this.skip();
+        }
+        
         // Create a test user
         const hashedPassword = await bcrypt.hash('TestPass123!', 10);
         verificationToken = crypto.randomBytes(32).toString('hex');
@@ -32,7 +37,12 @@ describe('Auth Controller', () => {
         await testUser.save();
     });
 
-    afterEach(async () => {
+    afterEach(async function() {
+        // Skip if MongoDB is not connected
+        if (mongoose.connection.readyState !== 1) {
+            return;
+        }
+        
         await User.deleteMany({});
     });
 
