@@ -1,14 +1,9 @@
+// CRITICAL: Import polyfills FIRST before any other modules
+// This ensures process.emitWarning is available during module initialization
+import './polyfills.js';
+
 import { DurableObject } from 'cloudflare:workers';
 import { httpServerHandler } from 'cloudflare:node';
-
-// Pre-emptive strike against Mongoose Node-isms
-if (typeof globalThis.process === 'undefined') {
-  globalThis.process = {};
-}
-if (typeof globalThis.process.emitWarning !== 'function') {
-  globalThis.process.emitWarning = () => {};
-}
-
 import mongoose from 'mongoose';
 import app from '../app.js';
 
