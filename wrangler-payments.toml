@@ -3,14 +3,16 @@ name = "rest-shop-payments"
 main = "src/payment-worker.js"
 
 # Payment Service Worker
-# This worker handles all payment-related operations (Stripe, PayPal, M-Pesa)
-# Part of microservices architecture to keep bundle sizes under 1MB
+# This worker now acts as a lightweight proxy to the Node.js backend
+# where all payment operations and MongoDB/Mongoose operations are handled.
+# Part of microservices architecture to keep bundle sizes minimal.
 
 # Compatibility flags
 compatibility_date = "2026-01-20"
-compatibility_flags = [ "nodejs_compat" ]
+# Removed nodejs_compat as we no longer need Node.js compatibility in the worker
+compatibility_flags = []
 
-find_additional_modules = true
+find_additional_modules = false
 
 # Account details (will be overridden by secrets in CI/CD)
 workers_dev = true
@@ -21,21 +23,22 @@ NODE_ENV = "production"
 PORT = "3001"
 FRONTEND_URL = "https://rest-shop.pages.dev"
 
+# IMPORTANT: Set this to your Node.js backend URL
+# For local development: http://localhost:3001
+# For production: your deployed Node.js backend URL (e.g., https://api.yourdomain.com)
+# This will be overridden by secrets in production
+# BACKEND_API_URL = "http://localhost:3001"
+
 # Service bindings
 [[kv_namespaces]]
 binding = "CACHE"
 id = "2b52b610274c4a078262f796b01bb7ec"
 
-# Durable Objects (for MongoDB connection pooling)
-[[durable_objects.bindings]]
-name = "PAYMENT_DB_CONNECTION"
-class_name = "PaymentDatabaseConnection"
+# Durable Objects removed - no longer needed as we proxy to Node.js backend
 
 # Build configuration
-[build]
-command = "npm run build"
+# Build command removed as we no longer need to patch mongoose
+# [build]
+# command = "npm run build"
 
-# Migrations
-[[migrations]]
-tag = "v1"
-new_sqlite_classes = ["PaymentDatabaseConnection"]
+# Migrations removed - no longer using Durable Objects
