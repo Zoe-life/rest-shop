@@ -8,6 +8,9 @@
     "test": "mocha",
     "test:watch": "mocha 'test/**/*.test.js' --watch",
     "create-admin": "node scripts/create-admin.js",
+    "seed": "node scripts/seed-products.js",
+    "seed:force": "node scripts/seed-products.js --force",
+    "seed:clear": "node scripts/seed-products.js --clear",
     "postinstall": "patch-package"
   },
   "keywords": [
