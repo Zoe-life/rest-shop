@@ -103,9 +103,11 @@ We've implemented a **separation of concerns** architecture:
 **Cloudflare Workers** (set in Wrangler or Cloudflare Dashboard):
 ```bash
 BACKEND_API_URL=https://api.yourdomain.com  # Your Node.js backend URL
-JWT_KEY=your_jwt_secret
-STRIPE_SECRET_KEY=sk_...
-# ... other secrets
+
+# SECURITY NOTE: Other secrets (JWT_KEY, payment keys, etc.) should be
+# configured directly in the backend environment, not in Workers.
+# Workers are just proxies and should not handle sensitive secrets.
+# The backend reads from its own environment variables.
 ```
 
 **Node.js Backend** (.env file or hosting platform):
@@ -114,7 +116,20 @@ MONGODB_URI=mongodb+srv://...
 JWT_KEY=your_jwt_secret
 PORT=3001
 NODE_ENV=production
+
+# Payment Gateway Secrets
+STRIPE_SECRET_KEY=sk_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+PAYPAL_CLIENT_ID=...
+PAYPAL_CLIENT_SECRET=...
+# etc.
 ```
+
+**Important Security Note:**
+- Workers should NOT forward secrets via headers (security risk)
+- All secrets should be configured directly in the backend environment
+- Workers only handle routing and proxy requests
+- If you need worker-to-backend authentication, use mutual TLS or signed tokens
 
 ### File Changes Summary
 
@@ -298,19 +313,47 @@ npm run test:load          # Load testing
 
 ## Security Considerations
 
-### Environment Variables
-- Workers forward secrets via headers (e.g., `X-JWT-Key`)
-- Backend reads from headers when present, falls back to env vars
-- Never log or expose these headers
+### Environment Variables and Secrets
+
+**Best Practice: Secrets in Backend Only**
+- Configure all sensitive secrets (JWT_KEY, payment gateway keys, etc.) directly in the backend environment
+- Workers should only know the `BACKEND_API_URL`
+- Do NOT forward secrets from Workers to backend via headers (security risk)
+- Backend reads secrets from its own environment variables
+
+### Why Not Forward Secrets via Headers?
+1. **Interception Risk**: HTTP headers can be intercepted if TLS is compromised
+2. **Logging Risk**: Secrets in headers might be logged by proxies or monitoring tools
+3. **Attack Surface**: Increases the attack surface by exposing secrets in two places
+4. **Best Practice**: Keep secrets in the environment where they're used
+
+### Secure Worker-to-Backend Communication
+
+If you need to authenticate the worker to the backend:
+
+1. **Mutual TLS (mTLS)**: Best option for production
+   - Backend validates worker's client certificate
+   - No secrets in headers
+
+2. **Signed Tokens**: Alternative approach
+   - Worker signs requests with a shared secret
+   - Backend verifies signature
+   - Still safer than forwarding raw secrets
+
+3. **IP Allowlisting**: Simple but less secure
+   - Backend only accepts requests from Cloudflare IPs
+   - Use with other methods for defense in depth
 
 ### CORS
-- Backend validates origins from `X-Allowed-Origins` header
+- Backend validates origins from `ALLOWED_ORIGINS` environment variable
 - Workers don't handle CORS directly (backend does)
+- Use specific origins, avoid wildcards in production
 
 ### Authentication
 - JWT validation happens in backend
-- Workers pass tokens transparently
+- Workers pass tokens transparently in Authorization header
 - No auth logic duplication
+- Backend is the single source of truth for authentication
 
 ## Troubleshooting
 

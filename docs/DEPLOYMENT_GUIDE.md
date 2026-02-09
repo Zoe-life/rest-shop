@@ -165,7 +165,7 @@ Now that your backend is running, configure the workers to proxy to it.
    wrangler login
    ```
 
-2. **Set Backend URL secret:**
+2. **Set Backend URL (REQUIRED):**
    ```bash
    # Use your backend URL from Step 2
    wrangler secret put BACKEND_API_URL --config wrangler.toml
@@ -175,23 +175,26 @@ Now that your backend is running, configure the workers to proxy to it.
    # Same URL
    ```
 
-3. **Set other secrets:**
-   ```bash
-   # JWT Key (MUST match backend)
-   wrangler secret put JWT_KEY --config wrangler.toml
-   wrangler secret put JWT_KEY --config wrangler-payments.toml
+3. **IMPORTANT: Configure Secrets in Backend, Not Workers**
    
-   # Payment secrets (for payment worker)
-   wrangler secret put STRIPE_SECRET_KEY --config wrangler-payments.toml
-   wrangler secret put STRIPE_WEBHOOK_SECRET --config wrangler-payments.toml
-   wrangler secret put PAYPAL_CLIENT_ID --config wrangler-payments.toml
-   wrangler secret put PAYPAL_CLIENT_SECRET --config wrangler-payments.toml
-   # Add other payment gateway secrets as needed
+   **✅ DO THIS:** Set all secrets in your backend environment (Railway/Render dashboard):
+   ```bash
+   # In Railway/Render dashboard, add these environment variables:
+   JWT_KEY=your_jwt_secret
+   STRIPE_SECRET_KEY=sk_...
+   STRIPE_WEBHOOK_SECRET=whsec_...
+   PAYPAL_CLIENT_ID=...
+   PAYPAL_CLIENT_SECRET=...
+   MPESA_CONSUMER_KEY=...
+   # etc.
    ```
-
-   Or set all secrets at once using Cloudflare Dashboard:
-   - Go to Workers & Pages → Select your worker → Settings → Variables
-   - Add secrets there
+   
+   **❌ DON'T DO THIS:** Don't set payment secrets in Cloudflare Workers
+   - Workers are just proxies, they don't need these secrets
+   - Forwarding secrets via headers creates security risks
+   - Backend reads from its own environment variables
+   
+   **The only secret Workers need is `BACKEND_API_URL`**
 
 ### Step 4: Deploy Workers
 
@@ -354,16 +357,25 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
 - ✅ `NODE_ENV` - Set to "production"
 - ✅ `PORT` - Port to run on (default 3001)
 - ✅ `ALLOWED_ORIGINS` - Comma-separated list of allowed origins
-
-### Required for Cloudflare Workers:
-- ✅ `BACKEND_API_URL` - Your backend URL (e.g., https://your-app.railway.app)
-- ✅ `JWT_KEY` - Same as backend
-- ✅ Payment secrets (if using payments):
+- ✅ Payment Gateway Secrets:
   - `STRIPE_SECRET_KEY`
   - `STRIPE_WEBHOOK_SECRET`
   - `PAYPAL_CLIENT_ID`
   - `PAYPAL_CLIENT_SECRET`
+  - `MPESA_CONSUMER_KEY`
+  - `MPESA_CONSUMER_SECRET`
   - etc.
+
+### Required for Cloudflare Workers:
+- ✅ `BACKEND_API_URL` - Your backend URL (e.g., https://your-app.railway.app)
+
+**That's it! Workers only need the backend URL.**
+
+**Security Note:**
+- ❌ Do NOT set JWT_KEY or payment secrets in Workers
+- ❌ Do NOT forward secrets from Workers to backend
+- ✅ Configure all secrets directly in the backend environment
+- ✅ Workers are just proxies and don't need access to secrets
 
 ## Cost Estimate
 

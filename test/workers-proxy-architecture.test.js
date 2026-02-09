@@ -112,15 +112,32 @@ describe('Cloudflare Workers Proxy Architecture', function() {
       const configPath = path.join(__dirname, '..', 'wrangler.toml');
       const configContent = fs.readFileSync(configPath, 'utf8');
       
-      // Should not have a build.command line that's not commented out
+      // Parse TOML to check for build.command
+      // Simple check: look for [build] section followed by command = line
       const lines = configContent.split('\n');
-      const buildCommandLines = lines.filter(line => 
-        line.includes('command =') && 
-        line.includes('[build]') === false &&
-        !line.trim().startsWith('#')
-      );
+      let inBuildSection = false;
+      let hasActiveCommand = false;
       
-      assert.strictEqual(buildCommandLines.length, 0, 
+      for (let line of lines) {
+        const trimmed = line.trim();
+        
+        // Check if we're entering/leaving build section
+        if (trimmed.startsWith('[build]')) {
+          inBuildSection = true;
+        } else if (trimmed.startsWith('[') && !trimmed.startsWith('[build')) {
+          inBuildSection = false;
+        }
+        
+        // If we're in build section and line has command = (not commented)
+        if (inBuildSection && trimmed.includes('command') && trimmed.includes('=')) {
+          if (!trimmed.startsWith('#')) {
+            hasActiveCommand = true;
+            break;
+          }
+        }
+      }
+      
+      assert.strictEqual(hasActiveCommand, false, 
         'wrangler.toml should not have active build command');
     });
   });

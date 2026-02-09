@@ -80,7 +80,6 @@ export default {
 
     try {
       // Clone the request to forward to backend
-      // We need to handle the body carefully based on content type
       const headers = new Headers(request.headers);
       
       // Add proxy identification header
@@ -95,14 +94,11 @@ export default {
         headers.set('X-Real-IP', clientIP);
       }
 
-      // Forward environment secrets as headers (for auth, etc.)
-      // The backend will read these from headers instead of env vars
-      if (env.JWT_KEY) {
-        headers.set('X-JWT-Key', env.JWT_KEY);
-      }
-      if (env.ALLOWED_ORIGINS) {
-        headers.set('X-Allowed-Origins', env.ALLOWED_ORIGINS);
-      }
+      // Security Note: Secrets should be configured in the backend environment
+      // directly, not forwarded from workers. The backend should read from its
+      // own environment variables. Workers only handle routing.
+      // If you need to pass authentication between worker and backend, use
+      // mutual TLS or signed tokens instead of forwarding raw secrets.
 
       // Create forwarded request
       const forwardedRequest = new Request(backendTargetUrl, {
