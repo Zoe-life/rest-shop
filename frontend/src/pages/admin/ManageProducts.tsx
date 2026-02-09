@@ -295,6 +295,7 @@ const ManageProducts: React.FC = () => {
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   required
+                  placeholder="e.g., Wireless Headphones"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-navy-700 text-navy-600 dark:text-white focus:ring-2 focus:ring-saffron-500 focus:border-transparent"
                 />
               </div>
@@ -308,6 +309,7 @@ const ManageProducts: React.FC = () => {
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: e.target.value })}
                   required
+                  placeholder="0.00"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-navy-700 text-navy-600 dark:text-white focus:ring-2 focus:ring-saffron-500 focus:border-transparent"
                 />
               </div>
@@ -320,6 +322,7 @@ const ManageProducts: React.FC = () => {
                   value={formData.stock}
                   onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
                   required
+                  placeholder="0"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-navy-700 text-navy-600 dark:text-white focus:ring-2 focus:ring-saffron-500 focus:border-transparent"
                 />
               </div>
@@ -331,6 +334,7 @@ const ManageProducts: React.FC = () => {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
+                  placeholder="Enter product description (optional)"
                   className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg bg-white dark:bg-navy-700 text-navy-600 dark:text-white focus:ring-2 focus:ring-saffron-500 focus:border-transparent"
                 />
               </div>

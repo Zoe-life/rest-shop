@@ -401,6 +401,32 @@ If you encounter issues connecting to MongoDB, see the [Mongoose Troubleshooting
 
 ### Running the Application
 
+#### Seeding Sample Products (Optional)
+
+To populate your database with professional sample products for a realistic e-commerce experience:
+
+```bash
+cd api
+
+# View what would be seeded (safe mode)
+npm run seed
+
+# Add 12 sample products with descriptions and images
+npm run seed:force
+
+# Clear existing products and reseed
+npm run seed:clear
+```
+
+This will add professional sample products including:
+- Electronics (headphones, smart watches, speakers, keyboards)
+- Accessories (bags, sunglasses)
+- Sports & Fitness (yoga mats, water bottles, running shoes)
+- Clothing (organic cotton t-shirts)
+- Home & Kitchen (coffee mugs, desk lamps)
+
+All products include professional descriptions, realistic pricing, high-quality images, and stock quantities.
+
 #### Development Mode - Full Stack
 
 **Terminal 1 - Backend API:**
