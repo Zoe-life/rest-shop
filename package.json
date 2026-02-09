@@ -16,9 +16,5 @@
     "worker"
   ],
   "author": "Merlyn Zawadi",
-  "license": "ISC",
-  "workspaces": [
-    "api",
-    "worker"
-  ]
+  "license": "ISC"
 }
