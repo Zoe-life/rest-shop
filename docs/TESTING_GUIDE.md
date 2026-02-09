@@ -551,13 +551,36 @@ npm run build
 
 ### Common Issues
 
-#### 1. MongoDB Connection Timeout
+#### 1. MongoDB Memory Server - libcrypto.so.1.1 Missing
+```bash
+# Error: Instance failed to start because a library is missing or cannot be opened: "libcrypto.so.1.1"
+# 
+# Cause: Ubuntu 22.04+ uses OpenSSL 3.x, but older MongoDB binaries require OpenSSL 1.1
+#
+# Solution: The project is configured to use MongoDB 7.0.14 which supports OpenSSL 3.x
+# Configuration in package.json:
+# {
+#   "config": {
+#     "mongodbMemoryServer": {
+#       "version": "7.0.14"
+#     }
+#   }
+# }
+#
+# Also set environment variable in CI:
+# MONGOMS_VERSION=7.0.14
+#
+# The CI workflow (.github/workflows/ci-cd.yml) is already configured with this setting.
+```
+
+#### 2. MongoDB Connection Timeout
 ```bash
 # Tests timeout waiting for MongoDB
 # Solution: Check MongoDB Memory Server setup in test/setup.js
+# Ensure network access to fastdl.mongodb.org for binary downloads
 ```
 
-#### 2. Redis Connection Errors in Tests
+#### 3. Redis Connection Errors in Tests
 ```bash
 # Redis logs ECONNREFUSED
 # Solution: Normal in test environment, Redis is optional

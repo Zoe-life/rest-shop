@@ -78,6 +78,7 @@ jobs:
         env:
           JWT_KEY: ${{ secrets.JWT_KEY || 'test_jwt_key' }}
           NODE_ENV: test
+          MONGOMS_VERSION: 7.0.14
 
   # Job 4: Build Verification
   build:
