@@ -44,6 +44,13 @@ id = "2b52b610274c4a078262f796b01bb7ec"  # Replace with: wrangler kv:namespace c
 
 # Durable Objects removed - no longer needed as we proxy to Node.js backend
 
+# Migration to delete the DatabaseConnection Durable Object class
+# This is required when removing Durable Objects from a previously deployed worker
+[[migrations]]
+tag = "v1" # Version tag for this migration
+new_classes = [] # No new classes being added
+deleted_classes = ["DatabaseConnection"] # Remove the DatabaseConnection class
+
 # Note: No build step needed - Workers are lightweight proxies
 
 # This tells the Wrangler to treat HTML files as plain text
