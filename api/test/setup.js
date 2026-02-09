@@ -12,21 +12,35 @@ before(async function() {
     this.timeout(60000);
     
     try {
-        // Configure MongoDB Memory Server to use Ubuntu 22.04 binaries for Ubuntu 24.04
-        // MongoDB 7.0.14 binaries don't exist for ubuntu2404, so we fall back to ubuntu2204
-        mongoServer = await MongoMemoryServer.create({
+        // Check if running on Ubuntu 24.04
+        const fs = require('fs');
+        let isUbuntu2404 = false;
+        try {
+            const osRelease = fs.readFileSync('/etc/os-release', 'utf8');
+            isUbuntu2404 = osRelease.includes('VERSION_ID="24.04"');
+        } catch (err) {
+            // If we can't read /etc/os-release, let mongodb-memory-server auto-detect
+        }
+        
+        // Configure MongoDB Memory Server
+        // For Ubuntu 24.04, use Ubuntu 22.04 binaries since 7.0.14 binaries don't exist for ubuntu2404
+        const mongoConfig = {
             binary: {
                 version: '7.0.14',
-                arch: 'x64',
-                platform: 'linux',
-                // Use Ubuntu 22.04 binaries which are compatible with Ubuntu 24.04
-                os: {
-                    os: 'linux',
-                    dist: 'ubuntu',
-                    release: '22.04'
-                }
             }
-        });
+        };
+        
+        if (isUbuntu2404) {
+            // Force Ubuntu 22.04 binaries for Ubuntu 24.04
+            mongoConfig.binary.arch = 'x64';
+            mongoConfig.binary.platform = 'linux';
+            mongoConfig.binary.os = {
+                dist: 'ubuntu',
+                release: '22.04'
+            };
+        }
+        
+        mongoServer = await MongoMemoryServer.create(mongoConfig);
         const mongoUri = mongoServer.getUri();
         await mongoose.connect(mongoUri);
     } catch (error) {
