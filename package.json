@@ -12,7 +12,7 @@
     "start": "nodemon server.js",
     "create-admin": "node scripts/create-admin.js",
     "clean": "rimraf dist && rm -rf coverage .nyc_output && rm -rf node_modules/@mapbox/node-pre-gyp",
-    "build": "npm run clean; node scripts/patch-mongoose-browser.js",
+    "build": "echo 'No build step needed - Workers are lightweight proxies'",
     "postinstall": "patch-package",
     "deploy:base": "wrangler deploy --config wrangler.toml",
     "deploy:payments": "wrangler deploy --config wrangler-payments.toml",
