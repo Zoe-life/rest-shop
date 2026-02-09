@@ -5,7 +5,7 @@
 
 const request = require('supertest');
 const app = require('../../app');
-const User = require('../../api/models/user');
+const User = require('../../models/user');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');

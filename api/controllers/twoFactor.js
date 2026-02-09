@@ -6,7 +6,7 @@
 const speakeasy = require('speakeasy');
 const QRCode = require('qrcode');
 const User = require('../models/user');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 /**
  * Setup 2FA - Generate secret and QR code

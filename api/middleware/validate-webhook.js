@@ -3,7 +3,7 @@
  * @description Middleware for validating webhook requests
  */
 
-const { logWarn, logError } = require('../../utils/logger');
+const { logWarn, logError } = require('../utils/logger');
 const crypto = require('crypto');
 
 /**

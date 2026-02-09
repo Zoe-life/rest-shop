@@ -2,9 +2,9 @@ const chai = require('chai');
 const expect = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
-const Order = require('../../api/models/order');
-const Product = require('../../api/models/product');
-const OrdersController = require('../../api/controllers/orders');
+const Order = require('../../models/order');
+const Product = require('../../models/product');
+const OrdersController = require('../../controllers/orders');
 
 describe('Orders Controller', () => {
     let req, res, next;

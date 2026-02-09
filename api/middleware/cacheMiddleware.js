@@ -4,7 +4,7 @@
  */
 
 const cacheService = require('../services/cacheService');
-const { logInfo } = require('../../utils/logger');
+const { logInfo } = require('../utils/logger');
 
 /**
  * Cache middleware factory

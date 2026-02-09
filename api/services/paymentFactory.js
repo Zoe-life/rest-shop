@@ -6,7 +6,7 @@
 const StripeService = require('./stripeService');
 const PayPalService = require('./paypalService');
 const MpesaService = require('./mpesaService');
-const { logError } = require('../../utils/logger');
+const { logError } = require('../utils/logger');
 
 /**
  * Payment Factory Class

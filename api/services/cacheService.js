@@ -4,7 +4,7 @@
  */
 
 const Redis = require('ioredis');
-const { logInfo, logError, logWarn } = require('../../utils/logger');
+const { logInfo, logError, logWarn } = require('../utils/logger');
 
 let redisClient = null;
 let isConnected = false;

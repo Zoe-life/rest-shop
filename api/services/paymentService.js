@@ -5,7 +5,7 @@
 
 const Payment = require('../models/payment');
 const mongoose = require('mongoose');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 /**
  * Base Payment Service Class

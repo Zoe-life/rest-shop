@@ -5,13 +5,13 @@ const morgan = require('morgan');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const passport = require('./config/passport');
-const { helmetConfig, apiLimiter, sanitizeInput } = require('./api/middleware/security');
+const { helmetConfig, apiLimiter, sanitizeInput } = require('./middleware/security');
 
 // Routes (Payment routes moved to payment-worker.js for microservices architecture)
-const productRoutes = require('./api/routes/products');
-const orderRoutes = require('./api/routes/orders');
-const userRoutes = require('./api/routes/user');
-const authRoutes = require('./api/routes/auth');
+const productRoutes = require('./routes/products');
+const orderRoutes = require('./routes/orders');
+const userRoutes = require('./routes/user');
+const authRoutes = require('./routes/auth');
 
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
@@ -59,7 +59,7 @@ app.get('/health', (req, res) => {
 
 // 4. Shop Routes (Payment routes handled by payment-worker.js)
 // Support both versioned and non-versioned routes for backward compatibility
-const v1Routes = require('./api/v1/routes');
+const v1Routes = require('./v1/routes');
 app.use('/api/v1', v1Routes);
 
 // Legacy non-versioned routes (backward compatibility)

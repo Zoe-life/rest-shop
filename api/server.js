@@ -46,7 +46,7 @@ mongoose.connect(process.env.MONGODB_URI, mongoOptions)
             
             // Initialize WebSocket server
             try {
-                const socketService = require('./api/services/socketService');
+                const socketService = require('./services/socketService');
                 socketService.initializeSocket(server);
                 console.log('🔌 WebSocket server initialized');
             } catch (err) {

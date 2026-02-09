@@ -6,7 +6,7 @@
 const Order = require('../models/order');
 const Product = require('../models/product');
 const mongoose = require('mongoose');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 /**
  * Retrieve all orders

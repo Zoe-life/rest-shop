@@ -3,7 +3,7 @@
  * @description WebSocket service for real-time notifications
  */
 
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 
 let io = null;
 const connectedUsers = new Map(); // userId -> socketId

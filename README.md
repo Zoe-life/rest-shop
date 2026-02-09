@@ -4,6 +4,32 @@
 [![Security](https://img.shields.io/badge/security-helmet-brightgreen)](https://helmetjs.github.io/)
 [![License](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 
+## Repository Structure
+
+```
+rest-shop/
+│
+├─ api/                 ← Node + Express + Mongoose
+│   ├─ models/
+│   ├─ routes/
+│   ├─ controllers/
+│   ├─ middleware/
+│   ├─ services/
+│   ├─ config/
+│   ├─ utils/
+│   ├─ test/
+│   ├─ server.js
+│   └─ package.json
+│
+├─ worker/              ← Cloudflare Worker
+│   ├─ src/
+│   │   └─ index.js
+│   ├─ wrangler.toml
+│   └─ package.json
+│
+└─ README.md
+```
+
 ## Table of Contents
 - [Overview](#overview)
 - [Architecture](#architecture)
@@ -214,13 +240,16 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
    cd rest-shop
    ```
 
-2. Install dependencies:
+2. Install dependencies for both API and Worker:
    ```bash
-   npm install
+   npm run install:all
+   # OR install separately:
+   cd api && npm install
+   cd ../worker && npm install
    ```
 
 ### Configuration
-1. Create a `.env` file in the root directory:
+1. Create a `.env` file in the `api/` directory:
    ```env
    # Core Configuration
    MONGODB_URI=mongodb+srv://username:password@cluster0.lifak.mongodb.net/
@@ -280,22 +309,31 @@ If you encounter issues connecting to MongoDB, see the [Mongoose Troubleshooting
 
 ### Running the Application
 
-#### Development Mode
+#### Development Mode (API Server)
 ```bash
 npm start
+# OR
+cd api && npm start
 # Server runs on http://localhost:3001
 ```
 
 #### Production Mode
 ```bash
-NODE_ENV=production node server.js
+cd api && NODE_ENV=production node server.js
+```
+
+#### Deploying the Worker
+```bash
+npm run deploy:worker
+# OR
+cd worker && npm run deploy
 ```
 
 #### Running Tests
 ```bash
 npm test
-# or with coverage
-npm run coverage
+# OR
+cd api && npm test
 ```
 
 ## API Endpoints

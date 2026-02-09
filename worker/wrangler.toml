@@ -1,6 +1,6 @@
 # Cloudflare Workers Configuration - Base Service
 name = "rest-shop-api"
-main = "src/worker.js"
+main = "src/index.js"
 
 # Base Service Worker (Products, Orders, User, Auth)
 # This worker now acts as a lightweight proxy to the Node.js backend

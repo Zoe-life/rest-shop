@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const sinon = require('sinon');
 const jwt = require('jsonwebtoken');
-const checkAuth = require('../../api/middleware/check-auth');
+const checkAuth = require('../../middleware/check-auth');
 
 describe('Check Auth Middleware', () => {
     let req, res, next;

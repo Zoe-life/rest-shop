@@ -3,8 +3,8 @@ const expect = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
-const User = require('../../api/models/user');
-const UserController = require('../../api/controllers/user');
+const User = require('../../models/user');
+const UserController = require('../../controllers/user');
 
 describe('User Controller', () => {
     let req, res, next;
