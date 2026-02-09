@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Header from './components/Header';
+import ProtectedRoute from './components/ProtectedRoute';
 import Products from './pages/Products';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
@@ -18,8 +19,12 @@ function App() {
       <ThemeProvider>
         <AuthProvider>
           <Routes>
-            {/* Admin Routes */}
-            <Route path="/admin" element={<AdminLayout />}>
+            {/* Admin Routes - Protected */}
+            <Route path="/admin" element={
+              <ProtectedRoute adminOnly>
+                <AdminLayout />
+              </ProtectedRoute>
+            }>
               <Route index element={<AdminDashboard />} />
               <Route path="products" element={<ManageProducts />} />
               <Route path="orders" element={<ManageOrders />} />
@@ -35,7 +40,11 @@ function App() {
                     <Route path="/" element={<Products />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
-                    <Route path="/orders" element={<Orders />} />
+                    <Route path="/orders" element={
+                      <ProtectedRoute>
+                        <Orders />
+                      </ProtectedRoute>
+                    } />
                   </Routes>
                 </main>
               </div>
