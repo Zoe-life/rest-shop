@@ -22,13 +22,19 @@ if (typeof globalThis.process === 'undefined') {
 
 // Polyfill process.emitWarning for Cloudflare Workers
 // Many Node.js modules call this during initialization
-if (typeof globalThis.process.emitWarning !== 'function') {
+// Use a more defensive check to avoid accessing undefined properties
+if (!globalThis.process.emitWarning || typeof globalThis.process.emitWarning !== 'function') {
   globalThis.process.emitWarning = function(warning, type, code) {
     // In Cloudflare Workers, we log warnings to console instead
     const warningType = type || 'Warning';
     const warningCode = code ? ` (${code})` : '';
     console.warn(`[${warningType}]${warningCode}: ${warning}`);
   };
+}
+
+// Also ensure process is available on global scope (not just globalThis)
+if (typeof global !== 'undefined' && typeof global.process === 'undefined') {
+  global.process = globalThis.process;
 }
 
 // Export for explicit imports if needed
