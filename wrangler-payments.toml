@@ -23,10 +23,9 @@ NODE_ENV = "production"
 PORT = "3001"
 FRONTEND_URL = "https://rest-shop.pages.dev"
 
-# IMPORTANT: Set this to your Node.js backend URL
-# For local development: http://localhost:3001
-# For production: your deployed Node.js backend URL (e.g., https://api.yourdomain.com)
-# This will be overridden by secrets in production
+# Backend API URL - Set this to your Node.js backend URL
+# For local development: uncomment and set to http://localhost:3001
+# For production: set via secrets (wrangler secret put BACKEND_API_URL)
 # BACKEND_API_URL = "http://localhost:3001"
 
 # Service bindings
