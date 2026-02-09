@@ -24,8 +24,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'api/package-lock.json'
       - name: Install dependencies
         run: cd api && npm ci
       - name: Check for security vulnerabilities
@@ -71,8 +69,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'api/package-lock.json'
       - name: Install dependencies
         run: cd api && npm ci
       - name: Run tests
@@ -94,8 +90,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'worker/package-lock.json'
       - name: Install Worker dependencies
         run: cd worker && npm ci || npm install
       - name: Validate Worker configuration
@@ -115,8 +109,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: 'worker/package-lock.json'
       - name: Install Worker dependencies
         run: cd worker && npm ci || npm install
       # Secrets (MONGO_ATLAS_PW, JWT_KEY, ALLOWED_ORIGINS) should be configured
