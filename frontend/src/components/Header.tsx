@@ -19,7 +19,7 @@ const Header: React.FC = () => {
         <div className="flex items-center justify-between">
           {/* Logo */}
           <Link to="/" className="flex items-center space-x-2">
-            <div className="w-10 h-10 bg-gradient-to-br from-saffron-500 to-saffron-600 rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-saffron-500 rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">RS</span>
             </div>
             <span className="text-2xl font-bold text-navy-600 dark:text-white">
