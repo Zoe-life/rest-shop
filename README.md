@@ -30,20 +30,36 @@ This RESTful API provides a comprehensive, **professional-grade e-commerce platf
 
 ## Architecture
 
-### Microservices Architecture
-The application uses a **microservices architecture** deployed on Cloudflare Workers to solve bundle size limitations and improve scalability:
+### Proxy Architecture for Cloudflare Workers Compatibility
 
-- **Gateway Worker** (~50KB): Lightweight router that directs traffic to appropriate services
-- **Payment Service** (~600-800KB): Dedicated worker for payment processing (Stripe, PayPal, M-Pesa)
-- **Base Service** (~1.2-1.5MB): Core functionality (products, orders, users, auth)
+The application uses a **proxy architecture** to solve Mongoose incompatibility with Cloudflare Workers:
+
+```
+Client → Cloudflare Workers (Edge Proxy) → Node.js Backend (Mongoose + MongoDB)
+```
+
+**Components:**
+- **Cloudflare Workers** (~10-50KB): Lightweight edge proxies for global distribution
+- **Node.js Backend**: Handles all database operations with Mongoose in a proper Node.js environment
 
 **Benefits:**
-- ✅ Each service stays under Cloudflare's 1MB free tier limit
-- ✅ Independent deployment and scaling per service
-- ✅ Zero-latency service-to-service communication via Service Bindings
-- ✅ Better separation of concerns and maintainability
+- ✅ No more Cloudflare Workers runtime errors (error 10021 solved)
+- ✅ Fast edge routing with global distribution
+- ✅ Reliable Mongoose/MongoDB operations in Node.js
+- ✅ Independent scaling of edge and backend layers
+- ✅ Industry-standard API gateway pattern
 
-See [Microservices Architecture Documentation](docs/MICROSERVICES_ARCHITECTURE.md) for detailed information.
+**Deployment:**
+- Workers: Deploy to Cloudflare (~10KB, stays in free tier)
+- Backend: Deploy to Railway, Render, VPS, or any Node.js hosting
+
+See detailed documentation:
+- [Proxy Architecture Explanation](docs/CLOUDFLARE_WORKERS_PROXY_ARCHITECTURE.md)
+- [Quick Deployment Guide](docs/DEPLOYMENT_GUIDE.md)
+
+### Legacy Microservices Architecture (Deprecated)
+
+The previous architecture attempted to run Mongoose directly in Workers using Durable Objects. This has been replaced by the proxy architecture above to resolve runtime incompatibility issues.
 
 ### Deployment Commands
 ```bash

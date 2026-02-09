@@ -94,12 +94,31 @@ export default {
         headers.set('X-Real-IP', clientIP);
       }
 
-      // Security Note: Payment gateway secrets should be configured in the
-      // backend environment directly, not forwarded from workers. The backend
-      // should read from its own environment variables. Workers only handle routing.
-      // Forwarding secrets via headers creates security risks (interception, logging).
-      // If you need to pass authentication between worker and backend, use
-      // mutual TLS or signed tokens instead of forwarding raw secrets.
+      // Forward environment secrets as headers
+      if (env.JWT_KEY) {
+        headers.set('X-JWT-Key', env.JWT_KEY);
+      }
+      if (env.STRIPE_SECRET_KEY) {
+        headers.set('X-Stripe-Secret-Key', env.STRIPE_SECRET_KEY);
+      }
+      if (env.STRIPE_WEBHOOK_SECRET) {
+        headers.set('X-Stripe-Webhook-Secret', env.STRIPE_WEBHOOK_SECRET);
+      }
+      if (env.PAYPAL_CLIENT_ID) {
+        headers.set('X-Paypal-Client-ID', env.PAYPAL_CLIENT_ID);
+      }
+      if (env.PAYPAL_CLIENT_SECRET) {
+        headers.set('X-Paypal-Client-Secret', env.PAYPAL_CLIENT_SECRET);
+      }
+      if (env.MPESA_CONSUMER_KEY) {
+        headers.set('X-Mpesa-Consumer-Key', env.MPESA_CONSUMER_KEY);
+      }
+      if (env.MPESA_CONSUMER_SECRET) {
+        headers.set('X-Mpesa-Consumer-Secret', env.MPESA_CONSUMER_SECRET);
+      }
+      if (env.ALLOWED_ORIGINS) {
+        headers.set('X-Allowed-Origins', env.ALLOWED_ORIGINS);
+      }
 
       // Create forwarded request
       const forwardedRequest = new Request(backendTargetUrl, {
