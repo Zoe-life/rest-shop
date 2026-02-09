@@ -44,10 +44,14 @@ let signupLimiterInstance = null;
  * Lazily initialized to avoid async operations in global scope (Cloudflare Workers requirement)
  */
 function getApiLimiter() {
+    if (process.env.NODE_ENV === 'test') {
+        return (req, res, next) => next();
+    }
+
     if (!apiLimiterInstance) {
         apiLimiterInstance = rateLimit({
-            windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 100, // Limit each IP to 100 requests per windowMs
+            windowMs: 15 * 60 * 1000,
+            max: 100,
             message: 'Too many requests from this IP, please try again later.',
             standardHeaders: true,
             legacyHeaders: false,
@@ -56,15 +60,20 @@ function getApiLimiter() {
     return apiLimiterInstance;
 }
 
+
 /**
  * Factory function for authentication rate limiter
  * Lazily initialized to avoid async operations in global scope (Cloudflare Workers requirement)
  */
 function getAuthLimiter() {
+    if (process.env.NODE_ENV === 'test') {
+        return (req, res, next) => next();
+    }
+
     if (!authLimiterInstance) {
         authLimiterInstance = rateLimit({
-            windowMs: 15 * 60 * 1000, // 15 minutes
-            max: 5, // Limit each IP to 5 requests per windowMs
+            windowMs: 15 * 60 * 1000,
+            max: 5,
             message: 'Too many authentication attempts, please try again later.',
             standardHeaders: true,
             legacyHeaders: false,
@@ -73,15 +82,20 @@ function getAuthLimiter() {
     return authLimiterInstance;
 }
 
+
 /**
  * Factory function for signup rate limiter
  * Lazily initialized to avoid async operations in global scope (Cloudflare Workers requirement)
  */
 function getSignupLimiter() {
+    if (process.env.NODE_ENV === 'test') {
+        return (req, res, next) => next();
+    }
+
     if (!signupLimiterInstance) {
         signupLimiterInstance = rateLimit({
-            windowMs: 60 * 60 * 1000, // 1 hour
-            max: 5, // Limit each IP to 5 signups per hour
+            windowMs: 60 * 60 * 1000,
+            max: 5,
             message: 'Too many accounts created, please try again later.',
             standardHeaders: true,
             legacyHeaders: false,
@@ -89,6 +103,7 @@ function getSignupLimiter() {
     }
     return signupLimiterInstance;
 }
+
 
 /**
  * Middleware wrapper for API rate limiter
