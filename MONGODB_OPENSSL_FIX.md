@@ -117,7 +117,7 @@ $ npm test
 
 This fix ensures that tests run successfully on modern Ubuntu systems by configuring MongoDB Memory Server to use MongoDB 7.0.14, which is compatible with OpenSSL 3.x. The solution is:
 
-- ✅ **Minimal**: Only 4 files changed
+- ✅ **Minimal**: Only 5 files changed
 - ✅ **Non-breaking**: Works on both old and new systems
 - ✅ **Well-documented**: Clear instructions and troubleshooting
 - ✅ **Future-proof**: Compatible with latest Ubuntu LTS releases
