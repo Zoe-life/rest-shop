@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: cd api && npm install #npm ci
+        run: cd api && npm ci
       - name: Check for security vulnerabilities
         run: cd api && npm audit --audit-level=moderate || true
       - name: Run ESLint
@@ -70,7 +70,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: cd api && npm install #npm ci
+        run: cd api && npm ci
       - name: Run tests
         run: cd api && npm test
         env:
@@ -91,7 +91,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Worker dependencies
-        run: cd worker && npm install #npm ci ||
+        run: cd worker && npm ci || npm install
       - name: Validate Worker configuration
         run: cd worker && npx wrangler validate || echo "Worker config validated"
 
@@ -110,7 +110,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Worker dependencies
-        run: cd worker && npm install #npm ci ||
+        run: cd worker && npm ci || npm install
       # Secrets (MONGO_ATLAS_PW, JWT_KEY, ALLOWED_ORIGINS) should be configured
       # in Cloudflare dashboard or via `wrangler secret put` command.
       # The secrets: parameter is removed to avoid "Binding name already in use" errors
