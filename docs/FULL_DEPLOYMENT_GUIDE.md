@@ -269,7 +269,7 @@ Expected response:
 Project name: rest-shop-frontend
 Production branch: main
 Build command: cd frontend && npm install && npm run build
-Build output directory: frontend/build
+Build output directory: frontend/dist
 Root directory: (leave empty)
 ```
 

@@ -99,7 +99,7 @@ jobs:
       - name: Build Frontend
         run: cd frontend && npm run build
         env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://rest-shop-worker.workers.dev' }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://rest-shop-worker.workers.dev' }}
 
   # Job 5: Deploy Worker to Cloudflare
   deploy-worker:
@@ -147,13 +147,13 @@ jobs:
       - name: Build Frontend
         run: cd frontend && npm run build
         env:
-          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          command: pages deploy frontend/build --project-name=rest-shop-frontend
+          command: pages deploy frontend/dist --project-name=rest-shop-frontend
 
   # Job 7: CodeQL Analysis
   codeql:
