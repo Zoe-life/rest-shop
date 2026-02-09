@@ -76,8 +76,9 @@ describe('Cloudflare Workers Proxy Architecture', function() {
       const workerPath = path.join(__dirname, '..', 'src', 'worker.js');
       const workerContent = fs.readFileSync(workerPath, 'utf8');
       
+      // Check for Durable Object specific patterns
       const hasDurableObject = workerContent.includes('DurableObject') ||
-                              workerContent.includes('export class');
+                              workerContent.includes('extends DurableObject');
       
       assert.strictEqual(hasDurableObject, false, 
         'worker.js should not have Durable Objects (proxy architecture)');

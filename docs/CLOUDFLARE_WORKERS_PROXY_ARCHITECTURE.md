@@ -86,7 +86,7 @@ We've implemented a **separation of concerns** architecture:
    Headers:
      X-Forwarded-By: Cloudflare-Worker
      X-Forwarded-For: <client-ip>
-     X-JWT-Key: <jwt-secret>
+     Authorization: Bearer <jwt-token> (if present in original request)
    ```
 
 4. **Backend → MongoDB**
@@ -374,9 +374,13 @@ wrangler secret put BACKEND_API_URL
 
 ### Authentication failures
 **Problem**: JWT validation failing
-**Solution**: Ensure `JWT_KEY` is identical in both:
-- Cloudflare Worker secrets
-- Backend environment variables
+**Solution**: Ensure `JWT_KEY` is set correctly in the **backend** environment:
+- Railway/Render: Check environment variables in dashboard
+- VPS: Check `.env` file on server
+- Must be at least 32 characters
+- Must match what was used to create tokens
+
+Note: Workers do NOT need JWT_KEY. It's only needed in the backend.
 
 ### Database not connected
 **Problem**: Backend shows "database: disconnected"

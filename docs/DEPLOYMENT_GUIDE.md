@@ -337,9 +337,16 @@ wrangler secret put BACKEND_API_URL --config wrangler.toml
 
 ### Issue: Authentication fails
 
-**Solution:** Ensure `JWT_KEY` is identical in:
-- Backend environment variables
-- Cloudflare Worker secrets (for both workers)
+**Solution:** Ensure `JWT_KEY` is set correctly in **backend** environment:
+```bash
+# In Railway/Render dashboard, verify:
+JWT_KEY=your_super_long_random_secret_at_least_32_characters
+
+# Must be at least 32 characters
+# Must match what was used to issue tokens
+```
+
+Note: Workers do NOT need JWT_KEY. Authentication happens in the backend.
 
 ### Issue: CORS errors
 
