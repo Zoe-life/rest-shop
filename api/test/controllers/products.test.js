@@ -2,8 +2,8 @@ const chai = require('chai');
 const expect = chai.expect;
 const sinon = require('sinon');
 const mongoose = require('mongoose');
-const Product = require('../../api/models/product');
-const ProductsController = require('../../api/controllers/products');
+const Product = require('../../models/product');
+const ProductsController = require('../../controllers/products');
 
 describe('Products Controller', () => {
     let req, res, next;

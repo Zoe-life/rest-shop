@@ -1,9 +1,9 @@
 const { expect } = require('chai');
 const sinon = require('sinon');
 const mongoose = require('mongoose');
-const Payment = require('../../api/models/payment');
-const Order = require('../../api/models/order');
-const PaymentsController = require('../../api/controllers/payments');
+const Payment = require('../../models/payment');
+const Order = require('../../models/order');
+const PaymentsController = require('../../controllers/payments');
 const PaymentFactory = require('../../api/services/paymentFactory');
 
 describe('Payments Controller', () => {

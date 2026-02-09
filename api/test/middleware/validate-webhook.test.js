@@ -2,7 +2,7 @@ const chai = require('chai');
 const expect = chai.expect;
 const sinon = require('sinon');
 const crypto = require('crypto');
-const { validateMpesaWebhook, validateWebhookSignature, getClientIP } = require('../../api/middleware/validate-webhook');
+const { validateMpesaWebhook, validateWebhookSignature, getClientIP } = require('../../middleware/validate-webhook');
 
 describe('Webhook Validation Middleware', () => {
     let req, res, next;
