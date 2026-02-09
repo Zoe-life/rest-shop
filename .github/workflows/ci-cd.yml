@@ -2,13 +2,13 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 env:
-  NODE_VERSION: '20.x' # Updated for better Cloudflare compatibility
+  NODE_VERSION: "20.x" # Updated for better Cloudflare compatibility
 
 jobs:
   # Job 1: Code Quality and Linting
@@ -25,7 +25,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: cd api && npm ci
+        run: cd api && npm install #npm ci
       - name: Check for security vulnerabilities
         run: cd api && npm audit --audit-level=moderate || true
       - name: Run ESLint
@@ -70,7 +70,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install dependencies
-        run: cd api && npm ci
+        run: cd api && npm install #npm ci
       - name: Run tests
         run: cd api && npm test
         env:
@@ -91,7 +91,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Worker dependencies
-        run: cd worker && npm ci || npm install
+        run: cd worker && npm install #npm ci ||
       - name: Validate Worker configuration
         run: cd worker && npx wrangler validate || echo "Worker config validated"
 
@@ -110,7 +110,7 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Worker dependencies
-        run: cd worker && npm ci || npm install
+        run: cd worker && npm install #npm ci ||
       # Secrets (MONGO_ATLAS_PW, JWT_KEY, ALLOWED_ORIGINS) should be configured
       # in Cloudflare dashboard or via `wrangler secret put` command.
       # The secrets: parameter is removed to avoid "Binding name already in use" errors
@@ -120,7 +120,7 @@ jobs:
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          workingDirectory: 'worker'
+          workingDirectory: "worker"
           command: deploy --minify
 
   # Job 6: CodeQL Analysis
@@ -138,6 +138,6 @@ jobs:
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
-         languages: javascript
+          languages: javascript
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
