@@ -105,6 +105,8 @@ jobs:
   deploy-worker:
     name: Deploy Worker to Cloudflare
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     # Wait for security, test, and build to pass before deploying to production
     needs: [security, test, build]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
@@ -133,6 +135,8 @@ jobs:
   deploy-frontend:
     name: Deploy Frontend to Cloudflare Pages
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     needs: [security, test, build, deploy-worker]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     steps:
