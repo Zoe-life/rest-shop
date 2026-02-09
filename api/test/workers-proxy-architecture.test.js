@@ -37,14 +37,14 @@ describe('Cloudflare Workers Proxy Architecture', function() {
     });
     
     it('workers should have BACKEND_API_URL configuration', function() {
-      const workerPath = path.join(__dirname, '..', 'src', 'worker.js');
+      const workerPath = path.join(__dirname, '..', '..', 'worker', 'src', 'index.js');
       const workerContent = fs.readFileSync(workerPath, 'utf8');
       
       const hasBackendUrl = workerContent.includes('BACKEND_API_URL') || 
                            workerContent.includes('NODE_BACKEND_URL');
       
       assert.strictEqual(hasBackendUrl, true, 
-        'worker.js should reference BACKEND_API_URL');
+        'worker index.js should reference BACKEND_API_URL');
     });
     
     it('workers should export default fetch handler', function() {
