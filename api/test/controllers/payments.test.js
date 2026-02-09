@@ -4,7 +4,7 @@ const mongoose = require('mongoose');
 const Payment = require('../../models/payment');
 const Order = require('../../models/order');
 const PaymentsController = require('../../controllers/payments');
-const PaymentFactory = require('../../api/services/paymentFactory');
+const PaymentFactory = require('../../services/paymentFactory');
 
 describe('Payments Controller', () => {
     let req, res, next;

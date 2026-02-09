@@ -7,7 +7,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
-const { logInfo, logError } = require('../../utils/logger');
+const { logInfo, logError } = require('../utils/logger');
 const { logTokenGenerated, logAuthFailure } = require('../utils/auditLogger');
 
 /**

@@ -8,7 +8,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { logInfo, logError } = require('../utils/logger');
-const { logUserSignup, logUserLogin, logAuthFailure, logUserDeleted } = require('../../utils/auditLogger');
+const { logUserSignup, logUserLogin, logAuthFailure, logUserDeleted } = require('../utils/auditLogger');
 
 /**
  * Safely extract IP address from request
