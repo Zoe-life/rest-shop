@@ -1,13 +1,34 @@
-# RESTful API for Order Management
+# RESTful E-Commerce Platform with React Frontend
 
 [![CI/CD Pipeline](https://github.com/Zoe-life/rest-shop/actions/workflows/ci-cd.yml/badge.svg)](https://github.com/Zoe-life/rest-shop/actions/workflows/ci-cd.yml)
 [![Security](https://img.shields.io/badge/security-helmet-brightgreen)](https://helmetjs.github.io/)
 [![License](https://img.shields.io/badge/license-ISC-blue.svg)](LICENSE)
 
+A modern, full-stack e-commerce platform with dual-backend architecture (Node.js + Cloudflare Workers) and React TypeScript frontend.
+
+## 🎨 Frontend Demo
+
+- **Live Demo**: [Cloudflare Pages](https://rest-shop-frontend.pages.dev) *(after deployment)*
+- **Features**: 
+  - 🌓 Day/Night mode toggle
+  - 📱 Fully responsive design
+  - 🎨 Saffron & Navy Blue theme
+  - ⚡ Fast performance on Cloudflare Pages
+
 ## Repository Structure
 
 ```
 rest-shop/
+│
+├─ frontend/            ← React + TypeScript + Tailwind CSS
+│   ├─ src/
+│   │   ├─ components/  # Reusable components
+│   │   ├─ pages/       # Page components
+│   │   ├─ contexts/    # React contexts (Auth, Theme)
+│   │   ├─ api/         # API configuration
+│   │   └─ App.tsx
+│   ├─ public/
+│   └─ package.json
 │
 ├─ api/                 ← Node + Express + Mongoose
 │   ├─ models/
@@ -21,17 +42,19 @@ rest-shop/
 │   ├─ server.js
 │   └─ package.json
 │
-├─ worker/              ← Cloudflare Worker
+├─ worker/              ← Cloudflare Worker (Edge Proxy)
 │   ├─ src/
 │   │   └─ index.js
 │   ├─ wrangler.toml
 │   └─ package.json
 │
+├─ docs/                ← Comprehensive documentation
 └─ README.md
 ```
 
 ## Table of Contents
 - [Overview](#overview)
+- [Frontend Features](#frontend-features)
 - [Architecture](#architecture)
 - [Features](#features)
   - [Enhanced Features](#enhanced-features)
@@ -52,36 +75,75 @@ rest-shop/
 - [Contributing](#contributing)
 
 ## Overview
-This RESTful API provides a comprehensive, **professional-grade e-commerce platform** with integrated payment processing for managing users, products, orders, and payments. It includes enterprise-grade security features, multiple payment gateways (Stripe, PayPal, M-Pesa), comprehensive testing, and CI/CD pipeline for deployment.
+This is a comprehensive, **professional-grade full-stack e-commerce platform** with:
+- **Modern React Frontend**: TypeScript, Tailwind CSS, responsive design
+- **RESTful API Backend**: Node.js, Express, Mongoose, MongoDB
+- **Edge Distribution**: Cloudflare Workers proxy for global performance
+- **Enterprise Features**: Payment processing (Stripe, PayPal, M-Pesa), authentication, order management
+- **Automated CI/CD**: GitHub Actions for continuous deployment
+
+## Frontend Features
+
+### 🎨 Modern UI/UX
+- **Theme Colors**: Bright Saffron (#FF9933) and Navy Blue (#002366)
+- **Dark/Light Mode**: Toggle with persistence via localStorage
+- **Responsive Design**: Mobile-first, works on all screen sizes
+- **Clean Interface**: Professional, intuitive, and user-friendly
+
+### 🚀 Technology Stack
+- **React 18** with TypeScript
+- **Tailwind CSS** for styling
+- **React Router** for navigation
+- **Context API** for state management
+- **Axios** for API communication
+
+### 📱 Pages & Features
+- **Product Browsing**: Grid layout with images, prices, and stock status
+- **Authentication**: Login and signup pages
+- **Order Management**: View order history and status
+- **User Profile**: Account information display
+- **Theme Toggle**: Seamless day/night mode switching
+
+See [Frontend README](./frontend/README.md) for detailed documentation.
 
 ## Architecture
 
 ### Proxy Architecture for Cloudflare Workers Compatibility
 
-The application uses a **proxy architecture** to solve Mongoose incompatibility with Cloudflare Workers:
+The application uses a **three-tier proxy architecture**:
 
 ```
-Client → Cloudflare Workers (Edge Proxy) → Node.js Backend (Mongoose + MongoDB)
+Frontend (Cloudflare Pages)
+    ↓ HTTPS
+Cloudflare Workers (Edge Proxy)
+    ↓ HTTPS
+Node.js Backend (Railway/Render)
+    ↓
+MongoDB Atlas
 ```
 
 **Components:**
-- **Cloudflare Workers** (~10-50KB): Lightweight edge proxies for global distribution
-- **Node.js Backend**: Handles all database operations with Mongoose in a proper Node.js environment
+- **Frontend** (~100KB): React SPA deployed to Cloudflare Pages
+- **Cloudflare Workers** (~10KB): Lightweight edge proxy for global distribution
+- **Node.js Backend**: Full API with Mongoose/MongoDB operations
+- **MongoDB Atlas**: Cloud database
 
 **Benefits:**
-- ✅ No more Cloudflare Workers runtime errors (error 10021 solved)
-- ✅ Fast edge routing with global distribution
+- ✅ Global CDN distribution for frontend
+- ✅ Fast edge routing via Workers
 - ✅ Reliable Mongoose/MongoDB operations in Node.js
-- ✅ Independent scaling of edge and backend layers
-- ✅ Industry-standard API gateway pattern
+- ✅ Independent scaling of all layers
+- ✅ Industry-standard architecture pattern
 
 **Deployment:**
-- Workers: Deploy to Cloudflare (~10KB, stays in free tier)
-- Backend: Deploy to Railway, Render, VPS, or any Node.js hosting
+- Frontend: Cloudflare Pages (automatic via GitHub Actions)
+- Workers: Cloudflare Workers (automatic via GitHub Actions)
+- Backend: Railway/Render (auto-deploy on push)
 
 See detailed documentation:
+- [Complete Deployment Guide](docs/FULL_DEPLOYMENT_GUIDE.md)
+- [GitHub CI/CD Setup](docs/GITHUB_SECRETS_CICD_GUIDE.md)
 - [Proxy Architecture Explanation](docs/CLOUDFLARE_WORKERS_PROXY_ARCHITECTURE.md)
-- [Quick Deployment Guide](docs/DEPLOYMENT_GUIDE.md)
 
 ### Legacy Microservices Architecture (Deprecated)
 
@@ -205,6 +267,16 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 - At least one special character (@$!%*?&)
 
 ## Technologies Used
+
+### Frontend
+- **React 18**: Modern UI library
+- **TypeScript**: Type-safe JavaScript
+- **Tailwind CSS**: Utility-first CSS framework
+- **React Router**: Client-side routing
+- **Axios**: HTTP client for API requests
+- **Context API**: State management
+
+### Backend
 - **Runtime**: Node.js 18.x/20.x
 - **Framework**: Express.js 4.x
 - **Database**: MongoDB Atlas with Mongoose 8.x (with indexing for scalability)
@@ -222,8 +294,13 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 - **Testing**: Mocha, Chai, Sinon, Supertest
 - **Logging**: Morgan, Custom transaction logging
 - **Environment**: dotenv
-- **Deployment**: Cloudflare Workers (Wrangler)
+
+### Deployment
+- **Frontend**: Cloudflare Pages
+- **Edge Layer**: Cloudflare Workers
+- **Backend**: Railway/Render/VPS
 - **CI/CD**: GitHub Actions
+- **Database**: MongoDB Atlas
 
 ## Getting Started
 
@@ -234,22 +311,30 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 - Git
 
 ### Installation
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/Zoe-life/rest-shop.git
    cd rest-shop
    ```
 
-2. Install dependencies for both API and Worker:
+2. Install dependencies for all components:
    ```bash
-   npm run install:all
-   # OR install separately:
+   # Install backend dependencies
    cd api && npm install
+   
+   # Install worker dependencies
    cd ../worker && npm install
+   
+   # Install frontend dependencies
+   cd ../frontend && npm install
    ```
 
 ### Configuration
-1. Create a `.env` file in the `api/` directory:
+
+#### 1. Backend Configuration
+
+Create a `.env` file in the `api/` directory:
    ```env
    # Core Configuration
    MONGODB_URI=mongodb+srv://username:password@cluster0.lifak.mongodb.net/
@@ -292,7 +377,14 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
    MPESA_CONSUMER_SECRET=your-mpesa-consumer-secret
    ```
 
-2. Configure MongoDB Atlas:
+#### 2. Frontend Configuration
+
+Create a `.env.local` file in the `frontend/` directory:
+   ```env
+   REACT_APP_API_URL=http://localhost:3001
+   ```
+
+#### 3. MongoDB Atlas Setup
    - Create a cluster at https://cloud.mongodb.com
    - Add your IP to the IP Access List
    - Create a database user
@@ -309,10 +401,24 @@ If you encounter issues connecting to MongoDB, see the [Mongoose Troubleshooting
 
 ### Running the Application
 
-#### Development Mode (API Server)
+#### Development Mode - Full Stack
+
+**Terminal 1 - Backend API:**
 ```bash
-npm start
-# OR
+cd api && npm start
+# Server runs on http://localhost:3001
+```
+
+**Terminal 2 - Frontend:**
+```bash
+cd frontend && npm start
+# Frontend runs on http://localhost:3000
+```
+
+Visit [http://localhost:3000](http://localhost:3000) to see the application.
+
+#### Development Mode - API Only
+```bash
 cd api && npm start
 # Server runs on http://localhost:3001
 ```
@@ -603,10 +709,13 @@ Content-Type: application/json
 - [OAuth Setup Guide](docs/OAUTH_SETUP.md) - Configure Google, Microsoft, and Apple OAuth
 
 #### Architecture & Deployment
+- **[Complete Deployment Guide](docs/FULL_DEPLOYMENT_GUIDE.md)** - Full-stack deployment walkthrough
+- **[GitHub CI/CD Setup](docs/GITHUB_SECRETS_CICD_GUIDE.md)** - Automated deployment with GitHub Actions
 - [Microservices Architecture](docs/MICROSERVICES_ARCHITECTURE.md) - Detailed architecture overview
 - [Microservices Quickstart](docs/MICROSERVICES_QUICKSTART.md) - Quick deployment guide
 - [Cloudflare Deployment](docs/CLOUDFLARE_DEPLOYMENT.md) - Deploy to Cloudflare Workers
 - [Cloudflare Secrets Setup](docs/CLOUDFLARE_SECRETS_SETUP.md) - Configure secrets
+- [Frontend README](frontend/README.md) - Frontend-specific documentation
 
 #### Enhanced Features
 - **[Enhanced Features Guide](docs/ENHANCED_FEATURES.md)** - Complete guide for:
@@ -648,74 +757,95 @@ Content-Type: application/json
 
 ## Deployment
 
-### Deploy to Cloudflare Workers
+### 🚀 Automated Deployment with GitHub Actions
 
-See detailed guides:
-- [Cloudflare Deployment Guide](docs/CLOUDFLARE_DEPLOYMENT.md)
-- [Cloudflare Secrets Setup Guide](docs/CLOUDFLARE_SECRETS_SETUP.md)
+The project includes full CI/CD automation via GitHub Actions for:
+- ✅ Cloudflare Workers (Edge proxy)
+- ✅ Cloudflare Pages (Frontend)
+- ✅ Automated testing and security scanning
 
-Quick start:
+**Quick Setup:**
+1. Configure [GitHub Secrets](docs/GITHUB_SECRETS_CICD_GUIDE.md)
+2. Push to `main` branch
+3. GitHub Actions handles the rest!
+
+**See detailed guides:**
+- **[GitHub CI/CD Setup Guide](docs/GITHUB_SECRETS_CICD_GUIDE.md)** - Complete automation setup
+- **[Full Deployment Guide](docs/FULL_DEPLOYMENT_GUIDE.md)** - Manual deployment walkthrough
+
+### Deploy Backend (Railway/Render)
+
+The backend deploys automatically via Railway/Render's built-in CI/CD:
+
+**Railway:**
 ```bash
-# Install Wrangler CLI
-npm install -g wrangler
+# Connect GitHub repository
+# Railway auto-deploys on push to main
+# Configure environment variables in Railway dashboard
+```
 
-# Login to Cloudflare
-wrangler login
+**Render:**
+```bash
+# Connect GitHub repository
+# Render auto-deploys on push to main
+# Configure environment variables in Render dashboard
+```
 
-# Configure secrets (only needed once)
-wrangler secret put JWT_KEY
-wrangler secret put MONGO_ATLAS_PW
-wrangler secret put ALLOWED_ORIGINS
+### Manual Deployment
 
-# Deploy
+#### Deploy Worker Manually
+```bash
+cd worker
+wrangler secret put BACKEND_API_URL  # One-time setup
 wrangler deploy
 ```
 
-**Note**: Secrets are persistent and only need to be configured once. The CI/CD pipeline deploys code changes without re-uploading secrets.
-
-### Alternative Deployments
-
-The application can also be deployed to:
-- **Railway**: `railway up`
-- **Render**: Connect GitHub repo
-- **Heroku**: `git push heroku main`
-- **Docker**: `docker build -t rest-shop .`
-
-See [MongoDB-Cloudflare Strategy](docs/MONGODB_CLOUDFLARE_STRATEGY.md) for compatibility details.
+#### Deploy Frontend Manually
+```bash
+cd frontend
+npm run build
+wrangler pages deploy build --project-name=rest-shop-frontend
+```
 
 ## CI/CD Pipeline
 
-The project includes a comprehensive GitHub Actions CI/CD pipeline:
+The project uses GitHub Actions for automated continuous integration and deployment.
 
-### Workflow Steps
-1. **Code Quality & Linting** - Checks code style and runs linters
-2. **Security Scanning** - npm audit and Snyk vulnerability scanning
-3. **Testing** - Runs tests on Node.js 18.x and 20.x
-4. **Build Verification** - Ensures the application builds successfully
-5. **CodeQL Analysis** - Security analysis with CodeQL
-6. **Deployment** - Auto-deploys to Cloudflare Workers on main branch
+### Pipeline Stages
 
-### GitHub Secrets Required
+1. **Code Quality & Linting** - ESLint, code style checks
+2. **Security Scanning** - npm audit, Snyk, CodeQL
+3. **Testing** - Full test suite with MongoDB Memory Server
+4. **Build Verification** - Build worker and frontend
+5. **Deploy Worker** - Automatic deployment to Cloudflare Workers (main branch only)
+6. **Deploy Frontend** - Automatic deployment to Cloudflare Pages (main branch only)
+
+### Required GitHub Secrets
+
+Configure these in GitHub repository settings → Secrets and variables → Actions:
+
 ```
-CLOUDFLARE_API_TOKEN
-CLOUDFLARE_ACCOUNT_ID
-JWT_KEY
-MONGODB_URI
-MONGO_ATLAS_PW
-ALLOWED_ORIGINS
+CLOUDFLARE_API_TOKEN     - Cloudflare API token for deployments
+CLOUDFLARE_ACCOUNT_ID    - Your Cloudflare account ID
+REACT_APP_API_URL        - Worker URL for frontend (e.g., https://rest-shop-worker.workers.dev)
 ```
 
-### Running CI Locally
-```bash
-# Install dependencies
-npm ci
-
-# Run tests
-npm test
-
-# Run security audit
-npm audit
+Optional:
 ```
+JWT_KEY                  - For CI tests only (not production)
+SNYK_TOKEN              - For Snyk security scanning
+```
+
+### Triggering Deployments
+
+**Automatic:**
+- Push to `main` branch triggers full deployment
+- Pull requests trigger testing only (no deployment)
+
+**Manual:**
+- Go to Actions tab → CI/CD Pipeline → Run workflow
+
+**See detailed guide:** [GitHub Secrets & CI/CD Setup](docs/GITHUB_SECRETS_CICD_GUIDE.md)
 
 ## Testing
 

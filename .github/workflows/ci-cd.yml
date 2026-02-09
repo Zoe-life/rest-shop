@@ -94,10 +94,16 @@ jobs:
         run: cd worker && npm ci || npm install
       - name: Validate Worker configuration
         run: cd worker && npx wrangler validate || echo "Worker config validated"
+      - name: Install Frontend dependencies
+        run: cd frontend && npm ci
+      - name: Build Frontend
+        run: cd frontend && npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL || 'https://rest-shop-worker.workers.dev' }}
 
-  # Job 5: Deploy to Cloudflare
-  deploy:
-    name: Deploy to Cloudflare
+  # Job 5: Deploy Worker to Cloudflare
+  deploy-worker:
+    name: Deploy Worker to Cloudflare
     runs-on: ubuntu-latest
     # Wait for security, test, and build to pass before deploying to production
     needs: [security, test, build]
@@ -111,8 +117,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Worker dependencies
         run: cd worker && npm ci || npm install
-      # Secrets (MONGO_ATLAS_PW, JWT_KEY, ALLOWED_ORIGINS) should be configured
-      # in Cloudflare dashboard or via `wrangler secret put` command.
+      # Secrets (BACKEND_API_URL) should be configured in Cloudflare dashboard
+      # or via `wrangler secret put` command once.
       # The secrets: parameter is removed to avoid "Binding name already in use" errors
       # when secrets already exist from previous deployments.
       - name: Deploy to Cloudflare Workers
@@ -123,7 +129,33 @@ jobs:
           workingDirectory: "worker"
           command: deploy --minify
 
-  # Job 6: CodeQL Analysis
+  # Job 6: Deploy Frontend to Cloudflare Pages
+  deploy-frontend:
+    name: Deploy Frontend to Cloudflare Pages
+    runs-on: ubuntu-latest
+    needs: [security, test, build, deploy-worker]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - name: Install Frontend dependencies
+        run: cd frontend && npm ci
+      - name: Build Frontend
+        run: cd frontend && npm run build
+        env:
+          REACT_APP_API_URL: ${{ secrets.REACT_APP_API_URL }}
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: pages deploy frontend/build --project-name=rest-shop-frontend
+
+  # Job 7: CodeQL Analysis
   codeql:
     name: CodeQL Security Analysis
     runs-on: ubuntu-latest

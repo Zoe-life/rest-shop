@@ -2,6 +2,10 @@
 
 This guide covers the complete deployment of the Rest Shop application with its dual-backend architecture (Node.js + Cloudflare Workers) and React frontend.
 
+> **🚀 CI/CD Deployment**: This project includes automated deployment via GitHub Actions. For GitHub CI/CD setup, see the [GitHub Secrets & CI/CD Guide](./GITHUB_SECRETS_CICD_GUIDE.md).
+> 
+> This guide covers **manual deployment** for understanding the architecture and initial setup.
+
 ## Architecture Overview
 
 ```
