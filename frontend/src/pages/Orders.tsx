@@ -1,18 +1,24 @@
 import React, { useEffect, useState } from 'react';
-import { api } from '../api/axios';
-import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
+import { api } from '../api/axios';
 
-interface Order {
-  _id: string;
+interface OrderProduct {
   product: {
     _id: string;
     name: string;
     price: number;
   };
   quantity: number;
-  status?: string;
+  _id: string;
+}
+
+interface Order {
+  _id: string;
+  products: OrderProduct[];
   createdAt: string;
+  status?: string;
+  totalAmount?: number;
 }
 
 const Orders: React.FC = () => {
@@ -28,38 +34,27 @@ const Orders: React.FC = () => {
       return;
     }
     fetchOrders();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+  }, [user, navigate]);
 
   const fetchOrders = async () => {
     try {
       setLoading(true);
       const response = await api.get('/orders');
-      setOrders(response.data.orders || []);
+      setOrders(response.data || []);
       setError(null);
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to fetch orders');
+      setError(err.response?.data?.message || 'Failed to fetch orders');
       console.error('Error fetching orders:', err);
     } finally {
       setLoading(false);
     }
   };
 
-  const getStatusColor = (status?: string) => {
-    switch (status?.toLowerCase()) {
-      case 'pending':
-        return 'text-yellow-600 dark:text-yellow-400 bg-yellow-100 dark:bg-yellow-900/30';
-      case 'processing':
-        return 'text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30';
-      case 'shipped':
-        return 'text-purple-600 dark:text-purple-400 bg-purple-100 dark:bg-purple-900/30';
-      case 'delivered':
-        return 'text-green-600 dark:text-green-400 bg-green-100 dark:bg-green-900/30';
-      case 'cancelled':
-        return 'text-red-600 dark:text-red-400 bg-red-100 dark:bg-red-900/30';
-      default:
-        return 'text-gray-600 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30';
-    }
+  const calculateOrderTotal = (order: Order) => {
+    if (order.totalAmount) return order.totalAmount;
+    return order.products.reduce((total, item) => {
+      return total + (item.product?.price || 0) * item.quantity;
+    }, 0);
   };
 
   if (loading) {
@@ -87,52 +82,79 @@ const Orders: React.FC = () => {
       </h1>
 
       {orders.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-navy-800 rounded-lg shadow">
+        <div className="text-center py-12">
           <p className="text-gray-600 dark:text-gray-400 text-lg mb-4">
             You haven't placed any orders yet.
           </p>
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/products')}
             className="px-6 py-3 bg-saffron-500 hover:bg-saffron-600 text-white rounded-lg transition-colors font-medium"
           >
-            Start Shopping
+            Browse Products
           </button>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-6">
           {orders.map((order) => (
             <div
               key={order._id}
-              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow duration-300"
+              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg p-6"
             >
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-4 mb-2">
-                    <h3 className="text-lg font-semibold text-navy-600 dark:text-white">
-                      {order.product?.name || 'Product'}
-                    </h3>
-                    {order.status && (
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
-                        {order.status}
-                      </span>
-                    )}
-                  </div>
-                  
-                  <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                    <p>Quantity: {order.quantity}</p>
-                    <p>Price: ${order.product?.price?.toFixed(2) || '0.00'}</p>
-                    <p>Total: ${((order.product?.price || 0) * order.quantity).toFixed(2)}</p>
-                    <p>Order Date: {new Date(order.createdAt).toLocaleDateString()}</p>
-                  </div>
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 border-b border-gray-200 dark:border-navy-700 pb-4">
+                <div>
+                  <h3 className="text-lg font-semibold text-navy-600 dark:text-white">
+                    Order #{order._id.slice(-8).toUpperCase()}
+                  </h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    {new Date(order.createdAt).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </p>
                 </div>
+                {order.status && (
+                  <span className="mt-2 sm:mt-0 inline-block px-3 py-1 rounded-full text-sm font-medium bg-saffron-500/10 text-saffron-600 dark:text-saffron-400">
+                    {order.status}
+                  </span>
+                )}
+              </div>
 
-                <div className="mt-4 md:mt-0 md:ml-6">
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-saffron-500">
-                      ${((order.product?.price || 0) * order.quantity).toFixed(2)}
+              <div className="space-y-3">
+                {order.products.map((item) => (
+                  <div
+                    key={item._id}
+                    className="flex justify-between items-center py-2"
+                  >
+                    <div className="flex-1">
+                      <p className="text-navy-600 dark:text-white font-medium">
+                        {item.product?.name || 'Unknown Product'}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        Quantity: {item.quantity}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-saffron-500 font-semibold">
+                        ${((item.product?.price || 0) * item.quantity).toFixed(2)}
+                      </p>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        ${(item.product?.price || 0).toFixed(2)} each
+                      </p>
                     </div>
                   </div>
-                </div>
+                ))}
+              </div>
+
+              <div className="mt-4 pt-4 border-t border-gray-200 dark:border-navy-700 flex justify-between items-center">
+                <span className="text-lg font-semibold text-navy-600 dark:text-white">
+                  Total:
+                </span>
+                <span className="text-2xl font-bold text-saffron-500">
+                  ${calculateOrderTotal(order).toFixed(2)}
+                </span>
               </div>
             </div>
           ))}

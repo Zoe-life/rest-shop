@@ -1,27 +1,27 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const { signup } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError(null);
 
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
 
-    if (password.length < 8) {
-      setError('Password must be at least 8 characters long');
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
       return;
     }
 
@@ -29,114 +29,105 @@ const Signup: React.FC = () => {
 
     try {
       await signup(email, password);
-      navigate('/');
+      navigate('/products');
     } catch (err: any) {
-      setError(err.response?.data?.error?.message || 'Failed to sign up');
+      setError(err.response?.data?.message || 'Failed to sign up');
+      console.error('Signup error:', err);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-navy-900 py-12 px-4 sm:px-6 lg:px-8 transition-colors duration-300">
-      <div className="max-w-md w-full space-y-8">
-        <div>
-          <div className="mx-auto h-16 w-16 bg-saffron-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-3xl">RS</span>
-          </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-navy-600 dark:text-white">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600 dark:text-gray-400">
-            Or{' '}
-            <Link to="/login" className="font-medium text-saffron-500 hover:text-saffron-600">
-              sign in to your existing account
-            </Link>
-          </p>
-        </div>
-        
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
+    <div className="container mx-auto px-4 py-8">
+      <div className="max-w-md mx-auto">
+        <div className="bg-white dark:bg-navy-800 rounded-lg shadow-lg p-8">
+          <h1 className="text-3xl font-bold text-navy-600 dark:text-white mb-6 text-center">
+            Sign Up
+          </h1>
+
           {error && (
-            <div className="bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded">
+            <div className="mb-4 bg-red-100 dark:bg-red-900/30 border border-red-400 dark:border-red-700 text-red-700 dark:text-red-400 px-4 py-3 rounded">
               {error}
             </div>
           )}
-          
-          <div className="rounded-md shadow-sm space-y-3">
+
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label htmlFor="email-address" className="sr-only">
-                Email address
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-navy-600 dark:text-gray-300 mb-2"
+              >
+                Email
               </label>
               <input
-                id="email-address"
-                name="email"
                 type="email"
-                autoComplete="email"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 dark:border-navy-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-navy-800 focus:outline-none focus:ring-saffron-500 focus:border-saffron-500 focus:z-10 sm:text-sm"
-                placeholder="Email address"
+                id="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-saffron-500 bg-white dark:bg-navy-700 text-navy-600 dark:text-white"
+                placeholder="Enter your email"
               />
             </div>
+
             <div>
-              <label htmlFor="password" className="sr-only">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-navy-600 dark:text-gray-300 mb-2"
+              >
                 Password
               </label>
               <input
-                id="password"
-                name="password"
                 type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 dark:border-navy-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-navy-800 focus:outline-none focus:ring-saffron-500 focus:border-saffron-500 focus:z-10 sm:text-sm"
-                placeholder="Password"
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-saffron-500 bg-white dark:bg-navy-700 text-navy-600 dark:text-white"
+                placeholder="Enter your password"
               />
             </div>
+
             <div>
-              <label htmlFor="confirm-password" className="sr-only">
+              <label
+                htmlFor="confirmPassword"
+                className="block text-sm font-medium text-navy-600 dark:text-gray-300 mb-2"
+              >
                 Confirm Password
               </label>
               <input
-                id="confirm-password"
-                name="confirm-password"
                 type="password"
-                autoComplete="new-password"
-                required
-                className="appearance-none rounded-md relative block w-full px-3 py-3 border border-gray-300 dark:border-navy-700 placeholder-gray-500 dark:placeholder-gray-400 text-gray-900 dark:text-white bg-white dark:bg-navy-800 focus:outline-none focus:ring-saffron-500 focus:border-saffron-500 focus:z-10 sm:text-sm"
-                placeholder="Confirm Password"
+                id="confirmPassword"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-saffron-500 bg-white dark:bg-navy-700 text-navy-600 dark:text-white"
+                placeholder="Confirm your password"
               />
             </div>
-          </div>
 
-          <div className="text-xs text-gray-600 dark:text-gray-400">
-            Password must be at least 8 characters long
-          </div>
-
-          <div>
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-saffron-500 hover:bg-saffron-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-saffron-500 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors"
+              className="w-full py-3 bg-saffron-500 hover:bg-saffron-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
             >
-              {loading ? (
-                <span className="flex items-center">
-                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Creating account...
-                </span>
-              ) : (
-                'Sign up'
-              )}
+              {loading ? 'Signing up...' : 'Sign Up'}
             </button>
+          </form>
+
+          <div className="mt-6 text-center">
+            <p className="text-gray-600 dark:text-gray-400">
+              Already have an account?{' '}
+              <button
+                onClick={() => navigate('/login')}
+                className="text-saffron-500 hover:text-saffron-600 font-medium"
+              >
+                Login
+              </button>
+            </p>
           </div>
-        </form>
+        </div>
       </div>
     </div>
   );

@@ -1,204 +1,73 @@
-# Rest Shop Frontend
+# React + TypeScript + Vite
 
-A modern, responsive e-commerce frontend built with React, TypeScript, and Tailwind CSS.
+This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
-## Features
+Currently, two official plugins are available:
 
-- 🎨 **Beautiful UI** with saffron and navy blue theme colors
-- 🌓 **Day/Night Mode** toggle for comfortable viewing
-- 📱 **Fully Responsive** design for all screen sizes
-- 🔐 **Authentication** with JWT tokens
-- 🛍️ **Product Browsing** with clean card layouts
-- 📦 **Order Management** for authenticated users
-- ⚡ **Fast Performance** optimized for Cloudflare Pages
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
 
-## Tech Stack
+## React Compiler
 
-- **React 18** - Modern UI library
-- **TypeScript** - Type-safe code
-- **Tailwind CSS** - Utility-first styling
-- **React Router** - Client-side routing
-- **Axios** - HTTP client
-- **Context API** - State management
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-## Getting Started
+## Expanding the ESLint configuration
 
-### Prerequisites
+If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
 
-- Node.js 18 or higher
-- npm or yarn
-- Backend API running (see main README)
+```js
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
 
-### Installation
+      // Remove tseslint.configs.recommended and replace with this
+      tseslint.configs.recommendedTypeChecked,
+      // Alternatively, use this for stricter rules
+      tseslint.configs.strictTypeChecked,
+      // Optionally, add this for stylistic rules
+      tseslint.configs.stylisticTypeChecked,
 
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Configure environment variables:
-   ```bash
-   cp .env.example .env.local
-   ```
-   
-   Update `.env.local` with your API URL:
-   ```
-   REACT_APP_API_URL=http://localhost:3001
-   ```
-
-3. Start the development server:
-   ```bash
-   npm start
-   ```
-   
-   The app will open at [http://localhost:3000](http://localhost:3000)
-
-## Building for Production
-
-```bash
-npm run build
+      // Other configs...
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
 
-This creates an optimized production build in the `build/` folder.
+You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-## Deployment to Cloudflare Pages
+```js
+// eslint.config.js
+import reactX from 'eslint-plugin-react-x'
+import reactDom from 'eslint-plugin-react-dom'
 
-### Option 1: Using Wrangler CLI
-
-1. Install Wrangler:
-   ```bash
-   npm install -g wrangler
-   ```
-
-2. Login to Cloudflare:
-   ```bash
-   wrangler login
-   ```
-
-3. Build the app:
-   ```bash
-   npm run build
-   ```
-
-4. Deploy to Cloudflare Pages:
-   ```bash
-   wrangler pages deploy build --project-name=rest-shop-frontend
-   ```
-
-### Option 2: Using Cloudflare Dashboard
-
-1. Go to [Cloudflare Dashboard](https://dash.cloudflare.com/)
-2. Navigate to **Workers & Pages** → **Create application** → **Pages**
-3. Connect your GitHub repository
-4. Configure build settings:
-   - **Build command**: `npm run build`
-   - **Build output directory**: `build`
-   - **Root directory**: `frontend`
-   - **Environment variables**: 
-     - `REACT_APP_API_URL`: Your backend API URL
-5. Click **Save and Deploy**
-
-### Environment Variables for Production
-
-In Cloudflare Pages settings, add:
-
+export default defineConfig([
+  globalIgnores(['dist']),
+  {
+    files: ['**/*.{ts,tsx}'],
+    extends: [
+      // Other configs...
+      // Enable lint rules for React
+      reactX.configs['recommended-typescript'],
+      // Enable lint rules for React DOM
+      reactDom.configs.recommended,
+    ],
+    languageOptions: {
+      parserOptions: {
+        project: ['./tsconfig.node.json', './tsconfig.app.json'],
+        tsconfigRootDir: import.meta.dirname,
+      },
+      // other options...
+    },
+  },
+])
 ```
-REACT_APP_API_URL=https://your-api-domain.com
-```
-
-Replace with your actual backend API URL (e.g., Railway, Render, or Cloudflare Worker URL).
-
-## Theme Customization
-
-The app uses a custom color palette:
-- **Saffron** (#FF9933) - Primary action color
-- **Navy Blue** (#002366) - Text and accents
-- **Dark Mode** - Automatic with system preference + manual toggle
-
-Colors are configured in `tailwind.config.js` and can be customized there.
-
-## Project Structure
-
-```
-frontend/
-├── public/              # Static assets
-├── src/
-│   ├── api/            # API configuration
-│   │   └── axios.ts    # Axios instance
-│   ├── components/     # Reusable components
-│   │   └── Header.tsx  # Navigation header
-│   ├── contexts/       # React contexts
-│   │   ├── AuthContext.tsx   # Authentication state
-│   │   └── ThemeContext.tsx  # Theme (dark/light) state
-│   ├── pages/          # Page components
-│   │   ├── Products.tsx   # Product listing
-│   │   ├── Login.tsx      # Login page
-│   │   ├── Signup.tsx     # Registration page
-│   │   └── Orders.tsx     # Order history
-│   ├── App.tsx         # Main app component
-│   ├── index.tsx       # Entry point
-│   └── index.css       # Global styles
-├── .env.example        # Environment template
-├── tailwind.config.js  # Tailwind configuration
-└── package.json        # Dependencies
-```
-
-## Available Scripts
-
-- `npm start` - Start development server
-- `npm run build` - Build for production
-- `npm test` - Run tests
-- `npm run eject` - Eject from Create React App (not recommended)
-
-## Features in Detail
-
-### Authentication
-- Login and signup with email/password
-- JWT token stored in localStorage
-- Automatic token refresh on page reload
-- Protected routes for authenticated users
-
-### Product Browsing
-- Grid layout with responsive columns
-- Product images and details
-- Price display
-- Stock status
-- Add to cart functionality (placeholder)
-
-### Order Management
-- View order history
-- Order status tracking
-- Total price calculation
-- Order date display
-
-### Dark Mode
-- Manual toggle button in header
-- Persists preference in localStorage
-- Smooth transitions between themes
-- System preference detection
-
-## Browser Support
-
-- Chrome (latest)
-- Firefox (latest)
-- Safari (latest)
-- Edge (latest)
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
-
-## License
-
-ISC License - See main repository LICENSE file
-
-## Support
-
-For issues or questions:
-- Check the main repository README
-- Open an issue on GitHub
-- Contact the development team

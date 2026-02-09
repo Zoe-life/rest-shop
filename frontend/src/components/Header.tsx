@@ -36,12 +36,22 @@ const Header: React.FC = () => {
               Products
             </Link>
             {user && (
-              <Link 
-                to="/orders" 
-                className="text-gray-700 dark:text-gray-300 hover:text-saffron-500 dark:hover:text-saffron-400 transition-colors"
-              >
-                My Orders
-              </Link>
+              <>
+                <Link 
+                  to="/orders" 
+                  className="text-gray-700 dark:text-gray-300 hover:text-saffron-500 dark:hover:text-saffron-400 transition-colors"
+                >
+                  My Orders
+                </Link>
+                {user.role === 'admin' && (
+                  <Link 
+                    to="/admin" 
+                    className="text-gray-700 dark:text-gray-300 hover:text-saffron-500 dark:hover:text-saffron-400 transition-colors font-medium"
+                  >
+                    Admin Panel
+                  </Link>
+                )}
+              </>
             )}
           </nav>
 
