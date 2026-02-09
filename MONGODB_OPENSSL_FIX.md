@@ -41,17 +41,22 @@ Configure `mongodb-memory-server` to use MongoDB 7.0+ with Ubuntu 22.04 binaries
 Updated to detect Ubuntu 24.04 and explicitly configure MongoDB Memory Server to use Ubuntu 22.04 binaries only when needed:
 
 ```javascript
+const mongoose = require('mongoose');
+const { MongoMemoryServer } = require('mongodb-memory-server');
+const jwt = require('jsonwebtoken');
+const fs = require('fs');
+
 before(async function() {
     // Increase timeout for MongoDB download
     this.timeout(60000);
     
     try {
         // Check if running on Ubuntu 24.04
-        const fs = require('fs');
         let isUbuntu2404 = false;
         try {
             const osRelease = fs.readFileSync('/etc/os-release', 'utf8');
-            isUbuntu2404 = osRelease.includes('VERSION_ID="24.04"');
+            // Use regex to match VERSION_ID field specifically
+            isUbuntu2404 = /VERSION_ID="24\.04"/.test(osRelease);
         } catch (err) {
             // If we can't read /etc/os-release, let mongodb-memory-server auto-detect
         }
@@ -86,7 +91,7 @@ before(async function() {
 ```
 
 This approach:
-- Detects if the system is running Ubuntu 24.04
+- Detects if the system is running Ubuntu 24.04 using a regex pattern
 - Only overrides the binary configuration for Ubuntu 24.04
 - Lets MongoDB Memory Server auto-detect the correct binaries for other systems (Ubuntu 20.04, 22.04, etc.)
 - Ubuntu 22.04 binaries support OpenSSL 3.x and are binary-compatible with Ubuntu 24.04

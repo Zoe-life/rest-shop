@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 let mongoServer;
 
@@ -13,11 +14,11 @@ before(async function() {
     
     try {
         // Check if running on Ubuntu 24.04
-        const fs = require('fs');
         let isUbuntu2404 = false;
         try {
             const osRelease = fs.readFileSync('/etc/os-release', 'utf8');
-            isUbuntu2404 = osRelease.includes('VERSION_ID="24.04"');
+            // Use regex to match VERSION_ID field specifically
+            isUbuntu2404 = /VERSION_ID="24\.04"/.test(osRelease);
         } catch (err) {
             // If we can't read /etc/os-release, let mongodb-memory-server auto-detect
         }
