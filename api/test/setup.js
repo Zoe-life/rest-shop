@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
 
 let mongoServer;
 
@@ -12,7 +13,35 @@ before(async function() {
     this.timeout(60000);
     
     try {
-        mongoServer = await MongoMemoryServer.create();
+        // Check if running on Ubuntu 24.04
+        let isUbuntu2404 = false;
+        try {
+            const osRelease = fs.readFileSync('/etc/os-release', 'utf8');
+            // Use regex to match VERSION_ID field specifically
+            isUbuntu2404 = /VERSION_ID="24\.04"/.test(osRelease);
+        } catch (err) {
+            // If we can't read /etc/os-release, let mongodb-memory-server auto-detect
+        }
+        
+        // Configure MongoDB Memory Server
+        // For Ubuntu 24.04, use Ubuntu 22.04 binaries since 7.0.14 binaries don't exist for ubuntu2404
+        const mongoConfig = {
+            binary: {
+                version: '7.0.14',
+            }
+        };
+        
+        if (isUbuntu2404) {
+            // Force Ubuntu 22.04 binaries for Ubuntu 24.04
+            mongoConfig.binary.arch = 'x64';
+            mongoConfig.binary.platform = 'linux';
+            mongoConfig.binary.os = {
+                dist: 'ubuntu',
+                release: '22.04'
+            };
+        }
+        
+        mongoServer = await MongoMemoryServer.create(mongoConfig);
         const mongoUri = mongoServer.getUri();
         await mongoose.connect(mongoUri);
     } catch (error) {
