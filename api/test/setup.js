@@ -12,7 +12,21 @@ before(async function() {
     this.timeout(60000);
     
     try {
-        mongoServer = await MongoMemoryServer.create();
+        // Configure MongoDB Memory Server to use Ubuntu 22.04 binaries for Ubuntu 24.04
+        // MongoDB 7.0.14 binaries don't exist for ubuntu2404, so we fall back to ubuntu2204
+        mongoServer = await MongoMemoryServer.create({
+            binary: {
+                version: '7.0.14',
+                arch: 'x64',
+                platform: 'linux',
+                // Use Ubuntu 22.04 binaries which are compatible with Ubuntu 24.04
+                os: {
+                    os: 'linux',
+                    dist: 'ubuntu',
+                    release: '22.04'
+                }
+            }
+        });
         const mongoUri = mongoServer.getUri();
         await mongoose.connect(mongoUri);
     } catch (error) {
