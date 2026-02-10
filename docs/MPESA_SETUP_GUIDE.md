@@ -18,11 +18,11 @@ This guide explains how to integrate M-Pesa payments using the Safaricom Daraja 
 M-Pesa is Kenya's leading mobile money service. This integration uses the **Lipa Na M-Pesa Online (STK Push)** API, which allows customers to make payments directly from their M-Pesa mobile wallets.
 
 ### Features
-- ✅ STK Push payment initiation
-- ✅ Payment status verification
-- ✅ Webhook callback handling
-- ✅ Transaction tracking and logging
-- ✅ Automatic order status updates
+- STK Push payment initiation
+- Payment status verification
+- Webhook callback handling
+- Transaction tracking and logging
+- Automatic order status updates
 
 ## Prerequisites
 

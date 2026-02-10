@@ -1,6 +1,6 @@
 # Quick Reference: Connecting Worker to Backend
 
-## 🚀 TL;DR (Too Long; Didn't Read)
+## TL;DR (Too Long; Didn't Read)
 
 ```bash
 # 1. Deploy backend
@@ -23,7 +23,7 @@ curl https://your-worker.workers.dev/health
 
 ---
 
-## 📋 Cheat Sheet
+## Cheat Sheet
 
 ### Backend URLs by Platform
 
@@ -58,7 +58,7 @@ curl https://your-worker.workers.dev/health
 
 ---
 
-## 🔍 Troubleshooting Quick Fixes
+## Troubleshooting Quick Fixes
 
 ### "Backend not configured"
 ```bash
@@ -93,9 +93,9 @@ MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/
 
 ---
 
-## 📊 Health Check Responses
+## Health Check Responses
 
-### ✅ Healthy Backend
+### Healthy Backend
 ```bash
 curl https://backend-url/health
 ```
@@ -107,7 +107,7 @@ curl https://backend-url/health
 }
 ```
 
-### ✅ Healthy Worker (with Backend)
+### Healthy Worker (with Backend)
 ```bash
 curl https://worker-url/health
 ```
@@ -122,7 +122,7 @@ curl https://worker-url/health
 }
 ```
 
-### ❌ Worker Can't Reach Backend
+### Worker Can't Reach Backend
 ```bash
 curl https://worker-url/health
 ```
@@ -137,9 +137,9 @@ curl https://worker-url/health
 
 ---
 
-## 🎯 Configuration Checklist
+## Configuration Checklist
 
-### Backend ✓
+### Backend
 - [ ] Deployed to hosting provider
 - [ ] `curl https://backend-url/health` returns 200
 - [ ] `MONGODB_URI` is set
@@ -147,7 +147,7 @@ curl https://worker-url/health
 - [ ] `ALLOWED_ORIGINS` includes worker URL
 - [ ] Database shows "connected"
 
-### Worker ✓
+### Worker
 - [ ] `BACKEND_API_URL` secret is set
 - [ ] Deployed with `wrangler deploy`
 - [ ] `curl https://worker-url/health` returns 200
@@ -156,7 +156,7 @@ curl https://worker-url/health
 
 ---
 
-## 🔗 Quick Links
+## Quick Links
 
 | Resource | Link |
 |----------|------|
@@ -168,7 +168,7 @@ curl https://worker-url/health
 
 ---
 
-## 💡 Pro Tips
+## Pro Tips
 
 1. **Use the validation script** to check your setup:
    ```bash
@@ -194,7 +194,7 @@ curl https://worker-url/health
 
 ---
 
-## 🎓 Mental Model
+## Mental Model
 
 ```
 Frontend → Worker → Backend → Database
@@ -209,7 +209,7 @@ Frontend → Worker → Backend → Database
 
 ---
 
-## ⚡ Common Scenarios
+## Common Scenarios
 
 ### Local Development
 ```bash
@@ -262,7 +262,7 @@ wrangler deploy
 
 ---
 
-## 🆘 Emergency Fixes
+## Emergency Fixes
 
 ### Worker says backend not configured
 ```bash
@@ -307,4 +307,4 @@ node ../api/scripts/validate-connection.js https://backend-url https://worker-ur
 
 ---
 
-**Remember**: Backend does the work, worker just routes traffic. Keep it simple! 🚀
+**Remember**: Backend does the work, worker just routes traffic. Keep it simple!

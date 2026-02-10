@@ -37,11 +37,11 @@ This document shows the changes made during the microservices migration and the 
 ```
 
 **Problems:**
-- ❌ 2MB+ bundle size (exceeds free tier 1MB limit)
-- ❌ All features deployed together (risky)
-- ❌ Payment updates require full deployment
-- ❌ Single point of failure
-- ❌ Poor separation of concerns
+- 2MB+ bundle size (exceeds free tier 1MB limit)
+- All features deployed together (risky)
+- Payment updates require full deployment
+- Single point of failure
+- Poor separation of concerns
 
 ---
 
@@ -57,8 +57,8 @@ This document shows the changes made during the microservices migration and the 
 │   Gateway Worker (~50KB)        │
 │    rest-shop-gateway            │
 │                                 │
-│  ✅ Minimal routing logic        │
-│  ✅ Fast cold starts             │
+│  Minimal routing logic          │
+│  Fast cold starts               │
 └─────┬───────────────┬───────────┘
       │               │
       │ /payments     │ /*
@@ -68,8 +68,8 @@ This document shows the changes made during the microservices migration and the 
 │  Payment    │  │  Base Service  │
 │  Service    │  │  (~1.2-1.5MB)  │
 │ (~600-800KB)│  │                │
-│             │  │  ✅ Under limit │
-│ ✅ Under     │  │                │
+│             │  │  Under limit   │
+│ Under       │  │                │
 │   limit     │  │  - Products    │
 │             │  │  - Orders      │
 │ - Stripe    │  │  - Users       │
@@ -79,11 +79,11 @@ This document shows the changes made during the microservices migration and the 
 ```
 
 **Benefits:**
-- ✅ All services under 1MB (free tier compatible)
-- ✅ Independent deployment per service
-- ✅ Payment updates isolated from core API
-- ✅ Better fault isolation
-- ✅ Clear separation of concerns
+- All services under 1MB (free tier compatible)
+- Independent deployment per service
+- Payment updates isolated from core API
+- Better fault isolation
+- Clear separation of concerns
 
 ---
 
@@ -95,7 +95,7 @@ This document shows the changes made during the microservices migration and the 
 | **Gateway** | N/A | 50 KB | New |
 | **Payment Service** | Part of monolith | 600-800 KB | Isolated |
 | **Base Service** | 2,057 KB | 1,200-1,500 KB | -27% |
-| **Free Tier Compatible** | ❌ No | ✅ Yes | Fixed! |
+| **Free Tier Compatible** | No | Yes | Fixed! |
 
 ---
 
@@ -233,9 +233,9 @@ Heavy payment traffic affects all routes
 ```
 Heavy payment traffic only affects payment service
 │
-├─ Products unaffected ✓
-├─ Orders unaffected ✓
-└─ Auth unaffected ✓
+├─ Products unaffected
+├─ Orders unaffected
+└─ Auth unaffected
 ```
 
 ---
@@ -325,18 +325,18 @@ With microservices, you can:
 
 ### Key Achievements
 
-✅ **Solved bundle size problem** (2MB → three <1MB services)
-✅ **Enabled independent deployments** (reduce risk)
-✅ **Improved cold start times** (smaller bundles)
-✅ **Better code organization** (clear boundaries)
-✅ **Cost savings** (free tier compatible)
-✅ **Scalability** (independent scaling)
+**Solved bundle size problem** (2MB → three <1MB services)
+**Enabled independent deployments** (reduce risk)
+**Improved cold start times** (smaller bundles)
+**Better code organization** (clear boundaries)
+**Cost savings** (free tier compatible)
+**Scalability** (independent scaling)
 
 ### Trade-offs Accepted
 
-⚠️ **Increased complexity:** 3 workers instead of 1
-⚠️ **More configs:** 3 wrangler.toml files
-⚠️ **Deployment coordination:** Must deploy in correct order
+WARNING: **Increased complexity:** 3 workers instead of 1
+WARNING: **More configs:** 3 wrangler.toml files
+WARNING: **Deployment coordination:** Must deploy in correct order
 
 ### Net Result
 
@@ -344,7 +344,7 @@ With microservices, you can:
 
 ### Recommendation
 
-✅ **Continue with microservices architecture** for production deployment.
+**Continue with microservices architecture** for production deployment.
 
 ---
 
