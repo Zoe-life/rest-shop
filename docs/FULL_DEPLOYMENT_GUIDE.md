@@ -2,7 +2,7 @@
 
 This guide covers the complete deployment of the Rest Shop application with its dual-backend architecture (Node.js + Cloudflare Workers) and React frontend.
 
-> **🚀 CI/CD Deployment**: This project includes automated deployment via GitHub Actions. For GitHub CI/CD setup, see the [GitHub Secrets & CI/CD Guide](./GITHUB_SECRETS_CICD_GUIDE.md).
+> **CI/CD Deployment**: This project includes automated deployment via GitHub Actions. For GitHub CI/CD setup, see the [GitHub Secrets & CI/CD Guide](./GITHUB_SECRETS_CICD_GUIDE.md).
 > 
 > This guide covers **manual deployment** for understanding the architecture and initial setup.
 
@@ -438,18 +438,18 @@ wrangler secret put BACKEND_API_URL --config worker/wrangler.toml
 ## Environment Variables Checklist
 
 ### Backend (Railway/Render)
-- ✅ `MONGODB_URI`
-- ✅ `JWT_KEY` (32+ characters)
-- ✅ `NODE_ENV=production`
-- ✅ `PORT=3001`
-- ✅ `ALLOWED_ORIGINS` (comma-separated)
-- ✅ Payment gateway keys (if using payments)
+- `MONGODB_URI`
+- `JWT_KEY` (32+ characters)
+- `NODE_ENV=production`
+- `PORT=3001`
+- `ALLOWED_ORIGINS` (comma-separated)
+- Payment gateway keys (if using payments)
 
 ### Worker (Cloudflare)
-- ✅ `BACKEND_API_URL` (your backend URL)
+- `BACKEND_API_URL` (your backend URL)
 
 ### Frontend (Cloudflare Pages)
-- ✅ `REACT_APP_API_URL` (your worker URL)
+- `REACT_APP_API_URL` (your worker URL)
 
 ## Cost Estimate
 
@@ -506,11 +506,11 @@ For issues:
 4. Check [frontend/README.md](../frontend/README.md) for frontend details
 5. Open GitHub issue with error logs
 
-## Success! 🎉
+## Success!
 
 Your full-stack Rest Shop is now live with:
-- ✅ Global CDN distribution
-- ✅ Scalable backend
-- ✅ Modern React frontend
-- ✅ Automatic SSL/HTTPS
-- ✅ Production-ready architecture
+- Global CDN distribution
+- Scalable backend
+- Modern React frontend
+- Automatic SSL/HTTPS
+- Production-ready architecture

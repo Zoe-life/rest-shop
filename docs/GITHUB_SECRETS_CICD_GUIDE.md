@@ -107,9 +107,9 @@ This is only used in CI tests and is different from your production JWT_KEY.
 
 ```
 Required Secrets:
-✅ CLOUDFLARE_API_TOKEN     - Cloudflare API token for deployments
-✅ CLOUDFLARE_ACCOUNT_ID    - Your Cloudflare account ID
-✅ VITE_API_URL        - Worker URL for frontend to connect to
+CLOUDFLARE_API_TOKEN     - Cloudflare API token for deployments
+CLOUDFLARE_ACCOUNT_ID    - Your Cloudflare account ID
+VITE_API_URL        - Worker URL for frontend to connect to
 
 Optional Secrets:
 ⚪ JWT_KEY                  - Only for CI tests (not production)
@@ -434,17 +434,17 @@ wrangler secret put BACKEND_API_URL
 ## Security Best Practices
 
 ### DO:
-- ✅ Use separate secrets for CI/CD and production
-- ✅ Rotate API tokens periodically
-- ✅ Use minimal permissions for tokens
-- ✅ Keep production secrets in Railway/Render/Cloudflare only
-- ✅ Use different JWT_KEY for CI tests vs production
+- Use separate secrets for CI/CD and production
+- Rotate API tokens periodically
+- Use minimal permissions for tokens
+- Keep production secrets in Railway/Render/Cloudflare only
+- Use different JWT_KEY for CI tests vs production
 
 ### DON'T:
-- ❌ Don't put production secrets in GitHub Actions
-- ❌ Don't share secrets between environments
-- ❌ Don't commit secrets to git
-- ❌ Don't use the same JWT_KEY for tests and production
+- Don't put production secrets in GitHub Actions
+- Don't share secrets between environments
+- Don't commit secrets to git
+- Don't use the same JWT_KEY for tests and production
 
 ## Continuous Deployment
 

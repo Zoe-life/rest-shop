@@ -4,14 +4,14 @@ A modern, responsive e-commerce frontend built with React, TypeScript, Vite, and
 
 ## Features
 
-- 🎨 **Beautiful UI** with saffron (#FF9933) and navy blue (#002366) theme colors (solid colors only)
-- 🌓 **Day/Night Mode** toggle for comfortable viewing
-- 📱 **Fully Responsive** design for all screen sizes
-- 🔐 **Authentication** with JWT tokens
-- 🛍️ **Product Browsing** with clean card layouts
-- 📦 **Order Management** for authenticated users
-- 👨‍💼 **Admin Interface** for managing products, orders, and users
-- ⚡ **Fast Performance** with Vite and optimized builds
+- **Beautiful UI** with saffron (#FF9933) and navy blue (#002366) theme colors (solid colors only)
+- **Day/Night Mode** toggle for comfortable viewing
+- **Fully Responsive** design for all screen sizes
+- **Authentication** with JWT tokens
+- **Product Browsing** with clean card layouts
+- **Order Management** for authenticated users
+- **Admin Interface** for managing products, orders, and users
+- **Fast Performance** with Vite and optimized builds
 
 ## Tech Stack
 
@@ -219,11 +219,11 @@ Colors are configured in `tailwind.config.js` and can be customized there.
 ## Why Vite?
 
 Vite provides several advantages over Create React App:
-- ⚡ **Instant Server Start**: No bundling in development
-- 🔥 **Lightning Fast HMR**: Updates reflect instantly
-- 📦 **Optimized Build**: Rollup-based production builds
-- 🎯 **Better DX**: Faster development experience
-- 🔧 **Modern**: Native ESM support
+- **Instant Server Start**: No bundling in development
+- **Lightning Fast HMR**: Updates reflect instantly
+- **Optimized Build**: Rollup-based production builds
+- **Better DX**: Faster development experience
+- **Modern**: Native ESM support
 
 ## Contributing
 

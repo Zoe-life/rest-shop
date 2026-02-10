@@ -248,7 +248,7 @@ git push origin main
 
 ## Secrets Security Best Practices
 
-### ✅ DO:
+### DO:
 
 - Use GitHub Secrets for deployment credentials
 - Configure backend secrets in hosting platform (Railway/Render)
@@ -256,7 +256,7 @@ git push origin main
 - Use minimum required permissions
 - Keep `JWT_KEY` secret and secure
 
-### ❌ DON'T:
+### DON'T:
 
 - Commit secrets to repository
 - Share secrets in plain text

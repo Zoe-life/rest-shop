@@ -428,29 +428,29 @@ pm2 restart rest-shop-api
 
 Use this checklist to verify your setup:
 
-### Backend Configuration ✓
+### Backend Configuration
 
-- [ ] Backend is deployed and running
-- [ ] `curl https://your-backend-url/health` returns `{"status":"ok"}`
-- [ ] Environment variables are set:
-  - [ ] `MONGODB_URI`
-  - [ ] `JWT_KEY` (32+ characters)
-  - [ ] `NODE_ENV=production`
-  - [ ] `ALLOWED_ORIGINS` (includes worker URL)
-- [ ] MongoDB connection is working (database: "connected")
+- Backend is deployed and running
+- `curl https://your-backend-url/health` returns `{"status":"ok"}`
+- Environment variables are set:
+  - `MONGODB_URI`
+  - `JWT_KEY` (32+ characters)
+  - `NODE_ENV=production`
+  - `ALLOWED_ORIGINS` (includes worker URL)
+- MongoDB connection is working (database: "connected")
 
-### Worker Configuration ✓
+### Worker Configuration
 
-- [ ] Worker is deployed to Cloudflare
-- [ ] `BACKEND_API_URL` secret is set in Cloudflare
-- [ ] `BACKEND_API_URL` points to your backend (e.g., https://your-app.railway.app)
-- [ ] `curl https://your-worker.workers.dev/health` returns worker and backend status
+- Worker is deployed to Cloudflare
+- `BACKEND_API_URL` secret is set in Cloudflare
+- `BACKEND_API_URL` points to your backend (e.g., https://your-app.railway.app)
+- `curl https://your-worker.workers.dev/health` returns worker and backend status
 
-### Connection Test ✓
+### Connection Test
 
-- [ ] Health check shows both worker and backend are ok
-- [ ] API endpoints work through worker: `curl https://your-worker.workers.dev/products`
-- [ ] No CORS errors when accessing from frontend
+- Health check shows both worker and backend are ok
+- API endpoints work through worker: `curl https://your-worker.workers.dev/products`
+- No CORS errors when accessing from frontend
 
 ---
 
@@ -540,21 +540,21 @@ BACKEND_API_URL=https://your-backend-url
 
 ## Security Best Practices
 
-### ✅ DO
+### DO
 
-- ✅ Set `BACKEND_API_URL` in Cloudflare as a **secret** (encrypted)
-- ✅ Set all sensitive keys (JWT, payment keys) in **backend environment** only
-- ✅ Use HTTPS for backend URL in production
-- ✅ Use specific domains in `ALLOWED_ORIGINS`, not wildcards
-- ✅ Keep `JWT_KEY` at least 32 characters long
+- Set `BACKEND_API_URL` in Cloudflare as a **secret** (encrypted)
+- Set all sensitive keys (JWT, payment keys) in **backend environment** only
+- Use HTTPS for backend URL in production
+- Use specific domains in `ALLOWED_ORIGINS`, not wildcards
+- Keep `JWT_KEY` at least 32 characters long
 
-### ❌ DON'T
+### DON'T
 
-- ❌ Don't set payment keys or JWT_KEY in Cloudflare Workers
-- ❌ Don't forward secrets from worker to backend via headers
-- ❌ Don't use HTTP (not HTTPS) for backend in production
-- ❌ Don't use `*` (wildcard) in CORS origins in production
-- ❌ Don't commit `.env` files to git
+- Don't set payment keys or JWT_KEY in Cloudflare Workers
+- Don't forward secrets from worker to backend via headers
+- Don't use HTTP (not HTTPS) for backend in production
+- Don't use `*` (wildcard) in CORS origins in production
+- Don't commit `.env` files to git
 
 ---
 
@@ -660,4 +660,4 @@ That's it! The worker will proxy all requests to your backend, and your backend 
 Frontend → Worker (knows BACKEND_API_URL) → Backend (does the actual work) → MongoDB
 ```
 
-Happy deploying! 🚀
+Happy deploying!

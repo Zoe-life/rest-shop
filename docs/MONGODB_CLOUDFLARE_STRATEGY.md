@@ -8,25 +8,25 @@ Cloudflare Workers have limitations that make direct MongoDB connections challen
 
 ## Solution Strategy
 
-### Option 1: MongoDB Data API (Recommended) ✅
+### Option 1: MongoDB Data API (Recommended)
 **Use MongoDB Atlas Data API for HTTP-based access**
 
 #### Advantages:
-- ✅ Works seamlessly with Cloudflare Workers
-- ✅ No TCP socket requirements
-- ✅ Built-in authentication
-- ✅ REST API interface
-- ✅ Automatic connection pooling
+- Works seamlessly with Cloudflare Workers
+- No TCP socket requirements
+- Built-in authentication
+- REST API interface
+- Automatic connection pooling
 
-### Option 2: Cloudflare Workers with Node.js Compatibility Mode 🚀
+### Option 2: Cloudflare Workers with Node.js Compatibility Mode
 **Use Cloudflare Workers' Node.js compatibility to run Express app directly**
 
 This is the **EASIEST** approach as it requires minimal code changes:
-- ✅ Keep existing Mongoose code
-- ✅ Keep existing Express middleware
-- ✅ Add `nodejs_compat` flag in wrangler.toml
-- ⚠️ May have cold start latency
-- ⚠️ Some Node.js APIs may not work
+- Keep existing Mongoose code
+- Keep existing Express middleware
+- Add `nodejs_compat` flag in wrangler.toml
+- WARNING: May have cold start latency
+- WARNING: Some Node.js APIs may not work
 
 ## Recommended Implementation
 
