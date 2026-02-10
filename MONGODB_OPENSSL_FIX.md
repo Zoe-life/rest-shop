@@ -177,24 +177,24 @@ $ npm test
 
 | MongoDB Version | OpenSSL 1.1 | OpenSSL 3.x |
 |-----------------|-------------|-------------|
-| 4.x - 6.x       | ✅          | ❌          |
-| 7.0+            | ✅          | ✅          |
+| 4.x - 6.x       | Yes         | No          |
+| 7.0+            | Yes         | Yes         |
 
 ### Ubuntu OpenSSL Versions
 
 | Ubuntu Version | OpenSSL Version | MongoDB 7.0.14 Binary Support |
 |----------------|-----------------|------------------------------|
-| 20.04 LTS      | 1.1.1           | ✅ (uses ubuntu2004 binaries, auto-detected) |
-| 22.04 LTS      | 3.0.x           | ✅ (uses ubuntu2204 binaries, auto-detected) |
-| 24.04 LTS      | 3.0.x           | ✅ (uses ubuntu2204 binaries, manually configured) |
+| 20.04 LTS      | 1.1.1           | Yes (uses ubuntu2004 binaries, auto-detected) |
+| 22.04 LTS      | 3.0.x           | Yes (uses ubuntu2204 binaries, auto-detected) |
+| 24.04 LTS      | 3.0.x           | Yes (uses ubuntu2204 binaries, manually configured) |
 
 ### MongoDB Binary Availability for Version 7.0.14
 
 | Platform       | Available | URL Pattern |
 |----------------|-----------|-------------|
-| ubuntu2004     | ✅        | mongodb-linux-x86_64-ubuntu2004-7.0.14.tgz |
-| ubuntu2204     | ✅        | mongodb-linux-x86_64-ubuntu2204-7.0.14.tgz |
-| ubuntu2404     | ❌        | mongodb-linux-x86_64-ubuntu2404-7.0.14.tgz (404) |
+| ubuntu2004     | Yes       | mongodb-linux-x86_64-ubuntu2004-7.0.14.tgz |
+| ubuntu2204     | Yes       | mongodb-linux-x86_64-ubuntu2204-7.0.14.tgz |
+| ubuntu2404     | No        | mongodb-linux-x86_64-ubuntu2404-7.0.14.tgz (404) |
 
 ## References
 
@@ -210,8 +210,8 @@ This fix ensures that tests run successfully on modern Ubuntu systems (including
 
 The solution is:
 
-- ✅ **Minimal**: Only 2 files changed (test/setup.js and this documentation)
-- ✅ **Non-breaking**: Works on Ubuntu 20.04, 22.04, and 24.04
-- ✅ **Well-documented**: Clear instructions and troubleshooting
-- ✅ **Future-proof**: Compatible with latest Ubuntu LTS releases
-- ✅ **Solves both issues**: OpenSSL 3.x compatibility AND Ubuntu 24.04 binary availability
+- **Minimal**: Only 2 files changed (test/setup.js and this documentation)
+- **Non-breaking**: Works on Ubuntu 20.04, 22.04, and 24.04
+- **Well-documented**: Clear instructions and troubleshooting
+- **Future-proof**: Compatible with latest Ubuntu LTS releases
+- **Solves both issues**: OpenSSL 3.x compatibility AND Ubuntu 24.04 binary availability

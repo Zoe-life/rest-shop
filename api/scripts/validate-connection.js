@@ -26,19 +26,19 @@ function log(message, color = 'reset') {
 }
 
 function logSuccess(message) {
-  log(`✅ ${message}`, 'green');
+  log(`SUCCESS: ${message}`, 'green');
 }
 
 function logError(message) {
-  log(`❌ ${message}`, 'red');
+  log(`ERROR: ${message}`, 'red');
 }
 
 function logWarning(message) {
-  log(`⚠️  ${message}`, 'yellow');
+  log(`WARNING: ${message}`, 'yellow');
 }
 
 function logInfo(message) {
-  log(`ℹ️  ${message}`, 'cyan');
+  log(`INFO: ${message}`, 'cyan');
 }
 
 function logSection(message) {
@@ -345,11 +345,11 @@ function showNextSteps(backendOk, workerOk) {
     console.log('  3. Enter your backend URL when prompted');
     console.log('  4. Test worker health: curl https://your-worker-url/health');
   } else {
-    log('Everything looks good! 🎉', 'green');
+    log('Everything looks good!', 'green');
     console.log('\nYour setup is working correctly:');
-    console.log('  ✅ Backend is running and accessible');
-    console.log('  ✅ Worker is deployed');
-    console.log('  ✅ Worker can communicate with backend');
+    console.log('  - Backend is running and accessible');
+    console.log('  - Worker is deployed');
+    console.log('  - Worker can communicate with backend');
     console.log('\nYou can now:');
     console.log('  - Connect your frontend to the worker URL');
     console.log('  - Test API endpoints through the worker');

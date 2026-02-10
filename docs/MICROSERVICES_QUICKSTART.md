@@ -1,6 +1,6 @@
 # Microservices Quick Start Guide
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Deploy to Cloudflare Workers
 ```bash
@@ -13,13 +13,13 @@ npm run deploy:all
 
 That's it! Your microservices are now deployed.
 
-## 📋 What Gets Deployed?
+## What Gets Deployed?
 
 1. **Gateway Worker** - Main entry point (routes traffic)
 2. **Base Service** - Products, orders, users, auth
 3. **Payment Service** - Stripe, PayPal, M-Pesa payments
 
-## 🌐 Using Your API
+## Using Your API
 
 After deployment, use the **Gateway URL** for all requests:
 
@@ -51,7 +51,7 @@ curl -X POST https://rest-shop-gateway.YOUR-SUBDOMAIN.workers.dev/api/auth/login
   -d '{"email": "user@example.com", "password": "password"}'
 ```
 
-## 🔧 Deploy Individual Services
+## Deploy Individual Services
 
 ```bash
 # Deploy just the base service
@@ -64,7 +64,7 @@ npm run deploy:payments
 npm run deploy:gateway
 ```
 
-## 🧪 Test Locally
+## Test Locally
 
 ```bash
 # Test gateway locally
@@ -77,7 +77,7 @@ wrangler dev --config wrangler-payments.toml --port 8788
 wrangler dev --config wrangler.toml --port 8789
 ```
 
-## 🔐 Set Up Secrets
+## Set Up Secrets
 
 Each service needs access to certain secrets:
 
@@ -100,7 +100,7 @@ wrangler secret put ALLOWED_ORIGINS --config wrangler.toml
 wrangler secret put ALLOWED_ORIGINS --config wrangler-payments.toml
 ```
 
-## ✅ Verify Deployment
+## Verify Deployment
 
 Check that all services are healthy:
 
@@ -125,7 +125,7 @@ Expected response:
 }
 ```
 
-## 📊 Architecture Overview
+## Architecture Overview
 
 ```
 ┌─────────────┐
@@ -152,7 +152,7 @@ Expected response:
 └─────────────┘  └────────────────┘
 ```
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 ### "Service binding not found"
 - Ensure target services are deployed first
@@ -174,13 +174,13 @@ Expected response:
 - Check service bindings in gateway config
 - Use direct service URLs to test individual services
 
-## 📚 More Information
+## More Information
 
 - [Full Microservices Documentation](./MICROSERVICES_ARCHITECTURE.md)
 - [Bundle Size Analysis](../BUNDLE_SIZE_ANALYSIS.md)
 - [Main README](../README.md)
 
-## 💡 Tips
+## Tips
 
 1. **Always use the Gateway URL** for client requests
 2. **Deploy in order**: Base → Payments → Gateway
@@ -188,7 +188,7 @@ Expected response:
 4. **Monitor logs**: `wrangler tail --config wrangler-[service].toml`
 5. **Set secrets for all services** that need them
 
-## 🎯 Next Steps
+## Next Steps
 
 1. Update your frontend/client to use the Gateway URL
 2. Update any CI/CD pipelines to deploy all services

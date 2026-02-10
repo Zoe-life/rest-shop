@@ -1,6 +1,6 @@
 # Quick Start: Deploying REST Shop with Cloudflare Workers
 
-## 🎯 What You'll Deploy
+## What You'll Deploy
 
 1. **Node.js Backend** - Handles all database operations with Mongoose
 2. **Cloudflare Workers** - Edge proxies for global distribution
@@ -177,7 +177,7 @@ Now that your backend is running, configure the workers to proxy to it.
 
 3. **IMPORTANT: Configure Secrets in Backend, Not Workers**
    
-   **✅ DO THIS:** Set all secrets in your backend environment (Railway/Render dashboard):
+   **DO THIS:** Set all secrets in your backend environment (Railway/Render dashboard):
    ```bash
    # In Railway/Render dashboard, add these environment variables:
    JWT_KEY=your_jwt_secret
@@ -189,7 +189,7 @@ Now that your backend is running, configure the workers to proxy to it.
    # etc.
    ```
    
-   **❌ DON'T DO THIS:** Don't set payment secrets in Cloudflare Workers
+   **DON'T DO THIS:** Don't set payment secrets in Cloudflare Workers
    - Workers are just proxies, they don't need these secrets
    - Forwarding secrets via headers creates security risks
    - Backend reads from its own environment variables
@@ -210,13 +210,13 @@ npm run deploy:gateway    # Gateway router (main entry point)
 
 Expected output:
 ```
-✅ Successfully deployed rest-shop-api
+Successfully deployed rest-shop-api
    https://rest-shop-api.your-subdomain.workers.dev
 
-✅ Successfully deployed rest-shop-payments
+Successfully deployed rest-shop-payments
    https://rest-shop-payments.your-subdomain.workers.dev
 
-✅ Successfully deployed rest-shop-gateway
+Successfully deployed rest-shop-gateway
    https://rest-shop-gateway.your-subdomain.workers.dev
 ```
 
@@ -359,12 +359,12 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
 ## Environment Variables Checklist
 
 ### Required for Backend:
-- ✅ `MONGODB_URI` - MongoDB connection string
-- ✅ `JWT_KEY` - JWT secret (32+ characters)
-- ✅ `NODE_ENV` - Set to "production"
-- ✅ `PORT` - Port to run on (default 3001)
-- ✅ `ALLOWED_ORIGINS` - Comma-separated list of allowed origins
-- ✅ Payment Gateway Secrets:
+- `MONGODB_URI` - MongoDB connection string
+- `JWT_KEY` - JWT secret (32+ characters)
+- `NODE_ENV` - Set to "production"
+- `PORT` - Port to run on (default 3001)
+- `ALLOWED_ORIGINS` - Comma-separated list of allowed origins
+- Payment Gateway Secrets:
   - `STRIPE_SECRET_KEY`
   - `STRIPE_WEBHOOK_SECRET`
   - `PAYPAL_CLIENT_ID`
@@ -374,15 +374,15 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
   - etc.
 
 ### Required for Cloudflare Workers:
-- ✅ `BACKEND_API_URL` - Your backend URL (e.g., https://your-app.railway.app)
+- `BACKEND_API_URL` - Your backend URL (e.g., https://your-app.railway.app)
 
 **That's it! Workers only need the backend URL.**
 
 **Security Note:**
-- ❌ Do NOT set JWT_KEY or payment secrets in Workers
-- ❌ Do NOT forward secrets from Workers to backend
-- ✅ Configure all secrets directly in the backend environment
-- ✅ Workers are just proxies and don't need access to secrets
+- Do NOT set JWT_KEY or payment secrets in Workers
+- Do NOT forward secrets from Workers to backend
+- Configure all secrets directly in the backend environment
+- Workers are just proxies and don't need access to secrets
 
 ## Cost Estimate
 
@@ -400,13 +400,13 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
 
 ## Next Steps
 
-1. ✅ Set up monitoring (Railway/Render has built-in)
-2. ✅ Configure production environment variables
-3. ✅ Set up CI/CD (GitHub Actions already configured)
-4. ✅ Add custom domain
-5. ✅ Configure backup strategy for MongoDB
-6. ✅ Set up error tracking (Sentry, Rollbar, etc.)
-7. ✅ Load testing: `npm run test:load`
+1. Set up monitoring (Railway/Render has built-in)
+2. Configure production environment variables
+3. Set up CI/CD (GitHub Actions already configured)
+4. Add custom domain
+5. Configure backup strategy for MongoDB
+6. Set up error tracking (Sentry, Rollbar, etc.)
+7. Load testing: `npm run test:load`
 
 ## Support
 
@@ -416,10 +416,10 @@ If you encounter issues:
 3. Check backend logs
 4. Check Cloudflare Worker logs in Dashboard
 
-## Success! 🎉
+## Success!
 
 Your REST Shop API is now deployed with:
-- ✅ Global edge distribution via Cloudflare Workers
-- ✅ Robust Node.js backend with Mongoose
-- ✅ No more error 10021
-- ✅ Production-ready architecture
+- Global edge distribution via Cloudflare Workers
+- Robust Node.js backend with Mongoose
+- No more error 10021
+- Production-ready architecture

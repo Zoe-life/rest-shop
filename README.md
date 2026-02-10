@@ -6,14 +6,14 @@
 
 A modern, full-stack e-commerce platform with dual-backend architecture (Node.js + Cloudflare Workers) and React TypeScript frontend.
 
-## 🎨 Frontend Demo
+## Frontend Demo
 
 - **Live Demo**: [Cloudflare Pages](https://rest-shop-frontend.pages.dev) *(after deployment)*
 - **Features**: 
-  - 🌓 Day/Night mode toggle
-  - 📱 Fully responsive design
-  - 🎨 Saffron & Navy Blue theme
-  - ⚡ Fast performance on Cloudflare Pages
+  - Day/Night mode toggle
+  - Fully responsive design
+  - Saffron & Navy Blue theme
+  - Fast performance on Cloudflare Pages
 
 ## Repository Structure
 
@@ -56,7 +56,7 @@ rest-shop/
 - [Overview](#overview)
 - [Frontend Features](#frontend-features)
 - [Architecture](#architecture)
-- [🔗 Connecting the Worker to the Node.js Backend](#-connecting-the-worker-to-the-nodejs-backend)
+- [Connecting the Worker to the Node.js Backend](#-connecting-the-worker-to-the-nodejs-backend)
 - [Features](#features)
   - [Enhanced Features](#enhanced-features)
   - [Security Features](#security-features)
@@ -85,20 +85,20 @@ This is a comprehensive, **professional-grade full-stack e-commerce platform** w
 
 ## Frontend Features
 
-### 🎨 Modern UI/UX
+### Modern UI/UX
 - **Theme Colors**: Bright Saffron (#FF9933) and Navy Blue (#002366)
 - **Dark/Light Mode**: Toggle with persistence via localStorage
 - **Responsive Design**: Mobile-first, works on all screen sizes
 - **Clean Interface**: Professional, intuitive, and user-friendly
 
-### 🚀 Technology Stack
+### Technology Stack
 - **React 18** with TypeScript
 - **Tailwind CSS** for styling
 - **React Router** for navigation
 - **Context API** for state management
 - **Axios** for API communication
 
-### 📱 Pages & Features
+### Pages & Features
 - **Product Browsing**: Grid layout with images, prices, and stock status
 - **Authentication**: Login and signup pages
 - **Order Management**: View order history and status
@@ -130,11 +130,11 @@ MongoDB Atlas
 - **MongoDB Atlas**: Cloud database
 
 **Benefits:**
-- ✅ Global CDN distribution for frontend
-- ✅ Fast edge routing via Workers
-- ✅ Reliable Mongoose/MongoDB operations in Node.js
-- ✅ Independent scaling of all layers
-- ✅ Industry-standard architecture pattern
+- Global CDN distribution for frontend
+- Fast edge routing via Workers
+- Reliable Mongoose/MongoDB operations in Node.js
+- Independent scaling of all layers
+- Industry-standard architecture pattern
 
 **Deployment:**
 - Frontend: Cloudflare Pages (automatic via GitHub Actions)
@@ -161,7 +161,7 @@ npm run deploy:payments  # Payment service
 npm run deploy:gateway   # Gateway (main entry point)
 ```
 
-## 🔗 Connecting the Worker to the Node.js Backend
+## Connecting the Worker to the Node.js Backend
 
 **The most important step:** The Cloudflare Worker acts as a proxy and needs to know where your Node.js backend is running.
 
@@ -207,10 +207,10 @@ npm start
 ### Detailed Guide
 
 See **[Connection Guide](docs/CONNECTION_GUIDE.md)** for:
-- ✅ Step-by-step instructions
-- ✅ Multiple deployment options (Railway, Render, VPS)
-- ✅ Troubleshooting common issues
-- ✅ Configuration validation script
+- Step-by-step instructions
+- Multiple deployment options (Railway, Render, VPS)
+- Troubleshooting common issues
+- Configuration validation script
 
 ### Validation Script
 
@@ -226,23 +226,23 @@ node api/scripts/validate-connection.js https://your-app.railway.app https://you
 ## Features
 
 ### Core Features
-✅ User authentication and management with JWT  
-✅ **OAuth 2.0 integration (Google, Microsoft, Apple)**  
-✅ **Multi-Gateway Payment Processing (Stripe, PayPal, M-Pesa)**  
-✅ Product management with search, filtering, and pagination  
-✅ Advanced order management with status tracking  
-✅ Role-based access control (Admin/User)  
-✅ File upload for product images  
-✅ Inventory tracking (stock levels, SKU)  
-✅ Payment history and transaction logging  
-✅ Webhook handling for payment callbacks  
-✅ Comprehensive error handling  
-✅ CI/CD pipeline with GitHub Actions  
-✅ Cloudflare Workers deployment ready  
+- User authentication and management with JWT  
+- OAuth 2.0 integration (Google, Microsoft, Apple)  
+- Multi-Gateway Payment Processing (Stripe, PayPal, M-Pesa)  
+- Product management with search, filtering, and pagination  
+- Advanced order management with status tracking  
+- Role-based access control (Admin/User)  
+- File upload for product images  
+- Inventory tracking (stock levels, SKU)  
+- Payment history and transaction logging  
+- Webhook handling for payment callbacks  
+- Comprehensive error handling  
+- CI/CD pipeline with GitHub Actions  
+- Cloudflare Workers deployment ready
 
 ### Enhanced Features
 
-#### 🔐 Security Enhancements
+#### Security Enhancements
 - **Email Verification**: Secure email verification with time-limited tokens (24-hour expiry)
 - **Password Reset**: Secure password reset functionality with email notifications (1-hour expiry)
 - **Two-Factor Authentication (2FA)**: TOTP-based 2FA with authenticator apps (Google Authenticator, Authy)
@@ -251,7 +251,7 @@ node api/scripts/validate-connection.js https://your-app.railway.app https://you
   - Time-based one-time passwords (RFC 6238 compliant)
 - **API Versioning**: `/api/v1` endpoints with backward compatibility for legacy routes
 
-#### ⚡ Performance Features
+#### Performance Features
 - **Redis Caching**: Automatic response caching for GET requests
   - Configurable TTL per endpoint
   - Automatic cache invalidation on mutations
@@ -260,20 +260,20 @@ node api/scripts/validate-connection.js https://your-app.railway.app https://you
 - **Lazy Loading**: Selective field loading with Mongoose populate
 - **CDN Integration**: Cloudinary for optimized image delivery
 
-#### 🔔 Real-Time Features
+#### Real-Time Features
 - **WebSocket Notifications**: Instant order and payment status updates
   - User-specific notification channels
   - CORS-protected WebSocket connections
   - Automatic reconnection handling
 - **Email Notifications**: Automated email alerts for order status changes
 
-#### 🧪 Testing & Quality
+#### Testing & Quality
 - **Automated Testing**: Comprehensive test suite with Mocha/Chai
 - **Load Testing**: Artillery-based performance testing scenarios
 - **Integration Tests**: Full workflow testing
 - **Security Testing**: npm audit, Snyk, CodeQL integration
 
-**📚 For detailed documentation, see:**
+**For detailed documentation, see:**
 - [Enhanced Features Guide](docs/ENHANCED_FEATURES.md) - Complete setup and usage guide
 - [Monitoring & Observability](docs/MONITORING_OBSERVABILITY.md) - APM, metrics, and alerting
 - [Testing Guide](docs/TESTING_GUIDE.md) - Comprehensive testing documentation
@@ -281,9 +281,9 @@ node api/scripts/validate-connection.js https://your-app.railway.app https://you
 ## Payment Integration
 
 ### Supported Payment Methods
-- **💳 Stripe**: Credit/Debit card payments (Global)
-- **🅿️ PayPal**: PayPal account payments (Global)
-- **📱 M-Pesa**: Mobile money for Kenyan users (Kenya-specific)
+- **Stripe**: Credit/Debit card payments (Global)
+- **PayPal**: PayPal account payments (Global)
+- **M-Pesa**: Mobile money for Kenyan users (Kenya-specific)
 
 ### Payment Features
 - **Secure Transaction Processing**: PCI-compliant payment handling
@@ -298,7 +298,7 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 
 ## Security Features
 
-### 🔒 Production-Grade Security
+### Production-Grade Security
 - **Helmet.js**: Security headers (CSP, HSTS, X-Frame-Options, XSS protection)
 - **CORS**: Configurable origin restrictions
 - **Rate Limiting**: 
@@ -453,7 +453,7 @@ Create a `.env.local` file in the `frontend/` directory:
    - Create a database user
    - Get your connection string
 
-**📚 Configuration Guides:**
+**Configuration Guides:**
 - [OAuth Setup Guide](docs/OAUTH_SETUP.md) - Configure social login
 - [Payment Setup](docs/PAYMENT_API_DOCUMENTATION.md) - Payment gateway configuration
 - [M-Pesa Setup](docs/MPESA_SETUP_GUIDE.md) - M-Pesa integration
@@ -791,7 +791,7 @@ Content-Type: application/json
 
 ## Documentation
 
-### 📖 Complete Documentation Library
+### Complete Documentation Library
 
 #### Getting Started
 - [Installation & Configuration](#getting-started) - Setup and configuration guide
@@ -846,12 +846,12 @@ Content-Type: application/json
 
 ## Deployment
 
-### 🚀 Automated Deployment with GitHub Actions
+### Automated Deployment with GitHub Actions
 
 The project includes full CI/CD automation via GitHub Actions for:
-- ✅ Cloudflare Workers (Edge proxy)
-- ✅ Cloudflare Pages (Frontend)
-- ✅ Automated testing and security scanning
+- Cloudflare Workers (Edge proxy)
+- Cloudflare Pages (Frontend)
+- Automated testing and security scanning
 
 **Quick Setup:**
 1. Configure [GitHub Secrets](docs/GITHUB_SECRETS_CICD_GUIDE.md)
@@ -991,18 +991,18 @@ tests/load/
 > **Note**: If you encounter "libcrypto.so.1.1" errors, the project is pre-configured to use MongoDB 7.0.14 which supports OpenSSL 3.x. This is set in `package.json` under `config.mongodbMemoryServer.version`.
 
 ### Test Coverage
-- ✅ User authentication (signup, login, delete, email verification, password reset)
-- ✅ Two-factor authentication (setup, enable, verify, disable)
-- ✅ Product CRUD operations with caching
-- ✅ Order management with real-time notifications
-- ✅ Payment processing (Stripe, PayPal, M-Pesa)
-- ✅ JWT middleware and authorization
-- ✅ WebSocket connections and notifications
-- ✅ Error handling and security
-- ✅ Load testing scenarios
+- User authentication (signup, login, delete, email verification, password reset)
+- Two-factor authentication (setup, enable, verify, disable)
+- Product CRUD operations with caching
+- Order management with real-time notifications
+- Payment processing (Stripe, PayPal, M-Pesa)
+- JWT middleware and authorization
+- WebSocket connections and notifications
+- Error handling and security
+- Load testing scenarios
 - **Target Coverage**: > 90%
 
-**📚 For complete testing documentation, see [Testing Guide](docs/TESTING_GUIDE.md)**
+**For complete testing documentation, see [Testing Guide](docs/TESTING_GUIDE.md)**
 
 ## Monitoring and Observability
 
@@ -1038,7 +1038,7 @@ tests/load/
 - Payment gateway issues
 - Memory and CPU usage warnings
 
-**📚 For complete monitoring setup, see [Monitoring & Observability Guide](docs/MONITORING_OBSERVABILITY.md)**
+**For complete monitoring setup, see [Monitoring & Observability Guide](docs/MONITORING_OBSERVABILITY.md)**
 
 ## Middleware
 

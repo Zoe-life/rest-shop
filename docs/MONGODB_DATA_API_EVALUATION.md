@@ -17,20 +17,20 @@ The application currently uses:
 MongoDB Data API is an HTTP-based REST API that allows applications to interact with MongoDB Atlas without requiring TCP socket connections. It's particularly suitable for serverless environments like Cloudflare Workers.
 
 ### Advantages of MongoDB Data API:
-- ✅ No TCP socket requirements (perfect for Cloudflare Workers)
-- ✅ Built-in authentication via API keys
-- ✅ RESTful interface (JSON over HTTP)
-- ✅ Automatic connection pooling
-- ✅ No cold start issues with connection management
-- ✅ Works in any environment with HTTP/fetch support
+- No TCP socket requirements (perfect for Cloudflare Workers)
+- Built-in authentication via API keys
+- RESTful interface (JSON over HTTP)
+- Automatic connection pooling
+- No cold start issues with connection management
+- Works in any environment with HTTP/fetch support
 
 ### Disadvantages of MongoDB Data API:
-- ⚠️ Requires complete rewrite of data access layer
-- ⚠️ No Mongoose schema validation on the client side
-- ⚠️ No Mongoose middleware (pre/post hooks)
-- ⚠️ Different query syntax (JSON-based, not Mongoose query builder)
-- ⚠️ May have higher latency (HTTP overhead vs native driver)
-- ⚠️ Limited to CRUD operations (complex aggregations may be challenging)
+- WARNING: Requires complete rewrite of data access layer
+- WARNING: No Mongoose schema validation on the client side
+- WARNING: No Mongoose middleware (pre/post hooks)
+- WARNING: Different query syntax (JSON-based, not Mongoose query builder)
+- WARNING: May have higher latency (HTTP overhead vs native driver)
+- WARNING: Limited to CRUD operations (complex aggregations may be challenging)
 
 ## Impact Analysis
 
@@ -75,7 +75,7 @@ MongoDB Data API is an HTTP-based REST API that allows applications to interact 
 
 ## Recommendation
 
-### ❌ Do NOT migrate to MongoDB Data API at this time
+### Do NOT migrate to MongoDB Data API at this time
 
 **Reasons**:
 
@@ -85,7 +85,7 @@ MongoDB Data API is an HTTP-based REST API that allows applications to interact 
 4. **Testing Complexity**: All tests would need complete rewrites
 5. **Maintenance Burden**: Team familiarity with Mongoose vs learning new API patterns
 
-### ✅ When to Consider Migration:
+### When to Consider Migration:
 
 1. **Performance Issues**: If current implementation shows unacceptable latency
 2. **Connection Problems**: If Node.js compatibility mode causes issues in production

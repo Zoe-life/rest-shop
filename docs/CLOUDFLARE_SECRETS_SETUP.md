@@ -108,12 +108,12 @@ If your worker can't access a secret:
 
 ## Security Best Practices
 
-- ✅ Never commit secrets to version control
-- ✅ Use Cloudflare's encrypted secret storage
-- ✅ Rotate secrets regularly (every 90 days)
-- ✅ Use different secrets for development/production
-- ✅ Limit secret access to necessary team members
-- ✅ Monitor secret access in Cloudflare audit logs
+- Never commit secrets to version control
+- Use Cloudflare's encrypted secret storage
+- Rotate secrets regularly (every 90 days)
+- Use different secrets for development/production
+- Limit secret access to necessary team members
+- Monitor secret access in Cloudflare audit logs
 
 ## Additional Resources
 

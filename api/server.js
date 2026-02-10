@@ -1,4 +1,5 @@
-require('dotenv').config();
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 const http = require('http');
 const app = require('./app');
 const mongoose = require('mongoose');
@@ -8,17 +9,21 @@ const GRACEFUL_SHUTDOWN_TIMEOUT_MS = 10000; // 10 seconds
 
 // Security: Validate critical environment variables on startup
 if (!process.env.JWT_KEY) {
-    console.error('❌ CRITICAL: JWT_KEY environment variable is not set');
+    console.error('CRITICAL: JWT_KEY environment variable is not set');
+    console.error('Please set JWT_KEY in your environment variables or .env file');
+    console.error('For Render: Go to Dashboard > Environment > Add JWT_KEY variable');
     process.exit(1);
 }
 
 if (process.env.JWT_KEY.length < 32) {
-    console.error('❌ CRITICAL: JWT_KEY must be at least 32 characters long for security');
+    console.error('CRITICAL: JWT_KEY must be at least 32 characters long for security');
+    console.error('Current length:', process.env.JWT_KEY.length);
     process.exit(1);
 }
 
 if (!process.env.MONGODB_URI) {
-    console.error('❌ CRITICAL: MONGODB_URI environment variable is not set');
+    console.error('CRITICAL: MONGODB_URI environment variable is not set');
+    console.error('Please set MONGODB_URI in your environment variables or .env file');
     process.exit(1);
 }
 
@@ -38,43 +43,43 @@ const mongoOptions = {
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, mongoOptions)
     .then(() => {
-        console.log('✅ Connected to MongoDB successfully');
+        console.log('Connected to MongoDB successfully');
         // Start server only after DB connection is established
         server.listen(port, () => {
-            console.log(`🚀 Server is running on port ${port}`);
-            console.log(`📊 Environment: ${process.env.NODE_ENV || 'development'}`);
+            console.log(`Server is running on port ${port}`);
+            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
             
             // Initialize WebSocket server
             try {
                 const socketService = require('./services/socketService');
                 socketService.initializeSocket(server);
-                console.log('🔌 WebSocket server initialized');
+                console.log('WebSocket server initialized');
             } catch (err) {
-                console.error('⚠️  WebSocket initialization failed:', err.message);
+                console.error('WARNING: WebSocket initialization failed:', err.message);
             }
         });
     })
     .catch((error) => {
-        console.error('❌ MongoDB connection error:', error.message);
+        console.error('MongoDB connection error:', error.message);
         process.exit(1); // Exit if cannot connect to database
     });
 
 // MongoDB Connection Event Handlers
 mongoose.connection.on('connected', () => {
-    console.log('📡 Mongoose connected to MongoDB');
+    console.log('Mongoose connected to MongoDB');
 });
 
 mongoose.connection.on('error', (err) => {
-    console.error('❌ Mongoose connection error:', err);
+    console.error('Mongoose connection error:', err);
 });
 
 mongoose.connection.on('disconnected', () => {
-    console.warn('⚠️  Mongoose disconnected from MongoDB');
+    console.warn('WARNING: Mongoose disconnected from MongoDB');
 });
 
 // Graceful Shutdown
 const gracefulShutdown = async (signal) => {
-    console.log(`\n🛑 ${signal} received. Starting graceful shutdown...`);
+    console.log(`\n${signal} received. Starting graceful shutdown...`);
     
     let serverClosed = false;
     
@@ -89,27 +94,27 @@ const gracefulShutdown = async (signal) => {
             server.close((err) => {
                 clearTimeout(timeout);
                 if (err) {
-                    console.error('❌ Error closing HTTP server:', err);
+                    console.error('Error closing HTTP server:', err);
                     reject(err);
                 } else {
-                    console.log('🔒 HTTP server closed (all connections finished)');
+                    console.log('HTTP server closed (all connections finished)');
                     resolve();
                 }
             });
         });
         serverClosed = true;
     } catch (err) {
-        console.error('❌ Failed to close HTTP server gracefully:', err.message);
+        console.error('Failed to close HTTP server gracefully:', err.message);
         // Continue to close database connection even if server close failed
     }
     
     // Close database connection after server is closed (or timeout)
     try {
         await mongoose.connection.close();
-        console.log('🔌 MongoDB connection closed');
+        console.log('MongoDB connection closed');
         process.exit(serverClosed ? 0 : 1);
     } catch (err) {
-        console.error('❌ Error closing MongoDB connection:', err);
+        console.error('Error closing MongoDB connection:', err);
         process.exit(1);
     }
 };

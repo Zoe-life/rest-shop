@@ -31,10 +31,10 @@ MongooseServerSelectionError: Server selection timed out after 30000 ms
    
 2. **Verify Connection String:**
    ```javascript
-   // ✅ Correct format
+   // Correct format
    MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
    
-   // ❌ Common mistakes
+   // Common mistakes
    MONGODB_URI=mongodb://... (missing +srv for Atlas)
    MONGODB_URI=mongodb+srv://...mongodb.net (missing database name)
    ```
@@ -116,10 +116,10 @@ MongoError: bad auth Authentication failed
 
 2. **Use Lean Queries:**
    ```javascript
-   // ✅ Faster - returns plain JavaScript objects
+   // Faster - returns plain JavaScript objects
    const products = await Product.find().lean();
    
-   // ❌ Slower - returns Mongoose documents with methods
+   // Slower - returns Mongoose documents with methods
    const products = await Product.find();
    ```
 
@@ -144,10 +144,10 @@ MongoError: bad auth Authentication failed
 
 1. **Use Cursor for Large Datasets:**
    ```javascript
-   // ❌ Don't load all documents at once
+   // Don't load all documents at once
    const allProducts = await Product.find();
    
-   // ✅ Use cursor to stream
+   // Use cursor to stream
    const cursor = Product.find().cursor();
    for (let doc = await cursor.next(); doc != null; doc = await cursor.next()) {
        // Process one document at a time
@@ -243,9 +243,9 @@ try {
 ```javascript
 // Check schema requirements
 const product = new Product({
-    name: req.body.name,        // ✅ Required
-    price: req.body.price,       // ✅ Required
-    productImage: req.file.path  // ✅ Required
+    name: req.body.name,        // Required
+    price: req.body.price,       // Required
+    productImage: req.file.path  // Required
     // All required fields must be provided
 });
 ```
@@ -270,65 +270,65 @@ if (!mongoose.Types.ObjectId.isValid(id)) {
 
 ### 1. Connection Management
 
-✅ **DO:**
+**DO:**
 - Connect once at application startup
 - Reuse the same connection
 - Implement graceful shutdown
 - Use connection pooling
 
-❌ **DON'T:**
+**DON'T:**
 - Create new connections for each request
 - Leave connections open indefinitely
 - Ignore connection errors
 
 ### 2. Query Optimization
 
-✅ **DO:**
+**DO:**
 - Add indexes for frequently queried fields
 - Use `.lean()` when you don't need Mongoose methods
 - Implement pagination for large datasets
 - Use `.select()` to limit returned fields
 
-❌ **DON'T:**
+**DON'T:**
 - Query without indexes
 - Load entire collections into memory
 - Use `.find({})` without limits
 
 ### 3. Schema Design
 
-✅ **DO:**
+**DO:**
 - Use schema validation
 - Add appropriate indexes
 - Use embedded documents for 1-to-few relationships
 - Use references for 1-to-many relationships
 
-❌ **DON'T:**
+**DON'T:**
 - Store large arrays (MongoDB 16MB document limit)
 - Create deeply nested documents (>100 levels)
 - Ignore validation
 
 ### 4. Error Handling
 
-✅ **DO:**
+**DO:**
 - Wrap database operations in try-catch
 - Return appropriate HTTP status codes
 - Log errors for debugging
 - Implement retry logic for transient errors
 
-❌ **DON'T:**
+**DON'T:**
 - Ignore errors silently
 - Expose internal errors to users
 - Let unhandled promise rejections crash the app
 
 ### 5. Security
 
-✅ **DO:**
+**DO:**
 - Validate user input
 - Use parameterized queries (Mongoose does this by default)
 - Sanitize input to prevent injection
 - Validate ObjectIds before queries
 
-❌ **DON'T:**
+**DON'T:**
 - Build queries with string concatenation
 - Trust user input
 - Store passwords in plain text
@@ -406,35 +406,35 @@ console.log('Connection state:', mongoose.connection.readyState);
 
 You should consider migrating away from MongoDB/Mongoose **ONLY IF:**
 
-1. ✅ You have complex JOIN operations across many tables
-2. ✅ You need ACID transactions for all operations
-3. ✅ Your queries are primarily relational
-4. ✅ You have strict schema requirements that never change
-5. ✅ Performance issues persist after optimization
+1. You have complex JOIN operations across many tables
+2. You need ACID transactions for all operations
+3. Your queries are primarily relational
+4. You have strict schema requirements that never change
+5. Performance issues persist after optimization
 
 **Don't migrate if:**
-- ❌ You have a configuration problem (fix it first!)
-- ❌ The issue is lack of understanding (learn Mongoose)
-- ❌ You're impatient with setup (all databases need setup)
-- ❌ You heard "MongoDB is bad" (it's not - it's just different)
+- You have a configuration problem (fix it first!)
+- The issue is lack of understanding (learn Mongoose)
+- You're impatient with setup (all databases need setup)
+- You heard "MongoDB is bad" (it's not - it's just different)
 
 ---
 
 ## Summary
 
 Most "Mongoose headaches" come from:
-1. ⚠️ Misconfigured connections
-2. ⚠️ Missing indexes
-3. ⚠️ Poor error handling
-4. ⚠️ Lack of understanding
+1. Misconfigured connections
+2. Missing indexes
+3. Poor error handling
+4. Lack of understanding
 
 **Solution:** Fix the root cause, don't rewrite the entire application!
 
 The connection configuration in `server.js` now includes:
-- ✅ Proper connection pooling
-- ✅ Timeout configurations
-- ✅ Error handling
-- ✅ Graceful shutdown
-- ✅ Connection monitoring
+- Proper connection pooling
+- Timeout configurations
+- Error handling
+- Graceful shutdown
+- Connection monitoring
 
 This should resolve most common issues. If problems persist, review the specific error message in this guide.
