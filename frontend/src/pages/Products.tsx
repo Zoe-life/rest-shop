@@ -16,6 +16,7 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
   const { user } = useAuth();
   const navigate = useNavigate();
 
@@ -45,8 +46,13 @@ const Products: React.FC = () => {
     }
     
     // TODO: Implement actual cart functionality
-    // For now, just show an alert
-    alert(`Added ${product.name} to cart! (Cart functionality coming soon)`);
+    // For now, show a notification
+    setNotification(`Added ${product.name} to cart!`);
+    
+    // Clear notification after 3 seconds
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
   };
 
   if (loading) {
@@ -72,6 +78,13 @@ const Products: React.FC = () => {
       <h1 className="text-3xl font-bold text-navy-600 dark:text-white mb-8">
         Our Products
       </h1>
+
+      {/* Toast Notification */}
+      {notification && (
+        <div className="fixed top-20 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
+          {notification}
+        </div>
+      )}
 
       {products.length === 0 ? (
         <div className="text-center py-12">

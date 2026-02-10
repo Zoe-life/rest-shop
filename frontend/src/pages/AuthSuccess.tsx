@@ -5,7 +5,6 @@ import { api } from '../api/axios';
 
 const AuthSuccess: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -19,27 +18,32 @@ const AuthSuccess: React.FC = () => {
         const { token } = response.data;
 
         if (token) {
-          // Decode the token to get user info (simple base64 decode of JWT payload)
-          const payload = JSON.parse(atob(token.split('.')[1]));
-          
-          const user = {
-            _id: payload.userId,
-            email: payload.email,
-            role: payload.role
-          };
+          // Safely decode the token to get user info
+          try {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            
+            const user = {
+              _id: payload.userId,
+              email: payload.email,
+              role: payload.role
+            };
 
-          // Store token and user in localStorage
-          localStorage.setItem('token', token);
-          localStorage.setItem('user', JSON.stringify(user));
-          
-          // Set the token in axios defaults
-          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            // Store token and user in localStorage
+            localStorage.setItem('token', token);
+            localStorage.setItem('user', JSON.stringify(user));
+            
+            // Set the token in axios defaults
+            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
 
-          // Clear the cookie by calling logout endpoint
-          await api.get('/auth/logout', { withCredentials: true });
+            // Clear the cookie by calling logout endpoint
+            await api.get('/auth/logout', { withCredentials: true });
 
-          // Redirect to products page
-          navigate('/products');
+            // Redirect to products page
+            navigate('/products');
+          } catch (decodeError) {
+            console.error('Failed to decode token:', decodeError);
+            setError('Invalid token format received');
+          }
         } else {
           setError('No authentication token received');
         }
