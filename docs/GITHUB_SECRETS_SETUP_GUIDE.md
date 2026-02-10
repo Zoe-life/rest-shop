@@ -154,7 +154,7 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 
 ## Complete Secrets Checklist
 
-### Required for All Deployments ✓
+### Required for All Deployments
 
 - [ ] `CLOUDFLARE_API_TOKEN`
 - [ ] `CLOUDFLARE_ACCOUNT_ID`
@@ -162,16 +162,16 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 - [ ] `VITE_API_URL`
 - [ ] `JWT_KEY`
 
-### Required for Railway Deployment ✓
+### Required for Railway Deployment
 
 - [ ] `RAILWAY_TOKEN`
 - [ ] `RAILWAY_SERVICE_ID`
 
-### Required for Render Deployment ✓
+### Required for Render Deployment
 
 - [ ] `RENDER_DEPLOY_HOOK`
 
-### Optional ✓
+### Optional
 
 - [ ] `SNYK_TOKEN` (for security scanning)
 
@@ -359,12 +359,12 @@ If you encounter issues:
 
 **Key Points:**
 
-1. ✅ Use GitHub Secrets for deployment credentials (Cloudflare tokens, Railway tokens)
-2. ✅ Use hosting platform UI for backend environment variables
-3. ✅ `BACKEND_API_URL` connects worker to backend
-4. ✅ `VITE_API_URL` connects frontend to API
-5. ✅ Deploy backend first, then add its URL to GitHub Secrets
-6. ✅ Push to main → Everything deploys automatically
+1. Use GitHub Secrets for deployment credentials (Cloudflare tokens, Railway tokens)
+2. Use hosting platform UI for backend environment variables
+3. `BACKEND_API_URL` connects worker to backend
+4. `VITE_API_URL` connects frontend to API
+5. Deploy backend first, then add its URL to GitHub Secrets
+6. Push to main → Everything deploys automatically
 
 **Quick Setup:**
 ```bash

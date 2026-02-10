@@ -177,7 +177,7 @@ Now that your backend is running, configure the workers to proxy to it.
 
 3. **IMPORTANT: Configure Secrets in Backend, Not Workers**
    
-   **✅ DO THIS:** Set all secrets in your backend environment (Railway/Render dashboard):
+   **DO THIS:** Set all secrets in your backend environment (Railway/Render dashboard):
    ```bash
    # In Railway/Render dashboard, add these environment variables:
    JWT_KEY=your_jwt_secret
@@ -189,7 +189,7 @@ Now that your backend is running, configure the workers to proxy to it.
    # etc.
    ```
    
-   **❌ DON'T DO THIS:** Don't set payment secrets in Cloudflare Workers
+   **DON'T DO THIS:** Don't set payment secrets in Cloudflare Workers
    - Workers are just proxies, they don't need these secrets
    - Forwarding secrets via headers creates security risks
    - Backend reads from its own environment variables
@@ -210,13 +210,13 @@ npm run deploy:gateway    # Gateway router (main entry point)
 
 Expected output:
 ```
-✅ Successfully deployed rest-shop-api
+Successfully deployed rest-shop-api
    https://rest-shop-api.your-subdomain.workers.dev
 
-✅ Successfully deployed rest-shop-payments
+Successfully deployed rest-shop-payments
    https://rest-shop-payments.your-subdomain.workers.dev
 
-✅ Successfully deployed rest-shop-gateway
+Successfully deployed rest-shop-gateway
    https://rest-shop-gateway.your-subdomain.workers.dev
 ```
 
@@ -400,13 +400,13 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
 
 ## Next Steps
 
-1. ✅ Set up monitoring (Railway/Render has built-in)
-2. ✅ Configure production environment variables
-3. ✅ Set up CI/CD (GitHub Actions already configured)
-4. ✅ Add custom domain
-5. ✅ Configure backup strategy for MongoDB
-6. ✅ Set up error tracking (Sentry, Rollbar, etc.)
-7. ✅ Load testing: `npm run test:load`
+1. Set up monitoring (Railway/Render has built-in)
+2. Configure production environment variables
+3. Set up CI/CD (GitHub Actions already configured)
+4. Add custom domain
+5. Configure backup strategy for MongoDB
+6. Set up error tracking (Sentry, Rollbar, etc.)
+7. Load testing: `npm run test:load`
 
 ## Support
 

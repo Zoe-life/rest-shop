@@ -180,8 +180,8 @@ https://rest-shop-payments.YOUR-SUBDOMAIN.workers.dev
 ### 1. Bundle Size Management
 - **Before**: Single 2MB+ worker (exceeded free tier 1MB limit)
 - **After**: 
-  - Gateway: ~50KB ✓
-  - Payment Service: ~600-800KB ✓
+  - Gateway: ~50KB
+  - Payment Service: ~600-800KB
   - Base Service: ~1.2-1.5MB (can be split further if needed)
 
 ### 2. Independent Deployment

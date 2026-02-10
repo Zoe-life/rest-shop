@@ -51,7 +51,7 @@ curl -X POST https://rest-shop-gateway.YOUR-SUBDOMAIN.workers.dev/api/auth/login
   -d '{"email": "user@example.com", "password": "password"}'
 ```
 
-## 🔧 Deploy Individual Services
+## Deploy Individual Services
 
 ```bash
 # Deploy just the base service
@@ -64,7 +64,7 @@ npm run deploy:payments
 npm run deploy:gateway
 ```
 
-## 🧪 Test Locally
+## Test Locally
 
 ```bash
 # Test gateway locally
@@ -77,7 +77,7 @@ wrangler dev --config wrangler-payments.toml --port 8788
 wrangler dev --config wrangler.toml --port 8789
 ```
 
-## 🔐 Set Up Secrets
+## Set Up Secrets
 
 Each service needs access to certain secrets:
 
@@ -100,7 +100,7 @@ wrangler secret put ALLOWED_ORIGINS --config wrangler.toml
 wrangler secret put ALLOWED_ORIGINS --config wrangler-payments.toml
 ```
 
-## ✅ Verify Deployment
+## Verify Deployment
 
 Check that all services are healthy:
 

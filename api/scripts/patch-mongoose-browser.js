@@ -29,13 +29,13 @@ try {
   
   // Check if already patched
   if (content.includes('Polyfill for Cloudflare Workers compatibility')) {
-    console.log('✓ Mongoose browser build already patched');
+    console.log('Mongoose browser build already patched');
     process.exit(0);
   }
   
   const patchedContent = polyfill + content;
   fs.writeFileSync(mongooseBrowserPath, patchedContent, 'utf8');
-  console.log('✓ Successfully patched mongoose browser build for Cloudflare Workers');
+  console.log('Successfully patched mongoose browser build for Cloudflare Workers');
 } catch (error) {
   console.error('Error patching mongoose:', error.message);
   process.exit(1);

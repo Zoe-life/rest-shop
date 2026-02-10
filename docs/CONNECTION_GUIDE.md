@@ -146,7 +146,7 @@ Choose one of these hosting providers:
 4. **Deploy**
    - Railway automatically deploys
    - Note your backend URL: `https://your-app.railway.app`
-   - ⚠️ **Save this URL** - you'll need it in Step 2
+   - **IMPORTANT: Save this URL** - you'll need it in Step 2
 
 5. **Test Your Backend**
    ```bash
@@ -174,7 +174,7 @@ Choose one of these hosting providers:
 4. **Deploy**
    - Render automatically deploys
    - Note your backend URL: `https://rest-shop-backend.onrender.com`
-   - ⚠️ **Save this URL** - you'll need it in Step 2
+   - **IMPORTANT: Save this URL** - you'll need it in Step 2
 
 #### Option C: VPS (DigitalOcean, AWS, etc.)
 
@@ -235,7 +235,7 @@ npx wrangler secret put BACKEND_API_URL
 # Press Enter
 ```
 
-✅ **The worker now knows where to find your backend!**
+**The worker now knows where to find your backend!**
 
 #### Method B: Using Cloudflare Dashboard
 
@@ -262,7 +262,7 @@ npx wrangler login
 npx wrangler deploy
 
 # Output will show your worker URL:
-# ✅ Published rest-shop-api (1.23s)
+# Published rest-shop-api (1.23s)
 #    https://rest-shop-api.your-subdomain.workers.dev
 ```
 
@@ -291,7 +291,7 @@ curl https://rest-shop-api.your-subdomain.workers.dev/products
 # Should return your products list
 ```
 
-**✅ Success!** Your worker is now connected to your backend!
+**Success!** Your worker is now connected to your backend!
 
 ---
 

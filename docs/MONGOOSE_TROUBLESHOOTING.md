@@ -243,9 +243,9 @@ try {
 ```javascript
 // Check schema requirements
 const product = new Product({
-    name: req.body.name,        // ✅ Required
-    price: req.body.price,       // ✅ Required
-    productImage: req.file.path  // ✅ Required
+    name: req.body.name,        // Required
+    price: req.body.price,       // Required
+    productImage: req.file.path  // Required
     // All required fields must be provided
 });
 ```
@@ -423,10 +423,10 @@ You should consider migrating away from MongoDB/Mongoose **ONLY IF:**
 ## Summary
 
 Most "Mongoose headaches" come from:
-1. WARNING: Misconfigured connections
-2. WARNING: Missing indexes
-3. WARNING: Poor error handling
-4. WARNING: Lack of understanding
+1. Misconfigured connections
+2. Missing indexes
+3. Poor error handling
+4. Lack of understanding
 
 **Solution:** Fix the root cause, don't rewrite the entire application!
 
