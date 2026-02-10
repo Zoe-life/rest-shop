@@ -78,7 +78,7 @@ curl https://your-backend-url/health
 
 ### CORS Errors
 ```bash
-# In backend environment (Render/Render dashboard):
+# In backend environment (Render dashboard):
 ALLOWED_ORIGINS=https://frontend.com,https://worker.workers.dev
 ```
 

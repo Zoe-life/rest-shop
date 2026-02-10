@@ -7,7 +7,7 @@ This guide explains how to configure GitHub Secrets and set up automated deploym
 1. [Overview](#overview)
 2. [GitHub Secrets Setup](#github-secrets-setup)
 3. [Cloudflare Secrets Setup](#cloudflare-secrets-setup)
-4. [Backend Deployment (Render/Render)](#backend-deployment-renderrender)
+4. [Backend Deployment (Render)](#backend-deployment-renderrender)
 5. [CI/CD Pipeline Flow](#cicd-pipeline-flow)
 6. [Testing the Pipeline](#testing-the-pipeline)
 7. [Troubleshooting](#troubleshooting)
@@ -27,8 +27,8 @@ The deployment uses a multi-tier approach:
 │  └── Deploy Frontend → Cloudflare Pages                         │
 │                                                                   │
 │  Backend API (Manual/Separate CI/CD)                            │
-│  └── Deployed to: Render/Render/VPS                            │
-│      - Uses Render/Render environment variables                │
+│  └── Deployed to: Render/VPS                            │
+│      - Uses Render environment variables                │
 │      - Not deployed via GitHub Actions                          │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
@@ -36,7 +36,7 @@ The deployment uses a multi-tier approach:
 
 **Key Points:**
 - **Frontend & Worker**: Deployed automatically via GitHub Actions
-- **Backend API**: Deployed separately via Render/Render (they auto-deploy on git push)
+- **Backend API**: Deployed separately via Render (they auto-deploy on git push)
 - **Secrets**: Split between GitHub (for CI/CD) and Cloudflare/Render (for runtime)
 
 ## GitHub Secrets Setup
@@ -159,9 +159,9 @@ Expected output:
 └─────────────────┴────────────────────────┘
 ```
 
-## Backend Deployment (Render/Render)
+## Backend Deployment (Render)
 
-The backend is **NOT** deployed via GitHub Actions. Instead, it uses Render/Render's built-in CI/CD.
+The backend is **NOT** deployed via GitHub Actions. Instead, it uses Render's built-in CI/CD.
 
 ### Render Setup
 
@@ -213,15 +213,6 @@ MPESA_CONSUMER_SECRET=...
    - Example: `https://rest-shop-production.up.onrender.com`
    - Use this URL in Cloudflare Worker's `BACKEND_API_URL` secret
 
-### Render Setup
-
-Similar process to Render:
-
-1. Create Web Service from GitHub
-2. Set Root Directory: `api`
-3. Add environment variables (same as Render above)
-4. Enable auto-deploy on push
-
 ## CI/CD Pipeline Flow
 
 ### On Every Push (PR or Main)
@@ -259,7 +250,7 @@ Similar process to Render:
    └─→ Automatic SSL/HTTPS
 
 Backend (Parallel)
-   └─→ Render/Render auto-deploys
+   └─→ Render auto-deploys
    └─→ Independent of GitHub Actions
 ```
 
@@ -269,9 +260,9 @@ Backend (Parallel)
 
 1. **First, deploy backend manually**:
    ```bash
-   # Push to Render/Render
+   # Push to Render
    git push origin main
-   # Render/Render will auto-deploy
+   # Render will auto-deploy
    # Get your backend URL: https://your-app.onrender.com
    ```
 
@@ -326,7 +317,7 @@ Follow this exact sequence for first-time deployment:
 
 ### 1. Deploy Backend First
 ```bash
-# Push to Render/Render
+# Push to Render
 git push origin main
 # Wait for deployment
 # Get URL: https://your-backend.onrender.com
@@ -361,9 +352,9 @@ git push origin main
 
 ### 6. Update CORS
 ```bash
-# In Render/Render dashboard, update:
+# In Render dashboard, update:
 ALLOWED_ORIGINS=https://rest-shop-frontend.pages.dev,https://rest-shop-worker.your-subdomain.workers.dev
-# Render/Render will auto-redeploy
+# Render will auto-redeploy
 ```
 
 ## Environment Variables Summary
@@ -381,7 +372,7 @@ JWT_KEY (optional)           → For CI tests only
 BACKEND_API_URL              → Node.js backend URL
 ```
 
-### Render/Render Environment Variables (Runtime)
+### Render Environment Variables (Runtime)
 ```
 MONGODB_URI                  → Database connection
 JWT_KEY                      → Production JWT secret
@@ -407,7 +398,7 @@ PAYPAL_CLIENT_ID             → (if using PayPal)
 **Solution:**
 ```bash
 wrangler secret put BACKEND_API_URL
-# Enter your Render/Render URL
+# Enter your Render URL
 ```
 
 ### Issue: Frontend can't connect to API
@@ -421,15 +412,15 @@ wrangler secret put BACKEND_API_URL
 
 **Remember:**
 - Backend is NOT deployed via GitHub Actions
-- Render/Render deploy automatically on push
-- Check Render/Render dashboard for logs
+- Render deploy automatically on push
+- Check Render dashboard for logs
 
 ### Issue: Worker deploys but returns 502
 
 **Check:**
 1. Is backend running? `curl https://your-backend-url/health`
 2. Is `BACKEND_API_URL` correct in worker?
-3. Check backend logs in Render/Render
+3. Check backend logs in Render
 
 ## Security Best Practices
 
@@ -437,7 +428,7 @@ wrangler secret put BACKEND_API_URL
 - Use separate secrets for CI/CD and production
 - Rotate API tokens periodically
 - Use minimal permissions for tokens
-- Keep production secrets in Render/Render/Cloudflare only
+- Keep production secrets in Render/Cloudflare only
 - Use different JWT_KEY for CI tests vs production
 
 ### DON'T:
@@ -451,7 +442,7 @@ wrangler secret put BACKEND_API_URL
 Once set up, deployment is automatic:
 
 1. **Push to main** → Full deployment pipeline runs
-2. **Backend** → Render/Render auto-deploys
+2. **Backend** → Render auto-deploys
 3. **Worker** → GitHub Actions deploys
 4. **Frontend** → GitHub Actions builds and deploys
 
@@ -462,7 +453,7 @@ Once set up, deployment is automatic:
 For issues:
 1. Check GitHub Actions logs
 2. Check Cloudflare dashboard logs
-3. Check Render/Render logs
+3. Check Render logs
 4. Review this guide
 5. Open GitHub issue with logs
 
@@ -478,7 +469,7 @@ VITE_API_URL=https://worker-url.workers.dev
 wrangler secret put BACKEND_API_URL
 > https://backend-url.onrender.com
 
-# Render/Render Environment Variables
+# Render Environment Variables
 MONGODB_URI=mongodb+srv://...
 JWT_KEY=long_random_string_32_chars
 NODE_ENV=production

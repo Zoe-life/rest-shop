@@ -375,7 +375,7 @@ wrangler secret put BACKEND_API_URL
 ### Authentication failures
 **Problem**: JWT validation failing
 **Solution**: Ensure `JWT_KEY` is set correctly in the **backend** environment:
-- Render/Render: Check environment variables in dashboard
+- Render: Check environment variables in dashboard
 - VPS: Check `.env` file on server
 - Must be at least 32 characters
 - Must match what was used to create tokens
