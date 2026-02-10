@@ -79,26 +79,26 @@ The worker needs to know **where** the Node.js backend is running. This is confi
 ```
 ┌─────────────────────────┐
 │   Node.js Backend       │
-│   (Railway/Render/VPS)  │
+│   (Render/Render/VPS)  │
 │                         │
 │   Status: Running       │
 │   URL: https://your-    │
-│        app.railway.app  │
+│        app.onrender.com  │
 └─────────────────────────┘
 ```
 
 **Commands:**
 ```bash
-# Deploy to Railway (example)
-railway up
+# Deploy to Render (example)
+render up
 
 # Get your backend URL
-# Example: https://your-app.railway.app
+# Example: https://your-app.onrender.com
 ```
 
 **Verify it works:**
 ```bash
-curl https://your-app.railway.app/health
+curl https://your-app.onrender.com/health
 # Should return: {"status":"ok","database":"connected"}
 ```
 
@@ -122,7 +122,7 @@ curl https://your-app.railway.app/health
 ```bash
 cd worker
 wrangler secret put BACKEND_API_URL
-# When prompted, enter: https://your-app.railway.app
+# When prompted, enter: https://your-app.onrender.com
 ```
 
 **After configuration:**
@@ -134,7 +134,7 @@ wrangler secret put BACKEND_API_URL
 │                         │
 │   BACKEND_API_URL:      │
 │   https://your-app.     │
-│   railway.app           │
+│   onrender.com           │
 └─────────────────────────┘
 ```
 
@@ -190,7 +190,7 @@ curl https://your-worker.workers.dev/health
 
 ## Configuration Checklist
 
-### Backend Configuration (Railway/Render Dashboard or .env)
+### Backend Configuration (Render/Render Dashboard or .env)
 
 ```bash
 # Required
@@ -212,7 +212,7 @@ PAYPAL_CLIENT_ID=...
 
 ```bash
 # Only ONE secret needed:
-BACKEND_API_URL=https://your-app.railway.app
+BACKEND_API_URL=https://your-app.onrender.com
 ```
 
 **That's it!** All other secrets stay in the backend.
@@ -281,7 +281,7 @@ wrangler secret put MONGODB_URI
 **DO THIS INSTEAD:**
 ```bash
 # Correct - Put secrets in backend environment
-# Set these in Railway/Render dashboard or .env file
+# Set these in Render/Render dashboard or .env file
 JWT_KEY=...
 STRIPE_SECRET_KEY=...
 MONGODB_URI=...
@@ -298,7 +298,7 @@ MONGODB_URI=...
 
 | What | Where | How |
 |------|-------|-----|
-| **Deploy Backend** | Railway/Render/VPS | `railway up` or dashboard |
+| **Deploy Backend** | Render/Render/VPS | `render up` or dashboard |
 | **Set Worker Config** | Cloudflare Worker | `wrangler secret put BACKEND_API_URL` |
 | **Deploy Worker** | Cloudflare | `wrangler deploy` |
 | **Test Backend** | CLI | `curl https://backend-url/health` |

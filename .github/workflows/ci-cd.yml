@@ -138,7 +138,7 @@ jobs:
 
   # Job 6: Deploy Backend (Node.js API)
   deploy-backend:
-    name: Deploy Backend to Railway/Render
+    name: Deploy Backend to Render
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -147,15 +147,7 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      - name: Deploy to Railway
-        if: ${{ secrets.RAILWAY_TOKEN != '' }}
-        run: |
-          npm install -g @railway/cli
-          railway up --service ${{ secrets.RAILWAY_SERVICE_ID }}
-        env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        continue-on-error: true
-      - name: Deploy to Render (Alternative)
+      - name: Deploy to Render
         if: ${{ secrets.RENDER_DEPLOY_HOOK != '' }}
         run: |
           curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
@@ -163,9 +155,8 @@ jobs:
       - name: Deployment Note
         run: |
           echo "Backend deployment status:"
-          echo "- If using Railway: Configured via RAILWAY_TOKEN"
-          echo "- If using Render: Triggered via RENDER_DEPLOY_HOOK"
-          echo "- Environment variables should be configured in Railway/Render dashboard"
+          echo "- Triggered via RENDER_DEPLOY_HOOK"
+          echo "- Environment variables should be configured in Render dashboard"
           echo "- Required variables: MONGODB_URI, JWT_KEY, BACKEND_API_URL, etc."
 
   # Job 7: Deploy Frontend to Cloudflare Pages

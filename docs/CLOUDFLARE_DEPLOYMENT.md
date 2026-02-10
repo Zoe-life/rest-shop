@@ -91,18 +91,11 @@ curl https://rest-shop-api.YOUR-SUBDOMAIN.workers.dev/health
 
 If Cloudflare Workers has compatibility issues, deploy to:
 
-1. **Railway** (https://railway.app/)
-   ```bash
-   railway login
-   railway init
-   railway up
-   ```
-
-2. **Render** (https://render.com/)
+1. **Render** (https://render.com/)
    - Connect GitHub repository
    - Auto-deploys on push
 
-3. **Heroku** (https://heroku.com/)
+2. **Heroku** (https://heroku.com/)
    ```bash
    heroku login
    heroku create rest-shop-api

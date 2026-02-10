@@ -5,7 +5,7 @@ This guide explains how to configure GitHub Secrets for automatic deployment of 
 ## Overview
 
 The CI/CD pipeline uses GitHub Secrets to deploy:
-1. **Backend** (Node.js API) - to Railway/Render
+1. **Backend** (Node.js API) - to Render/Render
 2. **Worker** (Cloudflare Worker) - to Cloudflare Workers
 3. **Frontend** (React App) - to Cloudflare Pages
 
@@ -18,16 +18,9 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 | `CLOUDFLARE_API_TOKEN` | API token for Cloudflare deployments | [Create Token](https://dash.cloudflare.com/profile/api-tokens) → Use "Edit Cloudflare Workers" template |
 | `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID | [Dashboard](https://dash.cloudflare.com/) → Account Home → Account ID (right sidebar) |
 
-### 2. Backend Deployment Secrets (Choose One)
+### 2. Backend Deployment Secrets
 
-#### Option A: Railway
-
-| Secret Name | Description | How to Get It |
-|-------------|-------------|---------------|
-| `RAILWAY_TOKEN` | Railway API token | Railway Dashboard → Account Settings → Tokens → Create New Token |
-| `RAILWAY_SERVICE_ID` | Your service ID | Railway Dashboard → Your Project → Service → Settings → Service ID |
-
-#### Option B: Render
+#### Render
 
 | Secret Name | Description | How to Get It |
 |-------------|-------------|---------------|
@@ -37,7 +30,7 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 
 | Secret Name | Description | Example Value |
 |-------------|-------------|---------------|
-| `BACKEND_API_URL` | URL where backend is deployed | `https://your-app.railway.app` |
+| `BACKEND_API_URL` | URL where backend is deployed | `https://your-app.onrender.com` |
 | `VITE_API_URL` | API URL for frontend to connect to | `https://your-worker.workers.dev` |
 | `JWT_KEY` | JWT secret for authentication (32+ chars) | `your-super-secret-key-min-32-characters-long` |
 
@@ -74,24 +67,7 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 
 ### Step 2: Add Backend Deployment Secrets
 
-#### If Using Railway:
-
-1. **Get Railway Token:**
-   - Go to https://railway.app/account/tokens
-   - Click "Create New Token"
-   - Copy the token
-
-2. **Get Service ID:**
-   - Go to your Railway project
-   - Click on your service
-   - Go to Settings
-   - Copy the Service ID
-
-3. **Add to GitHub:**
-   - Add secret `RAILWAY_TOKEN` with your token
-   - Add secret `RAILWAY_SERVICE_ID` with your service ID
-
-#### If Using Render:
+#### Using Render:
 
 1. **Get Deploy Hook:**
    - Go to your Render service dashboard
@@ -106,7 +82,7 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 
 1. **BACKEND_API_URL:**
    - Value: Your backend URL after deployment
-   - Railway: `https://your-app.railway.app`
+   - Render: `https://your-app.onrender.com`
    - Render: `https://your-service.onrender.com`
    - If not deployed yet, deploy backend first, then add this secret
 
@@ -122,11 +98,11 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 
 ### Step 4: Configure Backend Environment Variables
 
-**Important:** Backend environment variables should be configured in your hosting platform (Railway/Render), not in GitHub Secrets!
+**Important:** Backend environment variables should be configured in your hosting platform (Render/Render), not in GitHub Secrets!
 
-#### Railway Configuration:
+#### Render Configuration:
 
-Go to Railway Dashboard → Your Service → Variables tab, add:
+Go to Render Dashboard → Your Service → Variables tab, add:
 
 ```bash
 # Required
@@ -162,11 +138,6 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 - [ ] `VITE_API_URL`
 - [ ] `JWT_KEY`
 
-### Required for Railway Deployment
-
-- [ ] `RAILWAY_TOKEN`
-- [ ] `RAILWAY_SERVICE_ID`
-
 ### Required for Render Deployment
 
 - [ ] `RENDER_DEPLOY_HOOK`
@@ -181,11 +152,11 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 
 1. **Deploy Backend First**
    ```bash
-   # Railway
-   railway up
+   # Render
+   render up
    # or Render: Push to GitHub → Auto-deploy
    
-   # Get backend URL: https://your-app.railway.app
+   # Get backend URL: https://your-app.onrender.com
    ```
 
 2. **Add BACKEND_API_URL Secret**
@@ -234,7 +205,7 @@ git push origin main
 **Cause:** Secrets configured in GitHub instead of hosting platform.
 
 **Fix:**
-1. Go to Railway/Render dashboard
+1. Go to Render/Render dashboard
 2. Add all backend environment variables there
 3. Restart service
 
@@ -251,7 +222,7 @@ git push origin main
 ### DO:
 
 - Use GitHub Secrets for deployment credentials
-- Configure backend secrets in hosting platform (Railway/Render)
+- Configure backend secrets in hosting platform (Render/Render)
 - Rotate tokens periodically
 - Use minimum required permissions
 - Keep `JWT_KEY` secret and secure
@@ -275,8 +246,8 @@ git push origin main
 ### Check Backend Configuration:
 
 ```bash
-# Railway
-railway variables
+# Render
+render variables
 
 # Render
 # Check in dashboard → Environment tab
@@ -297,7 +268,7 @@ curl https://your-worker-url/health
 
 ## Environment Variables Reference
 
-### Backend (Railway/Render Dashboard)
+### Backend (Render/Render Dashboard)
 
 **Set these in your hosting platform:**
 
@@ -342,7 +313,7 @@ VITE_API_URL=https://your-worker-url
 
 | Component | Where to Set | How |
 |-----------|--------------|-----|
-| **Backend** | Railway/Render Dashboard | Manual in UI |
+| **Backend** | Render/Render Dashboard | Manual in UI |
 | **Worker** | GitHub Secrets → Cloudflare | CI/CD pipeline |
 | **Frontend** | GitHub Secrets → Build | CI/CD pipeline |
 
@@ -359,7 +330,7 @@ If you encounter issues:
 
 **Key Points:**
 
-1. Use GitHub Secrets for deployment credentials (Cloudflare tokens, Railway tokens)
+1. Use GitHub Secrets for deployment credentials (Cloudflare tokens, Render tokens)
 2. Use hosting platform UI for backend environment variables
 3. `BACKEND_API_URL` connects worker to backend
 4. `VITE_API_URL` connects frontend to API
@@ -370,7 +341,7 @@ If you encounter issues:
 ```bash
 # 1. Deploy backend → Get URL
 # 2. Add all GitHub Secrets
-# 3. Configure backend environment in Railway/Render
+# 3. Configure backend environment in Render/Render
 # 4. Push to main
 git push origin main
 # 5. Done! CI/CD handles the rest

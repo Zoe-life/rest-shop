@@ -25,7 +25,7 @@ This guide covers the complete deployment of the Rest Shop application with its 
 │  Backend API (Node.js + Express + Mongoose)                 │
 │  ├── Business logic + Database operations                   │
 │  ├── Authentication + Payment processing                     │
-│  └── Deployed to: Railway/Render/VPS                        │
+│  └── Deployed to: Render/Render/VPS                        │
 │                          ↓                                    │
 │  Database (MongoDB Atlas)                                    │
 │  └── Cloud-hosted MongoDB                                    │
@@ -50,7 +50,7 @@ This guide covers the complete deployment of the Rest Shop application with its 
 - GitHub account
 - Cloudflare account (free tier works)
 - MongoDB Atlas account (free tier works)
-- Railway/Render account (free tier works) OR VPS access
+- Render/Render account (free tier works) OR VPS access
 
 ## Phase 1: Database Setup
 
@@ -80,11 +80,11 @@ This guide covers the complete deployment of the Rest Shop application with its 
 
 Choose **ONE** of the following options:
 
-### Option A: Railway (Recommended - Easiest)
+### Option A: Render (Recommended - Easiest)
 
 #### 1. Sign up and prepare
 
-- Go to [railway.app](https://railway.app)
+- Go to [onrender.com](https://onrender.com)
 - Sign in with GitHub
 - Click "New Project"
 
@@ -93,7 +93,7 @@ Choose **ONE** of the following options:
 - Select "Deploy from GitHub repo"
 - Select your `rest-shop` repository
 - Select the `main` branch
-- Railway will auto-detect the Node.js app
+- Render will auto-detect the Node.js app
 
 #### 3. Configure Root Directory
 
@@ -135,8 +135,8 @@ MPESA_CONSUMER_SECRET=...
 
 #### 5. Deploy
 
-- Railway will automatically deploy
-- Get your URL: `https://rest-shop-production.up.railway.app`
+- Render will automatically deploy
+- Get your URL: `https://rest-shop-production.up.onrender.com`
 - Test it: `curl https://your-url/health`
 
 Expected response:
@@ -168,7 +168,7 @@ Expected response:
 
 #### 3. Add Environment Variables
 
-Same as Railway above (see Option A, Step 4)
+Same as Render above (see Option A, Step 4)
 
 #### 4. Deploy
 
@@ -203,7 +203,7 @@ This is the **ONLY** secret the worker needs:
 ```bash
 cd worker
 wrangler secret put BACKEND_API_URL
-# When prompted, enter: https://your-backend-url.railway.app
+# When prompted, enter: https://your-backend-url.onrender.com
 ```
 
 ### Step 3.4: Update wrangler.toml
@@ -394,7 +394,7 @@ curl https://rest-shop-worker.your-subdomain.workers.dev/products
 **Solutions:**
 1. Check MongoDB Atlas IP whitelist
 2. Verify `MONGODB_URI` is correct
-3. Check backend logs: `railway logs` or via dashboard
+3. Check backend logs: `render logs` or via dashboard
 
 #### Issue: Authentication fails
 
@@ -437,7 +437,7 @@ wrangler secret put BACKEND_API_URL --config worker/wrangler.toml
 
 ## Environment Variables Checklist
 
-### Backend (Railway/Render)
+### Backend (Render/Render)
 - `MONGODB_URI`
 - `JWT_KEY` (32+ characters)
 - `NODE_ENV=production`
@@ -455,14 +455,14 @@ wrangler secret put BACKEND_API_URL --config worker/wrangler.toml
 
 ### Free Tier Setup
 - **MongoDB Atlas**: Free (M0 - 512MB)
-- **Railway**: Free ($5 credit/month)
+- **Render**: Free ($5 credit/month)
 - **Cloudflare Workers**: Free (100K requests/day)
 - **Cloudflare Pages**: Free (unlimited static requests)
 - **Total**: $0/month for low traffic
 
 ### Production Setup
 - **MongoDB Atlas**: $9-30/month (M2-M10)
-- **Railway**: $20-50/month (Pro tier)
+- **Render**: $20-50/month (Pro tier)
 - **Cloudflare Workers**: $5/month (Workers Paid)
 - **Cloudflare Pages**: Free (included)
 - **Total**: $34-85/month
@@ -475,7 +475,7 @@ The repository includes GitHub Actions for automatic deployment. To enable:
    ```
    CLOUDFLARE_API_TOKEN=your_cloudflare_api_token
    CLOUDFLARE_ACCOUNT_ID=your_account_id
-   RAILWAY_TOKEN=your_railway_token (if using Railway)
+   RENDER_DEPLOY_HOOK=your_render_webhook_url (if using Render)
    ```
 
 2. Push to main branch - automatic deployment will trigger
@@ -484,7 +484,7 @@ The repository includes GitHub Actions for automatic deployment. To enable:
 
 ### Recommended Monitoring
 
-1. **Backend**: Railway/Render built-in monitoring
+1. **Backend**: Render/Render built-in monitoring
 2. **Worker**: Cloudflare Dashboard → Analytics
 3. **Frontend**: Cloudflare Pages Analytics
 4. **Database**: MongoDB Atlas monitoring

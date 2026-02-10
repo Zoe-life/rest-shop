@@ -107,10 +107,10 @@ Before deploying to production:
 
 ### Update Your Deployment
 
-1. **Railway/Render Dashboard:**
+1. **Render Dashboard:**
    - Add `BACKEND_API_URL` environment variable
    - Set it to your deployed backend URL
-   - Example: `https://rest-shop-api.railway.app`
+   - Example: `https://rest-shop-api.onrender.com`
 
 2. **GitHub Actions Secrets:**
    - Ensure `BACKEND_API_URL` secret is set

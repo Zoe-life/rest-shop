@@ -70,10 +70,10 @@ npm start
 
 **Want automatic deployment when you push to GitHub?**
 
-1. **Deploy Backend to Railway/Render:**
-   - Railway: Connect GitHub repo
+1. **Deploy Backend to Render/Render:**
    - Render: Connect GitHub repo
-   - Get backend URL: `https://your-app.railway.app`
+   - Render: Connect GitHub repo
+   - Get backend URL: `https://your-app.onrender.com`
 
 2. **Configure GitHub Secrets:**
    - Follow: [GITHUB_SECRETS_SETUP_GUIDE.md](./GITHUB_SECRETS_SETUP_GUIDE.md)
@@ -85,7 +85,7 @@ npm start
    ```
 
 4. **Done!** GitHub Actions deploys everything:
-   - Backend to Railway/Render
+   - Backend to Render/Render
    - Worker to Cloudflare (with BACKEND_API_URL)
    - Frontend to Cloudflare Pages
 
@@ -97,10 +97,10 @@ npm start
 
 1. **Deploy Backend:**
    ```bash
-   # Railway
-   railway up
+   # Render
+   render up
    
-   # Get URL: https://your-app.railway.app
+   # Get URL: https://your-app.onrender.com
    ```
 
 2. **Configure Worker:**
@@ -150,7 +150,7 @@ Validates:
 **Example:**
 ```bash
 node api/scripts/validate-connection.js \
-  https://your-app.railway.app \
+  https://your-app.onrender.com \
   https://your-worker.workers.dev
 ```
 
@@ -160,7 +160,7 @@ node api/scripts/validate-connection.js \
 
 ### Backend Configuration
 
-**Where:** Railway/Render Dashboard → Environment Variables
+**Where:** Render/Render Dashboard → Environment Variables
 
 ```bash
 # Required
@@ -179,7 +179,7 @@ PAYPAL_CLIENT_ID=...
 ```
 
 **Status:**
-- [ ] Deployed to Railway/Render
+- [ ] Deployed to Render/Render
 - [ ] Environment variables configured
 - [ ] `curl https://backend-url/health` returns 200
 - [ ] Database shows "connected"
@@ -224,7 +224,7 @@ VITE_API_URL=https://your-worker-url
 - [ ] `BACKEND_API_URL` (backend URL)
 - [ ] `VITE_API_URL` (worker or backend URL)
 - [ ] `JWT_KEY` (32+ characters)
-- [ ] `RAILWAY_TOKEN` or `RENDER_DEPLOY_HOOK`
+- [ ] `RENDER_DEPLOY_HOOK`
 
 **See:** [GITHUB_SECRETS_SETUP_GUIDE.md](./GITHUB_SECRETS_SETUP_GUIDE.md)
 
@@ -242,7 +242,7 @@ VITE_API_URL=https://your-worker-url
              ▼              ▼              ▼
 ┌───────────────┐  ┌──────────────┐  ┌──────────────────┐
 │   Backend     │  │    Worker    │  │    Frontend      │
-│  (Railway/    │  │ (Cloudflare) │  │  (Cloudflare     │
+│  (Render/    │  │ (Cloudflare) │  │  (Cloudflare     │
 │   Render)     │  │              │  │    Pages)        │
 │               │  │ Needs:       │  │                  │
 │ Has all      │  │ BACKEND_URL  │  │ Built with:      │
@@ -301,7 +301,7 @@ cd frontend && npm run build
 
 ### Issue: CORS errors
 ```bash
-# Update ALLOWED_ORIGINS in backend (Railway/Render dashboard)
+# Update ALLOWED_ORIGINS in backend (Render/Render dashboard)
 ALLOWED_ORIGINS=https://worker.dev,https://frontend.pages.dev
 ```
 

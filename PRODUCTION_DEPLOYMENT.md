@@ -9,7 +9,7 @@
 #### 1. BACKEND_API_URL (REQUIRED)
 ```env
 # Set this to your actual production backend URL
-BACKEND_API_URL=https://your-backend.railway.app
+BACKEND_API_URL=https://your-backend.onrender.com
 ```
 
 **Why it's required:**
@@ -22,22 +22,22 @@ While these can fall back to `BACKEND_API_URL`, it's better to set them explicit
 
 ```env
 # Google OAuth
-GOOGLE_CALLBACK_URL=https://your-backend.railway.app/auth/google/callback
+GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
 
 # Microsoft OAuth
-MICROSOFT_CALLBACK_URL=https://your-backend.railway.app/auth/microsoft/callback
+MICROSOFT_CALLBACK_URL=https://your-backend.onrender.com/auth/microsoft/callback
 
 # Apple OAuth
-APPLE_CALLBACK_URL=https://your-backend.railway.app/auth/apple/callback
+APPLE_CALLBACK_URL=https://your-backend.onrender.com/auth/apple/callback
 ```
 
 ### Deployment Platforms
 
-#### Railway
+#### Render
 1. Go to your project → Variables
 2. Add each environment variable
 3. Ensure `NODE_ENV=production`
-4. **MUST set `BACKEND_API_URL`** to your Railway URL (e.g., `https://rest-shop-production.up.railway.app`)
+4. **MUST set `BACKEND_API_URL`** to your Render URL (e.g., `https://rest-shop-production.up.onrender.com`)
 
 #### Render
 1. Go to Environment section
@@ -55,28 +55,28 @@ Follow similar steps to set environment variables in your platform's dashboard.
 ```env
 # CRITICAL - MUST BE SET
 NODE_ENV=production
-BACKEND_API_URL=https://your-backend.railway.app
+BACKEND_API_URL=https://your-backend.onrender.com
 MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/dbname
 JWT_KEY=your_long_random_production_jwt_key
 
 # CORS Configuration
-ALLOWED_ORIGINS=https://your-backend.railway.app,https://your-frontend.pages.dev
+ALLOWED_ORIGINS=https://your-backend.onrender.com,https://your-frontend.pages.dev
 FRONTEND_URL=https://your-frontend.pages.dev
 
 # OAuth Credentials (if using OAuth)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
-GOOGLE_CALLBACK_URL=https://your-backend.railway.app/auth/google/callback
+GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
 
 MICROSOFT_CLIENT_ID=your_microsoft_client_id
 MICROSOFT_CLIENT_SECRET=your_microsoft_client_secret
-MICROSOFT_CALLBACK_URL=https://your-backend.railway.app/auth/microsoft/callback
+MICROSOFT_CALLBACK_URL=https://your-backend.onrender.com/auth/microsoft/callback
 
 APPLE_CLIENT_ID=your_apple_client_id
 APPLE_TEAM_ID=your_apple_team_id
 APPLE_KEY_ID=your_apple_key_id
 APPLE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----"
-APPLE_CALLBACK_URL=https://your-backend.railway.app/auth/apple/callback
+APPLE_CALLBACK_URL=https://your-backend.onrender.com/auth/apple/callback
 
 # Optional but Recommended
 CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
@@ -95,7 +95,7 @@ After setting environment variables, update your OAuth provider consoles:
 2. Select your OAuth 2.0 Client ID
 3. Under "Authorized redirect URIs", add:
    ```
-   https://your-backend.railway.app/auth/google/callback
+   https://your-backend.onrender.com/auth/google/callback
    ```
 4. Save changes
 
@@ -104,7 +104,7 @@ After setting environment variables, update your OAuth provider consoles:
 2. Navigate to App registrations → Your App
 3. Under "Authentication", add redirect URI:
    ```
-   https://your-backend.railway.app/auth/microsoft/callback
+   https://your-backend.onrender.com/auth/microsoft/callback
    ```
 4. Save configuration
 
@@ -113,7 +113,7 @@ After setting environment variables, update your OAuth provider consoles:
 2. Select your Service ID
 3. Under "Return URLs", add:
    ```
-   https://your-backend.railway.app/auth/apple/callback
+   https://your-backend.onrender.com/auth/apple/callback
    ```
 4. Save configuration
 
@@ -143,12 +143,12 @@ After deployment:
    ```bash
    # SSH into your server or check platform dashboard
    echo $BACKEND_API_URL
-   # Should output: https://your-backend.railway.app (NOT localhost)
+   # Should output: https://your-backend.onrender.com (NOT localhost)
    ```
 
 2. **Test Health Endpoint:**
    ```bash
-   curl https://your-backend.railway.app/health
+   curl https://your-backend.onrender.com/health
    # Should return: {"status":"ok","database":"connected"}
    ```
 

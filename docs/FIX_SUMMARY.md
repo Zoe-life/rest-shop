@@ -39,7 +39,7 @@ const allowedOrigins = req.workerEnv?.ALLOWED_ORIGINS
 ```
 
 **Impact:**
-- Now checks `process.env.ALLOWED_ORIGINS` for direct Node.js deployments (Railway, Render, local dev)
+- Now checks `process.env.ALLOWED_ORIGINS` for direct Node.js deployments (Render, Render, local dev)
 - Fallback includes both backend and frontend origins
 - Maintains compatibility with Cloudflare Workers architecture
 
@@ -93,29 +93,29 @@ VITE_API_URL=http://localhost:3001
 
 ### For Production Deployment
 
-**Backend Environment Variables (Railway/Render):**
+**Backend Environment Variables (Render/Render):**
 ```env
 MONGODB_URI=mongodb+srv://...
 JWT_KEY=your_secret_key
-BACKEND_API_URL=https://your-backend.railway.app
-ALLOWED_ORIGINS=https://your-backend.railway.app,https://your-frontend.pages.dev
+BACKEND_API_URL=https://your-backend.onrender.com
+ALLOWED_ORIGINS=https://your-backend.onrender.com,https://your-frontend.pages.dev
 FRONTEND_URL=https://your-frontend.pages.dev
 
 # OAuth Configuration
 GOOGLE_CLIENT_ID=...
 GOOGLE_CLIENT_SECRET=...
-GOOGLE_CALLBACK_URL=https://your-backend.railway.app/auth/google/callback
+GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
 ```
 
 **Frontend Environment Variables (Cloudflare Pages):**
 ```env
-VITE_API_URL=https://your-backend.railway.app
+VITE_API_URL=https://your-backend.onrender.com
 ```
 
 **OAuth Provider Console Configuration:**
-- Google Console: Add `https://your-backend.railway.app/auth/google/callback` to authorized redirect URIs
-- Microsoft Portal: Add `https://your-backend.railway.app/auth/microsoft/callback` as redirect URI
-- Apple Developer: Add `https://your-backend.railway.app/auth/apple/callback` as return URL
+- Google Console: Add `https://your-backend.onrender.com/auth/google/callback` to authorized redirect URIs
+- Microsoft Portal: Add `https://your-backend.onrender.com/auth/microsoft/callback` as redirect URI
+- Apple Developer: Add `https://your-backend.onrender.com/auth/apple/callback` as return URL
 
 ## Testing
 

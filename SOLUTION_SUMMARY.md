@@ -86,17 +86,17 @@ callbackURL: buildCallbackUrl('google', process.env.GOOGLE_CALLBACK_URL)
 
 ### For Production Deployment
 
-Set these environment variables in your deployment platform (Railway/Render/etc.):
+Set these environment variables in your deployment platform (Render/etc.):
 
 ```env
-BACKEND_API_URL=https://your-backend.railway.app
-ALLOWED_ORIGINS=https://your-backend.railway.app,https://your-frontend.pages.dev
+BACKEND_API_URL=https://your-backend.onrender.com
+ALLOWED_ORIGINS=https://your-backend.onrender.com,https://your-frontend.pages.dev
 FRONTEND_URL=https://your-frontend.pages.dev
 
 # OAuth Callback URLs
-GOOGLE_CALLBACK_URL=https://your-backend.railway.app/auth/google/callback
-MICROSOFT_CALLBACK_URL=https://your-backend.railway.app/auth/microsoft/callback
-APPLE_CALLBACK_URL=https://your-backend.railway.app/auth/apple/callback
+GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
+MICROSOFT_CALLBACK_URL=https://your-backend.onrender.com/auth/microsoft/callback
+APPLE_CALLBACK_URL=https://your-backend.onrender.com/auth/apple/callback
 ```
 
 Also update your OAuth provider consoles to use the production callback URLs.

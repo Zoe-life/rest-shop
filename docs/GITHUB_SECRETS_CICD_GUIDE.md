@@ -7,7 +7,7 @@ This guide explains how to configure GitHub Secrets and set up automated deploym
 1. [Overview](#overview)
 2. [GitHub Secrets Setup](#github-secrets-setup)
 3. [Cloudflare Secrets Setup](#cloudflare-secrets-setup)
-4. [Backend Deployment (Railway/Render)](#backend-deployment-railwayrender)
+4. [Backend Deployment (Render/Render)](#backend-deployment-renderrender)
 5. [CI/CD Pipeline Flow](#cicd-pipeline-flow)
 6. [Testing the Pipeline](#testing-the-pipeline)
 7. [Troubleshooting](#troubleshooting)
@@ -27,8 +27,8 @@ The deployment uses a multi-tier approach:
 │  └── Deploy Frontend → Cloudflare Pages                         │
 │                                                                   │
 │  Backend API (Manual/Separate CI/CD)                            │
-│  └── Deployed to: Railway/Render/VPS                            │
-│      - Uses Railway/Render environment variables                │
+│  └── Deployed to: Render/Render/VPS                            │
+│      - Uses Render/Render environment variables                │
 │      - Not deployed via GitHub Actions                          │
 │                                                                   │
 └─────────────────────────────────────────────────────────────────┘
@@ -36,8 +36,8 @@ The deployment uses a multi-tier approach:
 
 **Key Points:**
 - **Frontend & Worker**: Deployed automatically via GitHub Actions
-- **Backend API**: Deployed separately via Railway/Render (they auto-deploy on git push)
-- **Secrets**: Split between GitHub (for CI/CD) and Cloudflare/Railway (for runtime)
+- **Backend API**: Deployed separately via Render/Render (they auto-deploy on git push)
+- **Secrets**: Split between GitHub (for CI/CD) and Cloudflare/Render (for runtime)
 
 ## GitHub Secrets Setup
 
@@ -134,7 +134,7 @@ wrangler login
 # Set the backend URL secret
 cd worker
 wrangler secret put BACKEND_API_URL
-# When prompted, enter: https://your-backend.railway.app
+# When prompted, enter: https://your-backend.onrender.com
 ```
 
 **Important**: 
@@ -159,14 +159,14 @@ Expected output:
 └─────────────────┴────────────────────────┘
 ```
 
-## Backend Deployment (Railway/Render)
+## Backend Deployment (Render/Render)
 
-The backend is **NOT** deployed via GitHub Actions. Instead, it uses Railway/Render's built-in CI/CD.
+The backend is **NOT** deployed via GitHub Actions. Instead, it uses Render/Render's built-in CI/CD.
 
-### Railway Setup
+### Render Setup
 
 1. **Connect GitHub Repository**:
-   - Go to [railway.app](https://railway.app)
+   - Go to [onrender.com](https://onrender.com)
    - Create new project from GitHub repo
    - Select your repository
 
@@ -174,7 +174,7 @@ The backend is **NOT** deployed via GitHub Actions. Instead, it uses Railway/Ren
    - Root Directory: `/api`
    - Start Command: `node server.js`
 
-3. **Add Environment Variables in Railway Dashboard**:
+3. **Add Environment Variables in Render Dashboard**:
 
 ```bash
 # Core Configuration
@@ -205,21 +205,21 @@ MPESA_CONSUMER_SECRET=...
 ```
 
 4. **Enable Auto-Deploy**:
-   - Railway automatically deploys on push to `main` branch
+   - Render automatically deploys on push to `main` branch
    - No GitHub Actions needed for backend
 
 5. **Get Backend URL**:
-   - After deployment, copy your Railway URL
-   - Example: `https://rest-shop-production.up.railway.app`
+   - After deployment, copy your Render URL
+   - Example: `https://rest-shop-production.up.onrender.com`
    - Use this URL in Cloudflare Worker's `BACKEND_API_URL` secret
 
 ### Render Setup
 
-Similar process to Railway:
+Similar process to Render:
 
 1. Create Web Service from GitHub
 2. Set Root Directory: `api`
-3. Add environment variables (same as Railway above)
+3. Add environment variables (same as Render above)
 4. Enable auto-deploy on push
 
 ## CI/CD Pipeline Flow
@@ -259,7 +259,7 @@ Similar process to Railway:
    └─→ Automatic SSL/HTTPS
 
 Backend (Parallel)
-   └─→ Railway/Render auto-deploys
+   └─→ Render/Render auto-deploys
    └─→ Independent of GitHub Actions
 ```
 
@@ -269,17 +269,17 @@ Backend (Parallel)
 
 1. **First, deploy backend manually**:
    ```bash
-   # Push to Railway/Render
+   # Push to Render/Render
    git push origin main
-   # Railway/Render will auto-deploy
-   # Get your backend URL: https://your-app.railway.app
+   # Render/Render will auto-deploy
+   # Get your backend URL: https://your-app.onrender.com
    ```
 
 2. **Configure Worker secret**:
    ```bash
    cd worker
    wrangler secret put BACKEND_API_URL
-   # Enter: https://your-app.railway.app
+   # Enter: https://your-app.onrender.com
    ```
 
 3. **Update GitHub Secret**:
@@ -317,7 +317,7 @@ You can manually trigger the workflow:
 
 4. **Backend**:
    ```bash
-   curl https://your-backend-url.railway.app/health
+   curl https://your-backend-url.onrender.com/health
    ```
 
 ## Deployment Sequence
@@ -326,10 +326,10 @@ Follow this exact sequence for first-time deployment:
 
 ### 1. Deploy Backend First
 ```bash
-# Push to Railway/Render
+# Push to Render/Render
 git push origin main
 # Wait for deployment
-# Get URL: https://your-backend.railway.app
+# Get URL: https://your-backend.onrender.com
 ```
 
 ### 2. Configure Worker Secret
@@ -361,9 +361,9 @@ git push origin main
 
 ### 6. Update CORS
 ```bash
-# In Railway/Render dashboard, update:
+# In Render/Render dashboard, update:
 ALLOWED_ORIGINS=https://rest-shop-frontend.pages.dev,https://rest-shop-worker.your-subdomain.workers.dev
-# Railway/Render will auto-redeploy
+# Render/Render will auto-redeploy
 ```
 
 ## Environment Variables Summary
@@ -381,7 +381,7 @@ JWT_KEY (optional)           → For CI tests only
 BACKEND_API_URL              → Node.js backend URL
 ```
 
-### Railway/Render Environment Variables (Runtime)
+### Render/Render Environment Variables (Runtime)
 ```
 MONGODB_URI                  → Database connection
 JWT_KEY                      → Production JWT secret
@@ -407,7 +407,7 @@ PAYPAL_CLIENT_ID             → (if using PayPal)
 **Solution:**
 ```bash
 wrangler secret put BACKEND_API_URL
-# Enter your Railway/Render URL
+# Enter your Render/Render URL
 ```
 
 ### Issue: Frontend can't connect to API
@@ -421,15 +421,15 @@ wrangler secret put BACKEND_API_URL
 
 **Remember:**
 - Backend is NOT deployed via GitHub Actions
-- Railway/Render deploy automatically on push
-- Check Railway/Render dashboard for logs
+- Render/Render deploy automatically on push
+- Check Render/Render dashboard for logs
 
 ### Issue: Worker deploys but returns 502
 
 **Check:**
 1. Is backend running? `curl https://your-backend-url/health`
 2. Is `BACKEND_API_URL` correct in worker?
-3. Check backend logs in Railway/Render
+3. Check backend logs in Render/Render
 
 ## Security Best Practices
 
@@ -437,7 +437,7 @@ wrangler secret put BACKEND_API_URL
 - Use separate secrets for CI/CD and production
 - Rotate API tokens periodically
 - Use minimal permissions for tokens
-- Keep production secrets in Railway/Render/Cloudflare only
+- Keep production secrets in Render/Render/Cloudflare only
 - Use different JWT_KEY for CI tests vs production
 
 ### DON'T:
@@ -451,7 +451,7 @@ wrangler secret put BACKEND_API_URL
 Once set up, deployment is automatic:
 
 1. **Push to main** → Full deployment pipeline runs
-2. **Backend** → Railway/Render auto-deploys
+2. **Backend** → Render/Render auto-deploys
 3. **Worker** → GitHub Actions deploys
 4. **Frontend** → GitHub Actions builds and deploys
 
@@ -462,7 +462,7 @@ Once set up, deployment is automatic:
 For issues:
 1. Check GitHub Actions logs
 2. Check Cloudflare dashboard logs
-3. Check Railway/Render logs
+3. Check Render/Render logs
 4. Review this guide
 5. Open GitHub issue with logs
 
@@ -476,9 +476,9 @@ VITE_API_URL=https://worker-url.workers.dev
 
 # Cloudflare Worker Secret (via Wrangler)
 wrangler secret put BACKEND_API_URL
-> https://backend-url.railway.app
+> https://backend-url.onrender.com
 
-# Railway/Render Environment Variables
+# Render/Render Environment Variables
 MONGODB_URI=mongodb+srv://...
 JWT_KEY=long_random_string_32_chars
 NODE_ENV=production

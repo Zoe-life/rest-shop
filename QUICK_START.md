@@ -112,7 +112,7 @@ Visit http://localhost:3000 in your browser. You should see:
 
 **Solutions:**
 1. Set `BACKEND_API_URL=http://localhost:3001` in `api/.env`
-2. For production, set `BACKEND_API_URL` to your deployed backend URL (e.g., `https://your-app.railway.app`)
+2. For production, set `BACKEND_API_URL` to your deployed backend URL (e.g., `https://your-app.onrender.com`)
 3. Ensure OAuth callback URLs in your OAuth provider console match:
    - Google Console: `{BACKEND_API_URL}/auth/google/callback`
    - Microsoft Portal: `{BACKEND_API_URL}/auth/microsoft/callback`
@@ -168,7 +168,7 @@ To enable social login:
 
 ## Production Deployment
 
-When deploying to production (Railway, Render, etc.):
+When deploying to production (Render, etc.):
 
 1. Set `BACKEND_API_URL` to your production backend URL
 2. Update OAuth callback URLs in provider consoles to use production URL
@@ -177,10 +177,10 @@ When deploying to production (Railway, Render, etc.):
 
 Example production `.env`:
 ```env
-BACKEND_API_URL=https://your-app.railway.app
-ALLOWED_ORIGINS=https://your-app.railway.app,https://rest-shop-frontend.pages.dev
+BACKEND_API_URL=https://your-app.onrender.com
+ALLOWED_ORIGINS=https://your-app.onrender.com,https://rest-shop-frontend.pages.dev
 FRONTEND_URL=https://rest-shop-frontend.pages.dev
-GOOGLE_CALLBACK_URL=https://your-app.railway.app/auth/google/callback
+GOOGLE_CALLBACK_URL=https://your-app.onrender.com/auth/google/callback
 ```
 
 ## Next Steps

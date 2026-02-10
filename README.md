@@ -118,7 +118,7 @@ Frontend (Cloudflare Pages)
     ↓ HTTPS
 Cloudflare Workers (Edge Proxy)
     ↓ HTTPS
-Node.js Backend (Railway/Render)
+Node.js Backend (Render)
     ↓
 MongoDB Atlas
 ```
@@ -139,7 +139,7 @@ MongoDB Atlas
 **Deployment:**
 - Frontend: Cloudflare Pages (automatic via GitHub Actions)
 - Workers: Cloudflare Workers (automatic via GitHub Actions)
-- Backend: Railway/Render (auto-deploy on push)
+- Backend: Render (auto-deploy on push)
 
 See detailed documentation:
 - [Complete Deployment Guide](docs/FULL_DEPLOYMENT_GUIDE.md)
@@ -167,18 +167,18 @@ npm run deploy:gateway   # Gateway (main entry point)
 
 ### Quick Setup
 
-1. **Deploy your Node.js backend** (Railway, Render, or VPS):
+1. **Deploy your Node.js backend** (Render or VPS):
    ```bash
-   # Example with Railway
-   railway up
-   # Get your URL: https://your-app.railway.app
+   # Example with Render
+   # Connect your GitHub repository in Render dashboard
+   # Get your URL: https://your-app.onrender.com
    ```
 
 2. **Set the backend URL in your worker**:
    ```bash
    cd worker
    wrangler secret put BACKEND_API_URL
-   # Enter: https://your-app.railway.app
+   # Enter: https://your-app.onrender.com
    ```
 
 3. **Deploy the worker**:
@@ -208,7 +208,7 @@ npm start
 
 See **[Connection Guide](docs/CONNECTION_GUIDE.md)** for:
 - Step-by-step instructions
-- Multiple deployment options (Railway, Render, VPS)
+- Multiple deployment options (Render, VPS)
 - Troubleshooting common issues
 - Configuration validation script
 
@@ -220,7 +220,7 @@ Check if your backends are connected correctly:
 node api/scripts/validate-connection.js <backend-url> [worker-url]
 
 # Example:
-node api/scripts/validate-connection.js https://your-app.railway.app https://your-worker.workers.dev
+node api/scripts/validate-connection.js https://your-app.onrender.com https://your-worker.workers.dev
 ```
 
 ## Features
@@ -361,7 +361,7 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 ### Deployment
 - **Frontend**: Cloudflare Pages
 - **Edge Layer**: Cloudflare Workers
-- **Backend**: Railway/Render/VPS
+- **Backend**: Render/VPS
 - **CI/CD**: GitHub Actions
 - **Database**: MongoDB Atlas
 
@@ -416,7 +416,7 @@ Create a `.env` file in the `api/` directory (or copy from `.env.example`):
    
    # Backend API URL (used for OAuth callbacks)
    # For local development: http://localhost:3001
-   # For production: https://your-backend.railway.app or your deployed URL
+   # For production: https://your-backend.onrender.com or your deployed URL
    BACKEND_API_URL=http://localhost:3001
    
    # Email Service (for verification & password reset)
@@ -460,7 +460,7 @@ Create a `.env` file in the `api/` directory (or copy from `.env.example`):
    ```
    
    **Important Notes:**
-   - For **production deployment**, set `BACKEND_API_URL` to your deployed backend URL (e.g., `https://your-app.railway.app`)
+   - For **production deployment**, set `BACKEND_API_URL` to your deployed backend URL (e.g., `https://your-app.onrender.com`)
    - OAuth callback URLs must match exactly what's configured in your OAuth provider console
    - If `GOOGLE_CALLBACK_URL` is not set, it defaults to `{BACKEND_API_URL}/auth/google/callback`
 
@@ -892,16 +892,9 @@ The project includes full CI/CD automation via GitHub Actions for:
 - **[GitHub CI/CD Setup Guide](docs/GITHUB_SECRETS_CICD_GUIDE.md)** - Complete automation setup
 - **[Full Deployment Guide](docs/FULL_DEPLOYMENT_GUIDE.md)** - Manual deployment walkthrough
 
-### Deploy Backend (Railway/Render)
+### Deploy Backend (Render)
 
-The backend deploys automatically via Railway/Render's built-in CI/CD:
-
-**Railway:**
-```bash
-# Connect GitHub repository
-# Railway auto-deploys on push to main
-# Configure environment variables in Railway dashboard
-```
+The backend deploys automatically via Render's built-in CI/CD:
 
 **Render:**
 ```bash

@@ -63,7 +63,7 @@ We've implemented a **separation of concerns** architecture:
   - Authentication and authorization
 - **Deployment Options**:
   - Traditional hosting (VPS, AWS EC2, etc.)
-  - Platform-as-a-Service (Railway, Render, Heroku, etc.)
+  - Platform-as-a-Service (Render, Render, Heroku, etc.)
   - Containerized (Docker, Kubernetes)
   - Serverless Functions (AWS Lambda, etc.)
 
@@ -154,25 +154,25 @@ PAYPAL_CLIENT_SECRET=...
 
 Choose a hosting option:
 
-#### Option A: Railway (Recommended for quick setup)
+#### Option A: Render (Recommended for quick setup)
 ```bash
-# Install Railway CLI
-npm install -g @railway/cli
+# Install Render CLI
+npm install -g @render/cli
 
 # Login and initialize
-railway login
-railway init
+render login
+render init
 
 # Set environment variables
-railway variables set MONGODB_URI="mongodb+srv://..."
-railway variables set JWT_KEY="your_secret"
+render variables set MONGODB_URI="mongodb+srv://..."
+render variables set JWT_KEY="your_secret"
 # ... set all other variables
 
 # Deploy
-railway up
+render up
 ```
 
-Your backend will be available at: `https://your-app.railway.app`
+Your backend will be available at: `https://your-app.onrender.com`
 
 #### Option B: Render
 1. Connect your GitHub repo to Render
@@ -204,7 +204,7 @@ Update environment variables in Cloudflare Dashboard or use Wrangler:
 ```bash
 # Set backend URL (CRITICAL)
 wrangler secret put BACKEND_API_URL
-# Enter: https://your-backend.railway.app (or your backend URL)
+# Enter: https://your-backend.onrender.com (or your backend URL)
 
 # Set other secrets
 wrangler secret put JWT_KEY
@@ -375,7 +375,7 @@ wrangler secret put BACKEND_API_URL
 ### Authentication failures
 **Problem**: JWT validation failing
 **Solution**: Ensure `JWT_KEY` is set correctly in the **backend** environment:
-- Railway/Render: Check environment variables in dashboard
+- Render/Render: Check environment variables in dashboard
 - VPS: Check `.env` file on server
 - Must be at least 32 characters
 - Must match what was used to create tokens
@@ -413,7 +413,7 @@ If upgrading from the previous Mongoose-in-Workers setup:
   - Free tier: 100,000 requests/day
   - Paid tier: $0.50 per million requests
 - **Backend hosting options**:
-  - Railway: $5-20/month
+  - Render: $5-20/month
   - Render: $7/month (free tier available)
   - VPS: $5-10/month
   - AWS/GCP: Pay as you go
@@ -423,7 +423,7 @@ If upgrading from the previous Mongoose-in-Workers setup:
 ## Recommended Backend Providers
 
 ### For Startups/MVPs
-1. **Railway** - Easy deployment, great DX
+1. **Render** - Easy deployment, great DX
 2. **Render** - Free tier available, good performance
 3. **Fly.io** - Global distribution, edge hosting
 
