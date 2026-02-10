@@ -17,13 +17,26 @@ const { logOAuthLogin, logAuthFailure } = require('../utils/auditLogger');
  * @param {string} provider - OAuth provider name (google, microsoft, apple)
  * @param {string} [envVarValue] - Value from specific callback URL environment variable
  * @returns {string} Absolute callback URL
+ * @throws {Error} In production if BACKEND_API_URL is not configured
  */
 function buildCallbackUrl(provider, envVarValue) {
     if (envVarValue) {
         return envVarValue;
     }
-    const baseUrl = process.env.BACKEND_API_URL || 'http://localhost:3001';
-    return `${baseUrl}/auth/${provider}/callback`;
+    
+    // In production, BACKEND_API_URL MUST be set
+    if (!process.env.BACKEND_API_URL) {
+        if (process.env.NODE_ENV === 'production') {
+            const error = `CRITICAL: BACKEND_API_URL must be set in production for OAuth to work. Cannot use localhost callback URLs in production.`;
+            logError(error);
+            throw new Error(error);
+        }
+        // Development fallback only
+        console.warn(`WARNING: BACKEND_API_URL not set. Using localhost fallback for ${provider} OAuth. This will NOT work in production!`);
+        return `http://localhost:3001/auth/${provider}/callback`;
+    }
+    
+    return `${process.env.BACKEND_API_URL}/auth/${provider}/callback`;
 }
 
 /**
