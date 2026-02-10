@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api/axios';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Product {
   _id: string;
@@ -14,6 +16,9 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [notification, setNotification] = useState<string | null>(null);
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchProducts();
@@ -31,6 +36,23 @@ const Products: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleAddToCart = (product: Product) => {
+    if (!user) {
+      // Redirect to login if not authenticated
+      navigate('/login');
+      return;
+    }
+    
+    // TODO: Implement actual cart functionality
+    // For now, show a notification
+    setNotification(`Added ${product.name} to cart!`);
+    
+    // Clear notification after 3 seconds
+    setTimeout(() => {
+      setNotification(null);
+    }, 3000);
   };
 
   if (loading) {
@@ -56,6 +78,13 @@ const Products: React.FC = () => {
       <h1 className="text-3xl font-bold text-navy-600 dark:text-white mb-8">
         Our Products
       </h1>
+
+      {/* Toast Notification */}
+      {notification && (
+        <div className="fixed top-20 right-4 z-50 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg animate-fade-in">
+          {notification}
+        </div>
+      )}
 
       {products.length === 0 ? (
         <div className="text-center py-12">
@@ -124,10 +153,11 @@ const Products: React.FC = () => {
                 </div>
 
                 <button
+                  onClick={() => handleAddToCart(product)}
                   className="w-full mt-4 py-2 bg-saffron-500 hover:bg-saffron-600 disabled:bg-gray-400 disabled:cursor-not-allowed text-white rounded-lg transition-colors font-medium"
                   disabled={product.stock === 0}
                 >
-                  Add to Cart
+                  {product.stock === 0 ? 'Out of Stock' : user ? 'Add to Cart' : 'Login to Buy'}
                 </button>
               </div>
             </div>

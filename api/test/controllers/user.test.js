@@ -30,6 +30,7 @@ describe('User Controller', () => {
 
     describe('user_signup', () => {
         it('should create a new user successfully', async () => {
+            const userId = new mongoose.Types.ObjectId();
             const findStub = sinon.stub(User, 'find').returns({
                 exec: sinon.stub().resolves([])
             });
@@ -37,12 +38,20 @@ describe('User Controller', () => {
             const bcryptStub = sinon.stub(bcrypt, 'hash').yields(null, 'hashedpassword');
 
             const saveStub = sinon.stub(User.prototype, 'save')
-                .resolves({ _id: new mongoose.Types.ObjectId(), provider: 'local' });
+                .resolves({ 
+                    _id: userId, 
+                    email: 'test@test.com',
+                    role: 'user',
+                    provider: 'local' 
+                });
 
             await UserController.user_signup(req, res, next);
 
             expect(res.status.calledWith(201)).to.be.true;
-            expect(res.json.calledWith({ message: 'User created' })).to.be.true;
+            expect(res.json.getCall(0).args[0]).to.have.property('token');
+            expect(res.json.getCall(0).args[0]).to.have.property('user');
+            expect(res.json.getCall(0).args[0].user).to.have.property('_id');
+            expect(res.json.getCall(0).args[0].user).to.have.property('email');
         });
 
         it('should return 409 if user already exists', async () => {
@@ -59,12 +68,14 @@ describe('User Controller', () => {
 
     describe('user_login', () => {
         it('should login successfully with correct credentials', async () => {
+            const userId = new mongoose.Types.ObjectId();
             const hashedPassword = await bcrypt.hash('testpassword', 10);
             const findStub = sinon.stub(User, 'find').returns({
                 exec: sinon.stub().resolves([{
                     email: 'test@test.com',
                     password: hashedPassword,
-                    _id: new mongoose.Types.ObjectId()
+                    _id: userId,
+                    role: 'user'
                 }])
             });
 
@@ -74,6 +85,9 @@ describe('User Controller', () => {
 
             expect(res.status.calledWith(200)).to.be.true;
             expect(res.json.getCall(0).args[0]).to.have.property('token');
+            expect(res.json.getCall(0).args[0]).to.have.property('user');
+            expect(res.json.getCall(0).args[0].user).to.have.property('_id');
+            expect(res.json.getCall(0).args[0].user).to.have.property('email');
         });
 
         it('should fail with incorrect credentials', async () => {

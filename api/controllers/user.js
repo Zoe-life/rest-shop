@@ -82,8 +82,27 @@ exports.user_signup = async (req, res, next) => {
                     outcome: 'success'
                 });
                 
+                // Generate JWT token for the new user
+                const token = jwt.sign(
+                    {
+                        email: result.email,
+                        userId: result._id,
+                        role: result.role
+                    },
+                    process.env.JWT_KEY,
+                    {
+                        expiresIn: process.env.JWT_EXPIRATION || "1h"
+                    }
+                );
+                
                 res.status(201).json({
-                    message: 'User created'
+                    message: 'User created',
+                    token: token,
+                    user: {
+                        _id: result._id,
+                        email: result.email,
+                        role: result.role
+                    }
                 })
             } catch (err) {
                 logError('User creation failed', err);
@@ -174,7 +193,7 @@ exports.user_login = async (req, res, next) => {
                 },
                 process.env.JWT_KEY,
                 {
-                    expiresIn: "1h"
+                    expiresIn: process.env.JWT_EXPIRATION || "1h"
                 }
             );
             
@@ -190,7 +209,12 @@ exports.user_login = async (req, res, next) => {
             
             return res.status(200).json({
                 message: 'Auth successful',
-                token: token
+                token: token,
+                user: {
+                    _id: user[0]._id,
+                    email: user[0].email,
+                    role: user[0].role
+                }
             });
         });
     } catch (err) {
