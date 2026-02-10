@@ -29,7 +29,7 @@ NODE_ENV = "production"
 PORT = "3001"
 
 # Add non-sensitive URLs here
-FRONTEND_URL = "https://rest-shop.pages.dev"
+FRONTEND_URL = "rest-shop-frontend.pages.dev"
 
 # Backend API URL - Set this to your Node.js backend URL
 # For local development: uncomment and set to http://localhost:3001
