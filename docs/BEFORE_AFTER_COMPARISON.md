@@ -18,7 +18,7 @@ This document shows the changes made during the microservices migration and the 
 │     Single Worker (2MB+)        │
 │      rest-shop-api              │
 │                                 │
-│  ❌ Exceeds 1MB free tier limit │
+│  Exceeds 1MB free tier limit   │
 │                                 │
 │  - Products                     │
 │  - Orders                       │
