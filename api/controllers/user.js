@@ -91,7 +91,7 @@ exports.user_signup = async (req, res, next) => {
                     },
                     process.env.JWT_KEY,
                     {
-                        expiresIn: "1h"
+                        expiresIn: process.env.JWT_EXPIRATION || "1h"
                     }
                 );
                 
@@ -193,7 +193,7 @@ exports.user_login = async (req, res, next) => {
                 },
                 process.env.JWT_KEY,
                 {
-                    expiresIn: "1h"
+                    expiresIn: process.env.JWT_EXPIRATION || "1h"
                 }
             );
             

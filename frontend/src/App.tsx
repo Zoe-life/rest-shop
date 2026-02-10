@@ -6,6 +6,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Products from './pages/Products';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import AuthSuccess from './pages/AuthSuccess';
 import Orders from './pages/Orders';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
@@ -38,8 +39,10 @@ function App() {
                 <main>
                   <Routes>
                     <Route path="/" element={<Products />} />
+                    <Route path="/products" element={<Products />} />
                     <Route path="/login" element={<Login />} />
                     <Route path="/signup" element={<Signup />} />
+                    <Route path="/auth/success" element={<AuthSuccess />} />
                     <Route path="/orders" element={
                       <ProtectedRoute>
                         <Orders />

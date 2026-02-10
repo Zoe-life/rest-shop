@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import OAuthButtons from '../components/OAuthButtons';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -85,6 +86,8 @@ const Login: React.FC = () => {
               {loading ? 'Logging in...' : 'Login'}
             </button>
           </form>
+
+          <OAuthButtons mode="login" />
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">

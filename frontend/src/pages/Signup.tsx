@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import OAuthButtons from '../components/OAuthButtons';
 
 const Signup: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -115,6 +116,8 @@ const Signup: React.FC = () => {
               {loading ? 'Signing up...' : 'Sign Up'}
             </button>
           </form>
+
+          <OAuthButtons mode="signup" />
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
