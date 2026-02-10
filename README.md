@@ -105,7 +105,7 @@ This is a comprehensive, **professional-grade full-stack e-commerce platform** w
 - **User Profile**: Account information display
 - **Theme Toggle**: Seamless day/night mode switching
 
-See [Frontend README](./frontend/README.md) for detailed documentation.
+See [Frontend README](./frontend/README.md) for detailed frontend documentation.
 
 ## Architecture
 
