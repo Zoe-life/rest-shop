@@ -65,6 +65,8 @@ This creates an optimized production build in the `dist/` folder.
 
 ## Deployment to Cloudflare Pages
 
+The frontend includes a `wrangler.toml` configuration file for seamless Cloudflare Pages deployment.
+
 ### Option 1: Using Wrangler CLI
 
 1. Install Wrangler:
@@ -84,8 +86,11 @@ This creates an optimized production build in the `dist/` folder.
 
 4. Deploy to Cloudflare Pages:
    ```bash
-   wrangler pages deploy dist --project-name=rest-shop-frontend
+   wrangler pages deploy dist
    ```
+   
+   The project name and configuration are automatically read from `wrangler.toml`.
+   The project will be created automatically on first deployment if it doesn't exist.
 
 ### Option 2: Using Cloudflare Dashboard
 

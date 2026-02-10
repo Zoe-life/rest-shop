@@ -158,7 +158,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           workingDirectory: "frontend"
-          command: pages deploy dist --project-name=rest-shop-frontend --branch=main --commit-dirty=true
+          command: pages deploy dist --branch=main --commit-dirty=true
 
   # Job 7: CodeQL Analysis
   codeql:

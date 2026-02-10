@@ -1,0 +1,16 @@
+# Cloudflare Pages Configuration
+name = "rest-shop-frontend"
+compatibility_date = "2026-01-20"
+
+pages_build_output_dir = "dist"
+
+# Account details (will be overridden by secrets in CI/CD)
+# These are used for local development and can be overridden
+# by environment variables or command-line arguments
+
+# Environment variables for Pages
+[env.production]
+pages_build_output_dir = "dist"
+
+[env.preview]
+pages_build_output_dir = "dist"
