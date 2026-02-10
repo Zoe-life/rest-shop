@@ -63,7 +63,7 @@ We've implemented a **separation of concerns** architecture:
   - Authentication and authorization
 - **Deployment Options**:
   - Traditional hosting (VPS, AWS EC2, etc.)
-  - Platform-as-a-Service (Render, Render, Heroku, etc.)
+  - Platform-as-a-Service (Render, Heroku, etc.)
   - Containerized (Docker, Kubernetes)
   - Serverless Functions (AWS Lambda, etc.)
 

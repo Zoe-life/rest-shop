@@ -4,7 +4,7 @@
 
 ```bash
 # 1. Deploy backend
-render up  # or render, or VPS
+# Connect GitHub repo in Render dashboard or deploy via VPS
 # Get URL: https://your-app.onrender.com
 
 # 2. Configure worker
@@ -220,7 +220,7 @@ npm start  # Just run backend at :3001
 ### Production with Render
 ```bash
 # 1. Deploy
-render up
+# Connect GitHub repository in Render dashboard
 
 # 2. Get URL from Render dashboard
 # 3. Configure worker

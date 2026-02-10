@@ -39,7 +39,7 @@ const allowedOrigins = req.workerEnv?.ALLOWED_ORIGINS
 ```
 
 **Impact:**
-- Now checks `process.env.ALLOWED_ORIGINS` for direct Node.js deployments (Render, Render, local dev)
+- Now checks `process.env.ALLOWED_ORIGINS` for direct Node.js deployments (Render, local dev)
 - Fallback includes both backend and frontend origins
 - Maintains compatibility with Cloudflare Workers architecture
 
@@ -93,7 +93,7 @@ VITE_API_URL=http://localhost:3001
 
 ### For Production Deployment
 
-**Backend Environment Variables (Render/Render):**
+**Backend Environment Variables (Render):**
 ```env
 MONGODB_URI=mongodb+srv://...
 JWT_KEY=your_secret_key

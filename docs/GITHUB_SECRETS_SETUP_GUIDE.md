@@ -5,7 +5,7 @@ This guide explains how to configure GitHub Secrets for automatic deployment of 
 ## Overview
 
 The CI/CD pipeline uses GitHub Secrets to deploy:
-1. **Backend** (Node.js API) - to Render/Render
+1. **Backend** (Node.js API) - to Render
 2. **Worker** (Cloudflare Worker) - to Cloudflare Workers
 3. **Frontend** (React App) - to Cloudflare Pages
 
@@ -98,7 +98,7 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 
 ### Step 4: Configure Backend Environment Variables
 
-**Important:** Backend environment variables should be configured in your hosting platform (Render/Render), not in GitHub Secrets!
+**Important:** Backend environment variables should be configured in your hosting platform (Render), not in GitHub Secrets!
 
 #### Render Configuration:
 
@@ -205,7 +205,7 @@ git push origin main
 **Cause:** Secrets configured in GitHub instead of hosting platform.
 
 **Fix:**
-1. Go to Render/Render dashboard
+1. Go to Render dashboard
 2. Add all backend environment variables there
 3. Restart service
 
@@ -222,7 +222,7 @@ git push origin main
 ### DO:
 
 - Use GitHub Secrets for deployment credentials
-- Configure backend secrets in hosting platform (Render/Render)
+- Configure backend secrets in hosting platform (Render)
 - Rotate tokens periodically
 - Use minimum required permissions
 - Keep `JWT_KEY` secret and secure
@@ -268,7 +268,7 @@ curl https://your-worker-url/health
 
 ## Environment Variables Reference
 
-### Backend (Render/Render Dashboard)
+### Backend (Render Dashboard)
 
 **Set these in your hosting platform:**
 
@@ -313,7 +313,7 @@ VITE_API_URL=https://your-worker-url
 
 | Component | Where to Set | How |
 |-----------|--------------|-----|
-| **Backend** | Render/Render Dashboard | Manual in UI |
+| **Backend** | Render Dashboard | Manual in UI |
 | **Worker** | GitHub Secrets → Cloudflare | CI/CD pipeline |
 | **Frontend** | GitHub Secrets → Build | CI/CD pipeline |
 
@@ -341,7 +341,7 @@ If you encounter issues:
 ```bash
 # 1. Deploy backend → Get URL
 # 2. Add all GitHub Secrets
-# 3. Configure backend environment in Render/Render
+# 3. Configure backend environment in Render
 # 4. Push to main
 git push origin main
 # 5. Done! CI/CD handles the rest

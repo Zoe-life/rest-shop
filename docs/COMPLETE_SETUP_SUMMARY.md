@@ -70,9 +70,8 @@ npm start
 
 **Want automatic deployment when you push to GitHub?**
 
-1. **Deploy Backend to Render/Render:**
-   - Render: Connect GitHub repo
-   - Render: Connect GitHub repo
+1. **Deploy Backend to Render:**
+   - Connect GitHub repo in Render dashboard
    - Get backend URL: `https://your-app.onrender.com`
 
 2. **Configure GitHub Secrets:**
@@ -85,7 +84,7 @@ npm start
    ```
 
 4. **Done!** GitHub Actions deploys everything:
-   - Backend to Render/Render
+   - Backend to Render
    - Worker to Cloudflare (with BACKEND_API_URL)
    - Frontend to Cloudflare Pages
 
@@ -160,7 +159,7 @@ node api/scripts/validate-connection.js \
 
 ### Backend Configuration
 
-**Where:** Render/Render Dashboard → Environment Variables
+**Where:** Render Dashboard → Environment Variables
 
 ```bash
 # Required
@@ -179,7 +178,7 @@ PAYPAL_CLIENT_ID=...
 ```
 
 **Status:**
-- [ ] Deployed to Render/Render
+- [ ] Deployed to Render
 - [ ] Environment variables configured
 - [ ] `curl https://backend-url/health` returns 200
 - [ ] Database shows "connected"
@@ -301,7 +300,7 @@ cd frontend && npm run build
 
 ### Issue: CORS errors
 ```bash
-# Update ALLOWED_ORIGINS in backend (Render/Render dashboard)
+# Update ALLOWED_ORIGINS in backend (Render dashboard)
 ALLOWED_ORIGINS=https://worker.dev,https://frontend.pages.dev
 ```
 

@@ -25,7 +25,7 @@ This guide covers the complete deployment of the Rest Shop application with its 
 │  Backend API (Node.js + Express + Mongoose)                 │
 │  ├── Business logic + Database operations                   │
 │  ├── Authentication + Payment processing                     │
-│  └── Deployed to: Render/Render/VPS                        │
+│  └── Deployed to: Render/VPS                        │
 │                          ↓                                    │
 │  Database (MongoDB Atlas)                                    │
 │  └── Cloud-hosted MongoDB                                    │
@@ -50,7 +50,7 @@ This guide covers the complete deployment of the Rest Shop application with its 
 - GitHub account
 - Cloudflare account (free tier works)
 - MongoDB Atlas account (free tier works)
-- Render/Render account (free tier works) OR VPS access
+- Render account (free tier works) OR VPS access
 
 ## Phase 1: Database Setup
 
@@ -437,7 +437,7 @@ wrangler secret put BACKEND_API_URL --config worker/wrangler.toml
 
 ## Environment Variables Checklist
 
-### Backend (Render/Render)
+### Backend (Render)
 - `MONGODB_URI`
 - `JWT_KEY` (32+ characters)
 - `NODE_ENV=production`
@@ -484,7 +484,7 @@ The repository includes GitHub Actions for automatic deployment. To enable:
 
 ### Recommended Monitoring
 
-1. **Backend**: Render/Render built-in monitoring
+1. **Backend**: Render built-in monitoring
 2. **Worker**: Cloudflare Dashboard → Analytics
 3. **Frontend**: Cloudflare Pages Analytics
 4. **Database**: MongoDB Atlas monitoring

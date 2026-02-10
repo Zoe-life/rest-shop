@@ -177,9 +177,9 @@ Now that your backend is running, configure the workers to proxy to it.
 
 3. **IMPORTANT: Configure Secrets in Backend, Not Workers**
    
-   **DO THIS:** Set all secrets in your backend environment (Render/Render dashboard):
+   **DO THIS:** Set all secrets in your backend environment (Render dashboard):
    ```bash
-   # In Render/Render dashboard, add these environment variables:
+   # In Render dashboard, add these environment variables:
    JWT_KEY=your_jwt_secret
    STRIPE_SECRET_KEY=sk_...
    STRIPE_WEBHOOK_SECRET=whsec_...
@@ -339,7 +339,7 @@ wrangler secret put BACKEND_API_URL --config wrangler.toml
 
 **Solution:** Ensure `JWT_KEY` is set correctly in **backend** environment:
 ```bash
-# In Render/Render dashboard, verify:
+# In Render dashboard, verify:
 JWT_KEY=your_super_long_random_secret_at_least_32_characters
 
 # Must be at least 32 characters
@@ -388,19 +388,19 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
 
 ### Minimal Setup (Free/Low Cost)
 - **MongoDB Atlas**: Free tier (512MB)
-- **Render/Render**: $0-7/month (free tier or starter)
+- **Render**: $0-7/month (free tier or starter)
 - **Cloudflare Workers**: Free tier (100K requests/day)
 - **Total**: $0-7/month
 
 ### Production Setup
 - **MongoDB Atlas**: $9-30/month (M2-M10)
-- **Render/Render**: $20-50/month (Pro tier)
+- **Render**: $20-50/month (Pro tier)
 - **Cloudflare Workers**: $5/month (paid plan for higher limits)
 - **Total**: $34-85/month
 
 ## Next Steps
 
-1. Set up monitoring (Render/Render has built-in)
+1. Set up monitoring (Render has built-in)
 2. Configure production environment variables
 3. Set up CI/CD (GitHub Actions already configured)
 4. Add custom domain

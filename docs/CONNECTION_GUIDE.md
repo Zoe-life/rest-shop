@@ -376,7 +376,7 @@ has been blocked by CORS policy
 
 **Solution:** Update `ALLOWED_ORIGINS` in your **backend** environment variables:
 
-**Render/Render Dashboard:**
+**Render Dashboard:**
 ```bash
 ALLOWED_ORIGINS=https://your-frontend.com,https://your-worker.workers.dev,http://localhost:3000
 ```
@@ -409,13 +409,13 @@ pm2 restart rest-shop-api
 **Solution:** Fix MongoDB connection in backend:
 
 1. **Check MONGODB_URI in backend environment**
-   - Render/Render: Check dashboard
+   - Render: Check dashboard
    - VPS: Check `.env` file
 
 2. **Check MongoDB Atlas IP whitelist**
    - Go to MongoDB Atlas → Network Access
    - Add IP: `0.0.0.0/0` (allow all) or your backend's IP
-   - For Render/Render: Use `0.0.0.0/0` (they use dynamic IPs)
+   - For Render: Use `0.0.0.0/0` (they use dynamic IPs)
 
 3. **Restart backend**
    - Render: Automatic on config change
@@ -498,7 +498,7 @@ npm run deploy:gateway    # Gateway
 
 ### What Goes Where?
 
-#### Backend Environment Variables (Render/Render/VPS)
+#### Backend Environment Variables (Render/VPS)
 
 **Set these in your backend hosting platform:**
 
@@ -614,7 +614,7 @@ After connecting your backends:
    - Point frontend to custom domain
 
 3. **Set up monitoring**
-   - Render/Render have built-in monitoring
+   - Render has built-in monitoring
    - Consider adding Sentry or similar for error tracking
 
 4. **Enable CI/CD**
@@ -648,7 +648,7 @@ After connecting your backends:
 
 **The key to connecting the worker to the Node.js backend is:**
 
-1. **Deploy your Node.js backend** to a hosting provider (Render, Render, VPS, etc.)
+1. **Deploy your Node.js backend** to a hosting provider (Render, VPS, etc.)
 2. **Get the backend URL** (e.g., `https://your-app.onrender.com`)
 3. **Set `BACKEND_API_URL`** in Cloudflare Worker with that URL
 4. **Deploy the worker** and test the `/health` endpoint

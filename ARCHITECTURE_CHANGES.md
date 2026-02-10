@@ -136,7 +136,7 @@ If you're updating from the old architecture:
 
 To complete the deployment:
 
-1. **Deploy your Node.js backend** to Render, Render, or another hosting service
+1. **Deploy your Node.js backend** to Render, or another hosting service
 2. **Set the `BACKEND_API_URL`** secret in Cloudflare Workers
 3. **Deploy the workers** with `npm run deploy:all`
 4. **Test it works** with `curl https://your-worker/health`

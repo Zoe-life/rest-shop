@@ -79,7 +79,7 @@ The worker needs to know **where** the Node.js backend is running. This is confi
 ```
 ┌─────────────────────────┐
 │   Node.js Backend       │
-│   (Render/Render/VPS)  │
+│   (Render/VPS)  │
 │                         │
 │   Status: Running       │
 │   URL: https://your-    │
@@ -190,7 +190,7 @@ curl https://your-worker.workers.dev/health
 
 ## Configuration Checklist
 
-### Backend Configuration (Render/Render Dashboard or .env)
+### Backend Configuration (Render Dashboard or .env)
 
 ```bash
 # Required
@@ -281,7 +281,7 @@ wrangler secret put MONGODB_URI
 **DO THIS INSTEAD:**
 ```bash
 # Correct - Put secrets in backend environment
-# Set these in Render/Render dashboard or .env file
+# Set these in Render dashboard or .env file
 JWT_KEY=...
 STRIPE_SECRET_KEY=...
 MONGODB_URI=...
@@ -298,7 +298,7 @@ MONGODB_URI=...
 
 | What | Where | How |
 |------|-------|-----|
-| **Deploy Backend** | Render/Render/VPS | `render up` or dashboard |
+| **Deploy Backend** | Render/VPS | `render up` or dashboard |
 | **Set Worker Config** | Cloudflare Worker | `wrangler secret put BACKEND_API_URL` |
 | **Deploy Worker** | Cloudflare | `wrangler deploy` |
 | **Test Backend** | CLI | `curl https://backend-url/health` |
