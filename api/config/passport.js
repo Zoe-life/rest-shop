@@ -13,30 +13,41 @@ const { logError, logInfo } = require('../utils/logger');
 const { logOAuthLogin, logAuthFailure } = require('../utils/auditLogger');
 
 /**
- * Build OAuth callback URL with fallbacks
+ * Build OAuth callback URL - REQUIRES explicit configuration
  * @param {string} provider - OAuth provider name (google, microsoft, apple)
  * @param {string} [envVarValue] - Value from specific callback URL environment variable
  * @returns {string} Absolute callback URL
- * @throws {Error} In production if BACKEND_API_URL is not configured
+ * @throws {Error} If callback URL cannot be determined or would use localhost in production
  */
 function buildCallbackUrl(provider, envVarValue) {
+    // If specific callback URL is provided, validate and use it
     if (envVarValue) {
-        return envVarValue;
-    }
-    
-    // In production, BACKEND_API_URL MUST be set
-    if (!process.env.BACKEND_API_URL) {
-        if (process.env.NODE_ENV === 'production') {
-            const error = `CRITICAL: BACKEND_API_URL must be set in production for OAuth to work. Cannot use localhost callback URLs in production.`;
+        // Validate that production environment doesn't use localhost
+        if (process.env.NODE_ENV === 'production' && envVarValue.includes('localhost')) {
+            const error = `CRITICAL: ${provider.toUpperCase()}_CALLBACK_URL contains 'localhost' which is invalid for production. Please set a production URL.`;
             logError(error);
             throw new Error(error);
         }
-        // Development fallback only
-        console.warn(`WARNING: BACKEND_API_URL not set. Using localhost fallback for ${provider} OAuth. This will NOT work in production!`);
-        return `http://localhost:3001/auth/${provider}/callback`;
+        return envVarValue;
     }
     
-    return `${process.env.BACKEND_API_URL}/auth/${provider}/callback`;
+    // If BACKEND_API_URL is not set, we cannot construct a callback URL
+    if (!process.env.BACKEND_API_URL) {
+        const error = `CRITICAL: BACKEND_API_URL must be set for ${provider} OAuth callback URL. Set either ${provider.toUpperCase()}_CALLBACK_URL or BACKEND_API_URL environment variable.`;
+        logError(error);
+        throw new Error(error);
+    }
+    
+    const callbackUrl = `${process.env.BACKEND_API_URL}/auth/${provider}/callback`;
+    
+    // Ensure production environment doesn't use localhost
+    if (process.env.NODE_ENV === 'production' && callbackUrl.includes('localhost')) {
+        const error = `CRITICAL: BACKEND_API_URL contains 'localhost' which is invalid for production. OAuth callback would be: ${callbackUrl}`;
+        logError(error);
+        throw new Error(error);
+    }
+    
+    return callbackUrl;
 }
 
 /**
