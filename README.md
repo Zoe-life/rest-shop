@@ -397,7 +397,13 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 
 #### 1. Backend Configuration
 
-Create a `.env` file in the `api/` directory:
+Create a `.env` file in the `api/` directory (or copy from `.env.example`):
+   ```bash
+   cd api
+   cp ../env.example .env
+   ```
+   
+   Edit the `.env` file with your configuration:
    ```env
    # Core Configuration
    MONGODB_URI=mongodb+srv://username:password@cluster0.lifak.mongodb.net/
@@ -405,7 +411,13 @@ Create a `.env` file in the `api/` directory:
    JWT_KEY=your_jwt_secret_key
    NODE_ENV=development
    ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
+   FRONTEND_URL=http://localhost:3000
    PORT=3001
+   
+   # Backend API URL (used for OAuth callbacks)
+   # For local development: http://localhost:3001
+   # For production: https://your-backend.railway.app or your deployed URL
+   BACKEND_API_URL=http://localhost:3001
    
    # Email Service (for verification & password reset)
    SMTP_HOST=smtp.example.com
@@ -414,7 +426,6 @@ Create a `.env` file in the `api/` directory:
    SMTP_USER=your-email@example.com
    SMTP_PASS=your-smtp-password
    EMAIL_FROM=noreply@rest-shop.com
-   FRONTEND_URL=http://localhost:3000
    
    # Redis Cache (optional - for performance optimization)
    REDIS_URL=redis://localhost:6379
@@ -424,13 +435,21 @@ Create a `.env` file in the `api/` directory:
    REDIS_PASSWORD=your-redis-password
    
    # OAuth (optional - for social login)
+   # Get credentials from: https://console.cloud.google.com/apis/credentials
    GOOGLE_CLIENT_ID=your-google-client-id
    GOOGLE_CLIENT_SECRET=your-google-client-secret
+   GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
+   
+   # Get credentials from: https://portal.azure.com
    MICROSOFT_CLIENT_ID=your-microsoft-client-id
    MICROSOFT_CLIENT_SECRET=your-microsoft-client-secret
+   MICROSOFT_CALLBACK_URL=http://localhost:3001/auth/microsoft/callback
+   
+   # Get credentials from: https://developer.apple.com
    APPLE_CLIENT_ID=your-apple-client-id
    APPLE_TEAM_ID=your-apple-team-id
    APPLE_KEY_ID=your-apple-key-id
+   APPLE_CALLBACK_URL=http://localhost:3001/auth/apple/callback
    
    # Payment Gateways (optional - for payment processing)
    STRIPE_SECRET_KEY=your-stripe-secret-key
@@ -439,12 +458,23 @@ Create a `.env` file in the `api/` directory:
    MPESA_CONSUMER_KEY=your-mpesa-consumer-key
    MPESA_CONSUMER_SECRET=your-mpesa-consumer-secret
    ```
+   
+   **Important Notes:**
+   - For **production deployment**, set `BACKEND_API_URL` to your deployed backend URL (e.g., `https://your-app.railway.app`)
+   - OAuth callback URLs must match exactly what's configured in your OAuth provider console
+   - If `GOOGLE_CALLBACK_URL` is not set, it defaults to `{BACKEND_API_URL}/auth/google/callback`
 
 #### 2. Frontend Configuration
 
-Create a `.env.local` file in the `frontend/` directory:
+Create a `.env` file in the `frontend/` directory (or copy from `.env.example`):
+   ```bash
+   cd frontend
+   cp .env.example .env
+   ```
+   
+   The `.env` file should contain:
    ```env
-   REACT_APP_API_URL=http://localhost:3001
+   VITE_API_URL=http://localhost:3001
    ```
 
 #### 3. MongoDB Atlas Setup
