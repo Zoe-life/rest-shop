@@ -177,7 +177,7 @@ Expected response:
 ## More Information
 
 - [Full Microservices Documentation](./MICROSERVICES_ARCHITECTURE.md)
-- [Bundle Size Analysis](../BUNDLE_SIZE_ANALYSIS.md)
+- [Bundle Size Analysis](./BUNDLE_SIZE_ANALYSIS.md)
 - [Main README](../README.md)
 
 ## Tips
