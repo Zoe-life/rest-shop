@@ -150,12 +150,12 @@ async function seedProducts() {
     // Connect to MongoDB
     const mongoUri = process.env.MONGO_ATLAS_URI || process.env.MONGODB_URI || 'mongodb://localhost:27017/rest-shop';
     await mongoose.connect(mongoUri);
-    console.log('✅ Connected to MongoDB');
+    console.log('Connected to MongoDB');
 
     // Check if products already exist
     const existingCount = await Product.countDocuments();
     if (existingCount > 0) {
-      console.log(`ℹ️  Database already has ${existingCount} products`);
+      console.log(`INFO: Database already has ${existingCount} products`);
       console.log('Do you want to:');
       console.log('  1. Skip seeding (keep existing products)');
       console.log('  2. Add sample products alongside existing ones');
@@ -166,9 +166,9 @@ async function seedProducts() {
       // Check for command line flags
       const args = process.argv.slice(2);
       if (args.includes('--clear')) {
-        console.log('🗑️  Clearing existing products...');
+        console.log('Clearing existing products...');
         await Product.deleteMany({});
-        console.log('✅ Cleared existing products');
+        console.log('Cleared existing products');
       } else if (!args.includes('--force')) {
         await mongoose.connection.close();
         return;
@@ -176,19 +176,19 @@ async function seedProducts() {
     }
 
     // Insert sample products
-    console.log('🌱 Seeding sample products...');
+    console.log('Seeding sample products...');
     await Product.insertMany(sampleProducts);
     
-    console.log(`✅ Successfully seeded ${sampleProducts.length} products!`);
+    console.log(`Successfully seeded ${sampleProducts.length} products!`);
     console.log('\nSample products added:');
     sampleProducts.forEach((product, index) => {
       console.log(`  ${index + 1}. ${product.name} - $${product.price}`);
     });
 
     await mongoose.connection.close();
-    console.log('\n✅ Database connection closed');
+    console.log('\nDatabase connection closed');
   } catch (error) {
-    console.error('❌ Error seeding products:', error);
+    console.error('Error seeding products:', error);
     process.exit(1);
   }
 }
