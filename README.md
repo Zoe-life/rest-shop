@@ -56,6 +56,7 @@ rest-shop/
 - [Overview](#overview)
 - [Frontend Features](#frontend-features)
 - [Architecture](#architecture)
+- [🔗 Connecting the Worker to the Node.js Backend](#-connecting-the-worker-to-the-nodejs-backend)
 - [Features](#features)
   - [Enhanced Features](#enhanced-features)
   - [Security Features](#security-features)
@@ -158,6 +159,68 @@ npm run deploy:all
 npm run deploy:base      # Base service
 npm run deploy:payments  # Payment service
 npm run deploy:gateway   # Gateway (main entry point)
+```
+
+## 🔗 Connecting the Worker to the Node.js Backend
+
+**The most important step:** The Cloudflare Worker acts as a proxy and needs to know where your Node.js backend is running.
+
+### Quick Setup
+
+1. **Deploy your Node.js backend** (Railway, Render, or VPS):
+   ```bash
+   # Example with Railway
+   railway up
+   # Get your URL: https://your-app.railway.app
+   ```
+
+2. **Set the backend URL in your worker**:
+   ```bash
+   cd worker
+   wrangler secret put BACKEND_API_URL
+   # Enter: https://your-app.railway.app
+   ```
+
+3. **Deploy the worker**:
+   ```bash
+   wrangler deploy
+   ```
+
+4. **Test the connection**:
+   ```bash
+   curl https://your-worker.workers.dev/health
+   # Should show both worker and backend are ok
+   ```
+
+### For Local Development
+
+You can skip the worker entirely and connect your frontend directly to the backend:
+
+```bash
+# Just run the Node.js backend
+npm start
+
+# Backend runs on http://localhost:3001
+# Point your frontend to: http://localhost:3001
+```
+
+### Detailed Guide
+
+See **[Connection Guide](docs/CONNECTION_GUIDE.md)** for:
+- ✅ Step-by-step instructions
+- ✅ Multiple deployment options (Railway, Render, VPS)
+- ✅ Troubleshooting common issues
+- ✅ Configuration validation script
+
+### Validation Script
+
+Check if your backends are connected correctly:
+
+```bash
+node api/scripts/validate-connection.js <backend-url> [worker-url]
+
+# Example:
+node api/scripts/validate-connection.js https://your-app.railway.app https://your-worker.workers.dev
 ```
 
 ## Features
