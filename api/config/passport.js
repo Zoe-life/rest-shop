@@ -13,6 +13,20 @@ const { logError, logInfo } = require('../utils/logger');
 const { logOAuthLogin, logAuthFailure } = require('../utils/auditLogger');
 
 /**
+ * Build OAuth callback URL with fallbacks
+ * @param {string} provider - OAuth provider name (google, microsoft, apple)
+ * @param {string} [envVarValue] - Value from specific callback URL environment variable
+ * @returns {string} Absolute callback URL
+ */
+function buildCallbackUrl(provider, envVarValue) {
+    if (envVarValue) {
+        return envVarValue;
+    }
+    const baseUrl = process.env.BACKEND_API_URL || 'http://localhost:3001';
+    return `${baseUrl}/auth/${provider}/callback`;
+}
+
+/**
  * Serialize user for session
  */
 passport.serializeUser((user, done) => {
@@ -39,7 +53,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL || `${process.env.BACKEND_API_URL || 'http://localhost:3001'}/auth/google/callback`,
+        callbackURL: buildCallbackUrl('google', process.env.GOOGLE_CALLBACK_URL),
         scope: ['profile', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -130,7 +144,7 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
     passport.use(new MicrosoftStrategy({
         clientID: process.env.MICROSOFT_CLIENT_ID,
         clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-        callbackURL: process.env.MICROSOFT_CALLBACK_URL || `${process.env.BACKEND_API_URL || 'http://localhost:3001'}/auth/microsoft/callback`,
+        callbackURL: buildCallbackUrl('microsoft', process.env.MICROSOFT_CALLBACK_URL),
         scope: ['user.read']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -220,7 +234,7 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
     passport.use(new AppleStrategy({
         clientID: process.env.APPLE_CLIENT_ID,
         teamID: process.env.APPLE_TEAM_ID,
-        callbackURL: process.env.APPLE_CALLBACK_URL || `${process.env.BACKEND_API_URL || 'http://localhost:3001'}/auth/apple/callback`,
+        callbackURL: buildCallbackUrl('apple', process.env.APPLE_CALLBACK_URL),
         keyID: process.env.APPLE_KEY_ID,
         privateKeyString: process.env.APPLE_PRIVATE_KEY,
         scope: ['email', 'name']
