@@ -59,16 +59,16 @@ To deploy to production, you **MUST** set:
 
 ```env
 NODE_ENV=production
-BACKEND_API_URL=https://your-backend.railway.app
+BACKEND_API_URL=https://your-backend.onrender.com
 ```
 
 Or explicitly set each callback URL:
 
 ```env
 NODE_ENV=production
-GOOGLE_CALLBACK_URL=https://your-backend.railway.app/auth/google/callback
-MICROSOFT_CALLBACK_URL=https://your-backend.railway.app/auth/microsoft/callback
-APPLE_CALLBACK_URL=https://your-backend.railway.app/auth/apple/callback
+GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
+MICROSOFT_CALLBACK_URL=https://your-backend.onrender.com/auth/microsoft/callback
+APPLE_CALLBACK_URL=https://your-backend.onrender.com/auth/apple/callback
 ```
 
 ## Documentation Updated

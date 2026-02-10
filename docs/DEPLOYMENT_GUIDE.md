@@ -30,9 +30,9 @@
 
 Choose one of these options:
 
-#### Option A: Railway (Easiest - Recommended)
+#### Option A: Render (Easiest - Recommended)
 
-1. **Sign up at [railway.app](https://railway.app)**
+1. **Sign up at [onrender.com](https://onrender.com)**
 
 2. **Deploy from GitHub:**
    - Click "New Project"
@@ -42,7 +42,7 @@ Choose one of these options:
 
 3. **Configure environment variables:**
    ```bash
-   # In Railway Dashboard → Variables tab, add:
+   # In Render Dashboard → Variables tab, add:
    MONGODB_URI=mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/
    JWT_KEY=your_super_long_random_jwt_secret_key_at_least_32_chars
    NODE_ENV=production
@@ -58,12 +58,12 @@ Choose one of these options:
    ```
 
 4. **Start the service:**
-   - Railway will auto-deploy
-   - Get your URL: `https://your-app.railway.app`
+   - Render will auto-deploy
+   - Get your URL: `https://your-app.onrender.com`
 
 5. **Test it works:**
    ```bash
-   curl https://your-app.railway.app/health
+   curl https://your-app.onrender.com/health
    ```
    
    Expected response:
@@ -88,7 +88,7 @@ Choose one of these options:
    - Start Command: `npm start`
 
 3. **Add Environment Variables:**
-   - Same variables as Railway above
+   - Same variables as Render above
    - Click "Environment" tab
    - Add each variable
 
@@ -169,7 +169,7 @@ Now that your backend is running, configure the workers to proxy to it.
    ```bash
    # Use your backend URL from Step 2
    wrangler secret put BACKEND_API_URL --config wrangler.toml
-   # When prompted, enter: https://your-app.railway.app
+   # When prompted, enter: https://your-app.onrender.com
    
    wrangler secret put BACKEND_API_URL --config wrangler-payments.toml
    # Same URL
@@ -177,9 +177,9 @@ Now that your backend is running, configure the workers to proxy to it.
 
 3. **IMPORTANT: Configure Secrets in Backend, Not Workers**
    
-   **DO THIS:** Set all secrets in your backend environment (Railway/Render dashboard):
+   **DO THIS:** Set all secrets in your backend environment (Render dashboard):
    ```bash
-   # In Railway/Render dashboard, add these environment variables:
+   # In Render dashboard, add these environment variables:
    JWT_KEY=your_jwt_secret
    STRIPE_SECRET_KEY=sk_...
    STRIPE_WEBHOOK_SECRET=whsec_...
@@ -333,13 +333,13 @@ wrangler secret put BACKEND_API_URL --config wrangler.toml
 **Checks:**
 1. Is `MONGODB_URI` correct in backend?
 2. MongoDB Atlas: IP whitelist configured?
-3. Check backend logs: `railway logs` or `pm2 logs`
+3. Check backend logs: `render logs` or `pm2 logs`
 
 ### Issue: Authentication fails
 
 **Solution:** Ensure `JWT_KEY` is set correctly in **backend** environment:
 ```bash
-# In Railway/Render dashboard, verify:
+# In Render dashboard, verify:
 JWT_KEY=your_super_long_random_secret_at_least_32_characters
 
 # Must be at least 32 characters
@@ -374,7 +374,7 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
   - etc.
 
 ### Required for Cloudflare Workers:
-- `BACKEND_API_URL` - Your backend URL (e.g., https://your-app.railway.app)
+- `BACKEND_API_URL` - Your backend URL (e.g., https://your-app.onrender.com)
 
 **That's it! Workers only need the backend URL.**
 
@@ -388,19 +388,19 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://api.yourdomain.com,http://localho
 
 ### Minimal Setup (Free/Low Cost)
 - **MongoDB Atlas**: Free tier (512MB)
-- **Railway/Render**: $0-7/month (free tier or starter)
+- **Render**: $0-7/month (free tier or starter)
 - **Cloudflare Workers**: Free tier (100K requests/day)
 - **Total**: $0-7/month
 
 ### Production Setup
 - **MongoDB Atlas**: $9-30/month (M2-M10)
-- **Railway/Render**: $20-50/month (Pro tier)
+- **Render**: $20-50/month (Pro tier)
 - **Cloudflare Workers**: $5/month (paid plan for higher limits)
 - **Total**: $34-85/month
 
 ## Next Steps
 
-1. Set up monitoring (Railway/Render has built-in)
+1. Set up monitoring (Render has built-in)
 2. Configure production environment variables
 3. Set up CI/CD (GitHub Actions already configured)
 4. Add custom domain

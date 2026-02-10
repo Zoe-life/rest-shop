@@ -47,16 +47,16 @@ curl http://localhost:3001/products
 **Step 1: Deploy Node.js Backend**
 
 Choose any hosting option:
-- Railway: `railway up` (easiest)
+- Render: `render up` (easiest)
 - Render: Connect GitHub repo
 - VPS: `pm2 start server.js`
 
-Get your backend URL (e.g., `https://your-app.railway.app`)
+Get your backend URL (e.g., `https://your-app.onrender.com`)
 
 **Step 2: Configure Workers**
 ```bash
 wrangler secret put BACKEND_API_URL
-# Enter: https://your-app.railway.app
+# Enter: https://your-app.onrender.com
 
 wrangler secret put JWT_KEY
 # Must match backend JWT_KEY
@@ -104,7 +104,7 @@ New tests added:
 
 ### Cost-Effective
 - Workers stay in free tier (100K requests/day)
-- Backend: $5-20/month (Railway/Render)
+- Backend: $5-20/month (Render)
 - Total: Much cheaper than trying to run everything in Workers
 
 ### Maintainability
@@ -136,7 +136,7 @@ If you're updating from the old architecture:
 
 To complete the deployment:
 
-1. **Deploy your Node.js backend** to Railway, Render, or another hosting service
+1. **Deploy your Node.js backend** to Render, or another hosting service
 2. **Set the `BACKEND_API_URL`** secret in Cloudflare Workers
 3. **Deploy the workers** with `npm run deploy:all`
 4. **Test it works** with `curl https://your-worker/health`

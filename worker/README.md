@@ -34,7 +34,6 @@ The worker needs **one secret**:
 - `BACKEND_API_URL` - URL of your Node.js backend
 
 **Examples:**
-- Railway: `https://your-app.railway.app`
 - Render: `https://rest-shop-backend.onrender.com`
 - VPS: `https://api.yourdomain.com`
 - Local: `http://localhost:3001`

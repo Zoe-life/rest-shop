@@ -115,9 +115,9 @@ For production, you need to:
 
 Choose one of these hosting providers:
 
-#### Option A: Railway (Recommended - Easy)
+#### Option A: Render (Recommended - Easy)
 
-1. **Sign up at [railway.app](https://railway.app)**
+1. **Sign up at [onrender.com](https://onrender.com)**
 
 2. **Create New Project**
    - Click "New Project"
@@ -127,7 +127,7 @@ Choose one of these hosting providers:
 
 3. **Configure Environment Variables**
    
-   In Railway Dashboard → Your Project → Variables tab, add:
+   In Render Dashboard → Your Project → Variables tab, add:
 
    ```bash
    MONGODB_URI=mongodb+srv://username:password@cluster.mongodb.net/database
@@ -144,13 +144,13 @@ Choose one of these hosting providers:
    ```
 
 4. **Deploy**
-   - Railway automatically deploys
-   - Note your backend URL: `https://your-app.railway.app`
+   - Render automatically deploys
+   - Note your backend URL: `https://your-app.onrender.com`
    - **IMPORTANT: Save this URL** - you'll need it in Step 2
 
 5. **Test Your Backend**
    ```bash
-   curl https://your-app.railway.app/health
+   curl https://your-app.onrender.com/health
    
    # Expected: {"status":"ok","database":"connected"}
    ```
@@ -169,7 +169,7 @@ Choose one of these hosting providers:
      - Start Command: `cd api && npm start` (or just `npm start`)
 
 3. **Add Environment Variables**
-   - Same variables as Railway (see above)
+   - Same variables as Render (see above)
 
 4. **Deploy**
    - Render automatically deploys
@@ -228,7 +228,7 @@ cd worker
 npx wrangler secret put BACKEND_API_URL
 
 # When prompted, enter your backend URL:
-# For Railway: https://your-app.railway.app
+# For Render: https://your-app.onrender.com
 # For Render: https://rest-shop-backend.onrender.com
 # For VPS: https://api.yourdomain.com (or http://your-server-ip:3001)
 
@@ -244,7 +244,7 @@ npx wrangler secret put BACKEND_API_URL
 3. Click "Add variable"
 4. Type: **Secret** (use encrypted secret, not plain text variable)
 5. Name: `BACKEND_API_URL`
-6. Value: Your backend URL (e.g., `https://your-app.railway.app`)
+6. Value: Your backend URL (e.g., `https://your-app.onrender.com`)
 7. Click "Save"
 
 ---
@@ -349,7 +349,7 @@ npx wrangler secret put BACKEND_API_URL
 
 4. **Backend crashed**
    - Check backend logs:
-     - Railway: `railway logs`
+     - Render: `render logs`
      - Render: Check logs in dashboard
      - VPS: `pm2 logs rest-shop-api`
 
@@ -376,7 +376,7 @@ has been blocked by CORS policy
 
 **Solution:** Update `ALLOWED_ORIGINS` in your **backend** environment variables:
 
-**Railway/Render Dashboard:**
+**Render Dashboard:**
 ```bash
 ALLOWED_ORIGINS=https://your-frontend.com,https://your-worker.workers.dev,http://localhost:3000
 ```
@@ -409,16 +409,16 @@ pm2 restart rest-shop-api
 **Solution:** Fix MongoDB connection in backend:
 
 1. **Check MONGODB_URI in backend environment**
-   - Railway/Render: Check dashboard
+   - Render: Check dashboard
    - VPS: Check `.env` file
 
 2. **Check MongoDB Atlas IP whitelist**
    - Go to MongoDB Atlas → Network Access
    - Add IP: `0.0.0.0/0` (allow all) or your backend's IP
-   - For Railway/Render: Use `0.0.0.0/0` (they use dynamic IPs)
+   - For Render: Use `0.0.0.0/0` (they use dynamic IPs)
 
 3. **Restart backend**
-   - Railway: Automatic on config change
+   - Render: Automatic on config change
    - Render: Automatic on config change
    - VPS: `pm2 restart rest-shop-api`
 
@@ -443,7 +443,7 @@ Use this checklist to verify your setup:
 
 - Worker is deployed to Cloudflare
 - `BACKEND_API_URL` secret is set in Cloudflare
-- `BACKEND_API_URL` points to your backend (e.g., https://your-app.railway.app)
+- `BACKEND_API_URL` points to your backend (e.g., https://your-app.onrender.com)
 - `curl https://your-worker.workers.dev/health` returns worker and backend status
 
 ### Connection Test
@@ -498,7 +498,7 @@ npm run deploy:gateway    # Gateway
 
 ### What Goes Where?
 
-#### Backend Environment Variables (Railway/Render/VPS)
+#### Backend Environment Variables (Render/VPS)
 
 **Set these in your backend hosting platform:**
 
@@ -585,7 +585,7 @@ curl https://your-worker.workers.dev/health
 ### Essential URLs
 
 - **Backend URL**: Where your Node.js + Express + MongoDB runs
-  - Example: `https://your-app.railway.app`
+  - Example: `https://your-app.onrender.com`
   - Must be accessible from Cloudflare Workers
   - Must respond to `/health` endpoint
 
@@ -614,7 +614,7 @@ After connecting your backends:
    - Point frontend to custom domain
 
 3. **Set up monitoring**
-   - Railway/Render have built-in monitoring
+   - Render has built-in monitoring
    - Consider adding Sentry or similar for error tracking
 
 4. **Enable CI/CD**
@@ -648,8 +648,8 @@ After connecting your backends:
 
 **The key to connecting the worker to the Node.js backend is:**
 
-1. **Deploy your Node.js backend** to a hosting provider (Railway, Render, VPS, etc.)
-2. **Get the backend URL** (e.g., `https://your-app.railway.app`)
+1. **Deploy your Node.js backend** to a hosting provider (Render, VPS, etc.)
+2. **Get the backend URL** (e.g., `https://your-app.onrender.com`)
 3. **Set `BACKEND_API_URL`** in Cloudflare Worker with that URL
 4. **Deploy the worker** and test the `/health` endpoint
 

@@ -116,7 +116,7 @@ async function validateBackend(backendUrl) {
   if (!backendUrl) {
     logError('No backend URL provided');
     logInfo('Usage: node validate-connection.js <backend-url> [worker-url]');
-    logInfo('Example: node validate-connection.js https://your-app.railway.app');
+    logInfo('Example: node validate-connection.js https://your-app.onrender.com');
     return false;
   }
 

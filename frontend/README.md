@@ -113,7 +113,7 @@ In Cloudflare Pages settings, add:
 VITE_API_URL=https://your-api-domain.com
 ```
 
-Replace with your actual backend API URL (e.g., Railway, Render, or Cloudflare Worker URL).
+Replace with your actual backend API URL (e.g., Render or Cloudflare Worker URL).
 
 ## Project Structure
 

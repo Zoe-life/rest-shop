@@ -131,9 +131,9 @@ cd frontend && npm run dev  # Terminal 2
 ### Production Setup
 Set these in your deployment platform:
 ```env
-BACKEND_API_URL=https://your-backend.railway.app
-ALLOWED_ORIGINS=https://your-backend.railway.app,https://your-frontend.pages.dev
-GOOGLE_CALLBACK_URL=https://your-backend.railway.app/auth/google/callback
+BACKEND_API_URL=https://your-backend.onrender.com
+ALLOWED_ORIGINS=https://your-backend.onrender.com,https://your-frontend.pages.dev
+GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
 ```
 
 Update OAuth provider consoles with production callback URLs.

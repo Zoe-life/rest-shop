@@ -4,13 +4,13 @@
 
 ```bash
 # 1. Deploy backend
-railway up  # or render, or VPS
-# Get URL: https://your-app.railway.app
+# Connect GitHub repo in Render dashboard or deploy via VPS
+# Get URL: https://your-app.onrender.com
 
 # 2. Configure worker
 cd worker
 wrangler secret put BACKEND_API_URL
-# Enter: https://your-app.railway.app
+# Enter: https://your-app.onrender.com
 
 # 3. Deploy worker
 wrangler deploy
@@ -29,7 +29,7 @@ curl https://your-worker.workers.dev/health
 
 | Platform | URL Format | Example |
 |----------|------------|---------|
-| **Railway** | `https://your-app.railway.app` | `https://rest-shop-api.railway.app` |
+| **Render** | `https://your-app.onrender.com` | `https://rest-shop-api.onrender.com` |
 | **Render** | `https://your-service.onrender.com` | `https://rest-shop-backend.onrender.com` |
 | **VPS** | `https://api.yourdomain.com` | `https://api.example.com` |
 | **Local** | `http://localhost:3001` | `http://localhost:3001` |
@@ -78,7 +78,7 @@ curl https://your-backend-url/health
 
 ### CORS Errors
 ```bash
-# In backend environment (Railway/Render dashboard):
+# In backend environment (Render dashboard):
 ALLOWED_ORIGINS=https://frontend.com,https://worker.workers.dev
 ```
 
@@ -189,7 +189,7 @@ curl https://worker-url/health
 4. **Always test health endpoints** after deployment
 
 5. **Check logs** if something doesn't work:
-   - Backend: `railway logs` or Render dashboard
+   - Backend: `render logs` or Render dashboard
    - Worker: `wrangler tail`
 
 ---
@@ -217,15 +217,15 @@ npm start  # Just run backend at :3001
 # Skip worker, connect frontend directly
 ```
 
-### Production with Railway
+### Production with Render
 ```bash
 # 1. Deploy
-railway up
+# Connect GitHub repository in Render dashboard
 
-# 2. Get URL from Railway dashboard
+# 2. Get URL from Render dashboard
 # 3. Configure worker
 cd worker
-echo "https://your-app.railway.app" | wrangler secret put BACKEND_API_URL
+echo "https://your-app.onrender.com" | wrangler secret put BACKEND_API_URL
 
 # 4. Deploy worker
 wrangler deploy
@@ -274,9 +274,9 @@ wrangler deploy  # Redeploy
 
 ### Backend not responding
 ```bash
-# Railway
-railway logs
-railway restart
+# Render
+render logs
+render restart
 
 # Render
 # Check dashboard logs
