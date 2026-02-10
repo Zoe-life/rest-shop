@@ -13,6 +13,44 @@ const { logError, logInfo } = require('../utils/logger');
 const { logOAuthLogin, logAuthFailure } = require('../utils/auditLogger');
 
 /**
+ * Build OAuth callback URL - REQUIRES explicit configuration
+ * @param {string} provider - OAuth provider name (google, microsoft, apple)
+ * @param {string} [envVarValue] - Value from specific callback URL environment variable
+ * @returns {string} Absolute callback URL
+ * @throws {Error} If callback URL cannot be determined or would use localhost in production
+ */
+function buildCallbackUrl(provider, envVarValue) {
+    // If specific callback URL is provided, validate and use it
+    if (envVarValue) {
+        // Validate that production environment doesn't use localhost
+        if (process.env.NODE_ENV === 'production' && envVarValue.includes('localhost')) {
+            const error = `CRITICAL: ${provider.toUpperCase()}_CALLBACK_URL contains 'localhost' which is invalid for production. Please set a production URL.`;
+            logError(error);
+            throw new Error(error);
+        }
+        return envVarValue;
+    }
+    
+    // If BACKEND_API_URL is not set, we cannot construct a callback URL
+    if (!process.env.BACKEND_API_URL) {
+        const error = `CRITICAL: BACKEND_API_URL must be set for ${provider} OAuth callback URL. Set either ${provider.toUpperCase()}_CALLBACK_URL or BACKEND_API_URL environment variable.`;
+        logError(error);
+        throw new Error(error);
+    }
+    
+    const callbackUrl = `${process.env.BACKEND_API_URL}/auth/${provider}/callback`;
+    
+    // Ensure production environment doesn't use localhost
+    if (process.env.NODE_ENV === 'production' && callbackUrl.includes('localhost')) {
+        const error = `CRITICAL: BACKEND_API_URL contains 'localhost' which is invalid for production. OAuth callback would be: ${callbackUrl}`;
+        logError(error);
+        throw new Error(error);
+    }
+    
+    return callbackUrl;
+}
+
+/**
  * Serialize user for session
  */
 passport.serializeUser((user, done) => {
@@ -39,7 +77,7 @@ if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
     passport.use(new GoogleStrategy({
         clientID: process.env.GOOGLE_CLIENT_ID,
         clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-        callbackURL: process.env.GOOGLE_CALLBACK_URL || '/auth/google/callback',
+        callbackURL: buildCallbackUrl('google', process.env.GOOGLE_CALLBACK_URL),
         scope: ['profile', 'email']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -130,7 +168,7 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
     passport.use(new MicrosoftStrategy({
         clientID: process.env.MICROSOFT_CLIENT_ID,
         clientSecret: process.env.MICROSOFT_CLIENT_SECRET,
-        callbackURL: process.env.MICROSOFT_CALLBACK_URL || '/auth/microsoft/callback',
+        callbackURL: buildCallbackUrl('microsoft', process.env.MICROSOFT_CALLBACK_URL),
         scope: ['user.read']
     },
     async (accessToken, refreshToken, profile, done) => {
@@ -220,7 +258,7 @@ if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPL
     passport.use(new AppleStrategy({
         clientID: process.env.APPLE_CLIENT_ID,
         teamID: process.env.APPLE_TEAM_ID,
-        callbackURL: process.env.APPLE_CALLBACK_URL || '/auth/apple/callback',
+        callbackURL: buildCallbackUrl('apple', process.env.APPLE_CALLBACK_URL),
         keyID: process.env.APPLE_KEY_ID,
         privateKeyString: process.env.APPLE_PRIVATE_KEY,
         scope: ['email', 'name']

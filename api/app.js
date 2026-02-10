@@ -25,10 +25,12 @@ app.use(sanitizeInput);
 
 // 2. CORS Logic (Adapted for Cloudflare)
 app.use((req, res, next) => {
-    // We get the secrets passed from worker.js via req.workerEnv
+    // We get the secrets passed from worker.js via req.workerEnv, or use process.env for direct Node.js deployment
     const allowedOrigins = req.workerEnv?.ALLOWED_ORIGINS 
         ? req.workerEnv.ALLOWED_ORIGINS.split(',') 
-        : ['http://localhost:3001'];
+        : (process.env.ALLOWED_ORIGINS 
+            ? process.env.ALLOWED_ORIGINS.split(',') 
+            : ['http://localhost:3001', 'http://localhost:3000']);
     
     const origin = req.headers.origin;
     // Security: Reject null, undefined, and the string 'null' origins when credentials are enabled
