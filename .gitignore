@@ -40,3 +40,6 @@ generate_logbook.py
 generate_report.py
 generate_documents.js
 read_docx.js
+
+# Tools
+actionlint
