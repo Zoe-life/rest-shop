@@ -76,7 +76,7 @@ npm start
 
 2. **Configure GitHub Secrets:**
    - Follow: [GITHUB_SECRETS_SETUP_GUIDE.md](./GITHUB_SECRETS_SETUP_GUIDE.md)
-   - Add `BACKEND_API_URL`, `VITE_API_URL`, `CLOUDFLARE_API_TOKEN`, etc.
+   - Add `BACKEND_API_URL`, `VITE_BACKEND_URL`, `CLOUDFLARE_API_TOKEN`, etc.
 
 3. **Push to Main Branch:**
    ```bash
@@ -203,12 +203,12 @@ BACKEND_API_URL=https://your-backend-url
 **Where:** GitHub Secrets (injected at build time)
 
 ```bash
-VITE_API_URL=https://your-worker-url
+VITE_BACKEND_URL=https://your-worker-url
 # or direct to backend: https://your-backend-url
 ```
 
 **Status:**
-- [ ] VITE_API_URL is set
+- [ ] VITE_BACKEND_URL is set
 - [ ] Frontend is built and deployed
 - [ ] Frontend can call API endpoints
 - [ ] No CORS errors
@@ -221,7 +221,7 @@ VITE_API_URL=https://your-worker-url
 - [ ] `CLOUDFLARE_API_TOKEN`
 - [ ] `CLOUDFLARE_ACCOUNT_ID`
 - [ ] `BACKEND_API_URL` (backend URL)
-- [ ] `VITE_API_URL` (worker or backend URL)
+- [ ] `VITE_BACKEND_URL` (worker or backend URL)
 - [ ] `JWT_KEY` (32+ characters)
 - [ ] `RENDER_DEPLOY_HOOK`
 
@@ -234,7 +234,7 @@ VITE_API_URL=https://your-worker-url
 ```
 ┌─────────────────────────────────────────────────────────────────┐
 │                         GITHUB (CI/CD)                          │
-│  Secrets: BACKEND_API_URL, VITE_API_URL, JWT_KEY, etc.        │
+│  Secrets: BACKEND_API_URL, VITE_BACKEND_URL, JWT_KEY, etc.        │
 └────────────┬──────────────┬──────────────┬─────────────────────┘
              │              │              │
              │ Deploy       │ Deploy       │ Deploy
@@ -245,7 +245,7 @@ VITE_API_URL=https://your-worker-url
 │   Render)     │  │              │  │    Pages)        │
 │               │  │ Needs:       │  │                  │
 │ Has all      │  │ BACKEND_URL  │  │ Built with:      │
-│ secrets       │◄─┤              │◄─┤ VITE_API_URL     │
+│ secrets       │◄─┤              │◄─┤ VITE_BACKEND_URL     │
 └───────────────┘  └──────────────┘  └──────────────────┘
         │
         ▼
@@ -258,7 +258,7 @@ VITE_API_URL=https://your-worker-url
 **Key Points:**
 1. Backend has all application secrets
 2. Worker only needs BACKEND_API_URL
-3. Frontend needs VITE_API_URL at build time
+3. Frontend needs VITE_BACKEND_URL at build time
 4. All configured via GitHub Secrets
 5. CI/CD deploys everything automatically
 
@@ -293,7 +293,7 @@ wrangler secret put BACKEND_API_URL
 
 ### Issue: Frontend can't connect to API
 ```bash
-# Check VITE_API_URL in GitHub Secrets
+# Check VITE_BACKEND_URL in GitHub Secrets
 # Rebuild frontend:
 cd frontend && npm run build
 ```

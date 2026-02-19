@@ -40,7 +40,7 @@ callbackURL: buildCallbackUrl('google', process.env.GOOGLE_CALLBACK_URL)
 ```
 
 ### 3. Updated Documentation
-- Fixed environment variable name from `REACT_APP_API_URL` to `VITE_API_URL` in README
+- Fixed environment variable name from `REACT_APP_API_URL` to `VITE_BACKEND_URL` in README
 - Added comprehensive setup instructions
 - Created `QUICK_START.md` for easy onboarding
 - Documented OAuth callback URL configuration
@@ -70,7 +70,7 @@ callbackURL: buildCallbackUrl('google', process.env.GOOGLE_CALLBACK_URL)
    
    cd ../frontend
    cp .env.example .env
-   # Already has: VITE_API_URL=http://localhost:3001
+   # Already has: VITE_BACKEND_URL=http://localhost:3001
    ```
 
 2. **Start the application:**

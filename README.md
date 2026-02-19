@@ -474,7 +474,7 @@ Create a `.env` file in the `frontend/` directory (or copy from `.env.example`):
    
    The `.env` file should contain:
    ```env
-   VITE_API_URL=http://localhost:3001
+   VITE_BACKEND_URL=http://localhost:3001
    ```
 
 #### 3. MongoDB Atlas Setup

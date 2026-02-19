@@ -99,7 +99,7 @@ jobs:
       - name: Build Frontend
         run: cd frontend && npm run build
         env:
-          VITE_API_URL: ${{ secrets.VITE_API_URL || 'https://rest-shop-worker.workers.dev' }}
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL || 'https://rest-shop-worker.workers.dev' }}
 
   # Job 5: Deploy Worker to Cloudflare
   deploy-worker:
@@ -180,7 +180,7 @@ jobs:
         run: cd frontend && npm run build
         env:
           # Frontend environment variables (injected at build time)
-          VITE_API_URL: ${{ secrets.VITE_API_URL }}
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:

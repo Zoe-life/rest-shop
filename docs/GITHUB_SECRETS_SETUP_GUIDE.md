@@ -31,7 +31,7 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 | Secret Name | Description | Example Value |
 |-------------|-------------|---------------|
 | `BACKEND_API_URL` | URL where backend is deployed | `https://your-app.onrender.com` |
-| `VITE_API_URL` | API URL for frontend to connect to | `https://your-worker.workers.dev` |
+| `VITE_BACKEND_URL` | API URL for frontend to connect to | `https://your-worker.workers.dev` |
 | `JWT_KEY` | JWT secret for authentication (32+ chars) | `your-super-secret-key-min-32-characters-long` |
 
 ### 4. Optional: Testing & Security Secrets
@@ -86,7 +86,7 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
    - Render: `https://your-service.onrender.com`
    - If not deployed yet, deploy backend first, then add this secret
 
-2. **VITE_API_URL:**
+2. **VITE_BACKEND_URL:**
    - Value: Your worker URL (or backend URL for direct connection)
    - Worker: `https://rest-shop-api.your-subdomain.workers.dev`
    - Direct to backend: Use same as BACKEND_API_URL
@@ -135,7 +135,7 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 - [ ] `CLOUDFLARE_API_TOKEN`
 - [ ] `CLOUDFLARE_ACCOUNT_ID`
 - [ ] `BACKEND_API_URL` (after backend is deployed)
-- [ ] `VITE_API_URL`
+- [ ] `VITE_BACKEND_URL`
 - [ ] `JWT_KEY`
 
 ### Required for Render Deployment
@@ -170,7 +170,7 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 4. **CI/CD Pipeline Runs:**
    - Tests backend
    - Deploys worker (with BACKEND_API_URL)
-   - Deploys frontend (with VITE_API_URL)
+   - Deploys frontend (with VITE_BACKEND_URL)
 
 ### Subsequent Deployments:
 
@@ -193,10 +193,10 @@ git push origin main
 
 ### Frontend: Can't connect to API
 
-**Cause:** `VITE_API_URL` is incorrect or not set.
+**Cause:** `VITE_BACKEND_URL` is incorrect or not set.
 
 **Fix:**
-1. Check `VITE_API_URL` in GitHub Secrets
+1. Check `VITE_BACKEND_URL` in GitHub Secrets
 2. Should point to worker URL (or backend URL if not using worker)
 3. Rebuild frontend after updating
 
@@ -306,7 +306,7 @@ BACKEND_API_URL=https://your-backend-url
 **Set in GitHub Secrets, injected at build time:**
 
 ```bash
-VITE_API_URL=https://your-worker-url
+VITE_BACKEND_URL=https://your-worker-url
 ```
 
 ## Quick Reference Table
@@ -333,7 +333,7 @@ If you encounter issues:
 1. Use GitHub Secrets for deployment credentials (Cloudflare tokens, Render tokens)
 2. Use hosting platform UI for backend environment variables
 3. `BACKEND_API_URL` connects worker to backend
-4. `VITE_API_URL` connects frontend to API
+4. `VITE_BACKEND_URL` connects frontend to API
 5. Deploy backend first, then add its URL to GitHub Secrets
 6. Push to main → Everything deploys automatically
 
