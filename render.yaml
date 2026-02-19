@@ -1,0 +1,70 @@
+services:
+  - type: web
+    name: rest-shop-api
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd api && yarn
+    startCommand: node api/server.js
+    # Disable auto-deploy so Render only deploys after GitHub Actions
+    # has successfully synced all secrets via the Render API
+    autoDeploy: false
+    envVars:
+      # Critical - app will not start without these
+      - key: JWT_KEY
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      # Server
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+      # CORS / URLs
+      - key: BACKEND_API_URL
+        sync: false
+      - key: ALLOWED_ORIGINS
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      # Redis (optional - caching)
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_HOST
+        sync: false
+      # Cloudinary (file uploads)
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      # Google OAuth
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      # Microsoft OAuth
+      - key: MICROSOFT_CLIENT_ID
+        sync: false
+      - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+      # Stripe (optional - only needed if using Stripe payments)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      # PayPal (optional - only needed if using PayPal payments)
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      # M-Pesa (optional - only needed if using M-Pesa payments)
+      - key: MPESA_CONSUMER_KEY
+        sync: false
+      - key: MPESA_CONSUMER_SECRET
+        sync: false
+      - key: MPESA_CALLBACK_URL
+        sync: false

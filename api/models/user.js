@@ -56,15 +56,10 @@ const userSchema = mongoose.Schema({
         unique: true,
         sparse: true
     },
-    appleId: {
-        type: String,
-        unique: true,
-        sparse: true
-    },
     // Authentication metadata
     provider: {
         type: String,
-        enum: ['local', 'google', 'microsoft', 'apple'],
+        enum: ['local', 'google', 'microsoft'],
         default: 'local'
     },
     displayName: {

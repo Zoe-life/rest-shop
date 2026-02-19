@@ -1,12 +1,11 @@
 /**
  * @module config/passport
- * @description Passport OAuth 2.0 configuration for Google, Microsoft, and Apple
+ * @description Passport OAuth 2.0 configuration for Google and Microsoft
  */
 
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const MicrosoftStrategy = require('passport-microsoft').Strategy;
-const AppleStrategy = require('passport-apple');
 const User = require('../models/user');
 const mongoose = require('mongoose');
 const { logError, logInfo } = require('../utils/logger');
@@ -248,104 +247,6 @@ if (process.env.MICROSOFT_CLIENT_ID && process.env.MICROSOFT_CLIENT_SECRET) {
     }));
 } else {
     console.warn('WARNING: Microsoft OAuth not configured. Set MICROSOFT_CLIENT_ID and MICROSOFT_CLIENT_SECRET to enable.');
-}
-
-/**
- * Apple OAuth 2.0 Strategy
- * @see https://developer.apple.com/account/resources/identifiers/list/serviceId
- */
-if (process.env.APPLE_CLIENT_ID && process.env.APPLE_TEAM_ID && process.env.APPLE_KEY_ID) {
-    passport.use(new AppleStrategy({
-        clientID: process.env.APPLE_CLIENT_ID,
-        teamID: process.env.APPLE_TEAM_ID,
-        callbackURL: buildCallbackUrl('apple', process.env.APPLE_CALLBACK_URL),
-        keyID: process.env.APPLE_KEY_ID,
-        privateKeyString: process.env.APPLE_PRIVATE_KEY,
-        scope: ['email', 'name']
-    },
-    async (accessToken, refreshToken, idToken, profile, done) => {
-        try {
-            // Validate that profile has required fields
-            if (!profile || !profile.id) {
-                logError('Apple OAuth: Invalid profile data - missing profile ID');
-                return done(new Error('Invalid profile data received from Apple'), null);
-            }
-
-            // Safely extract email with null checks
-            const email = profile.email;
-            if (!email) {
-                logError('Apple OAuth: No email provided in profile', { profileId: profile.id });
-                return done(new Error('Email not provided by Apple'), null);
-            }
-
-            // Check if user already exists
-            let user = await User.findOne({ 
-                $or: [
-                    { appleId: profile.id },
-                    { email: email }
-                ]
-            });
-
-            if (user) {
-                // Update Apple ID if not set
-                if (!user.appleId) {
-                    user.appleId = profile.id;
-                    await user.save();
-                }
-                
-                // Log successful OAuth login
-                logInfo('Apple OAuth login successful', { userId: user._id, email: user.email });
-                logOAuthLogin({
-                    userId: user._id.toString(),
-                    email: user.email,
-                    outcome: 'success',
-                    metadata: { provider: 'apple', action: 'existing_user' }
-                });
-                
-                return done(null, user);
-            }
-
-            // Create new user with safe name handling
-            const nameParts = [
-                profile.name?.firstName,
-                profile.name?.lastName
-            ].filter(Boolean);
-            const displayName = nameParts.length > 0 ? nameParts.join(' ') : 'Apple User';
-
-            user = new User({
-                _id: new mongoose.Types.ObjectId(),
-                email: email,
-                appleId: profile.id,
-                displayName: displayName,
-                provider: 'apple',
-                emailVerified: true,
-                password: null
-            });
-
-            await user.save();
-            
-            // Log successful OAuth signup
-            logInfo('Apple OAuth signup successful', { userId: user._id, email: user.email });
-            logOAuthLogin({
-                userId: user._id.toString(),
-                email: user.email,
-                outcome: 'success',
-                metadata: { provider: 'apple', action: 'new_user' }
-            });
-            
-            done(null, user);
-        } catch (error) {
-            logError('Apple OAuth error', error);
-            logAuthFailure({
-                outcome: 'failure',
-                reason: 'OAuth error',
-                metadata: { provider: 'apple', error: error.message }
-            });
-            done(error, null);
-        }
-    }));
-} else {
-    console.warn('WARNING: Apple OAuth not configured. Set APPLE_CLIENT_ID, APPLE_TEAM_ID, and APPLE_KEY_ID to enable.');
 }
 
 module.exports = passport;
