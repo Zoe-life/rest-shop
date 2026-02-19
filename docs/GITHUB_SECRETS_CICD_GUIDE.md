@@ -83,12 +83,12 @@ The deployment uses a multi-tier approach:
 - Name: `CLOUDFLARE_ACCOUNT_ID`
 - Secret: `[your account ID]`
 
-##### 3. `VITE_API_URL`
+##### 3. `VITE_BACKEND_URL`
 
 This is the URL where your Cloudflare Worker will be deployed.
 
 **Add to GitHub:**
-- Name: `VITE_API_URL`
+- Name: `VITE_BACKEND_URL`
 - Secret: `https://rest-shop-worker.your-subdomain.workers.dev`
 
 **Note**: You'll update this after first deploying the worker. Initial deployment can use a placeholder.
@@ -109,7 +109,7 @@ This is only used in CI tests and is different from your production JWT_KEY.
 Required Secrets:
 CLOUDFLARE_API_TOKEN     - Cloudflare API token for deployments
 CLOUDFLARE_ACCOUNT_ID    - Your Cloudflare account ID
-VITE_API_URL        - Worker URL for frontend to connect to
+VITE_BACKEND_URL        - Worker URL for frontend to connect to
 
 Optional Secrets:
 ⚪ JWT_KEY                  - Only for CI tests (not production)
@@ -245,7 +245,7 @@ MPESA_CONSUMER_SECRET=...
    └─→ Uses existing BACKEND_API_URL secret
 
 6. Deploy Frontend
-   └─→ Build with VITE_API_URL
+   └─→ Build with VITE_BACKEND_URL
    └─→ Deploy to Cloudflare Pages
    └─→ Automatic SSL/HTTPS
 
@@ -275,7 +275,7 @@ Backend (Parallel)
 
 3. **Update GitHub Secret**:
    - After worker deploys, note the worker URL
-   - Update `VITE_API_URL` secret in GitHub
+   - Update `VITE_BACKEND_URL` secret in GitHub
    - Use worker URL: `https://rest-shop-worker.your-subdomain.workers.dev`
 
 4. **Trigger deployment**:
@@ -340,7 +340,7 @@ git push origin main
 ### 4. Update Frontend Secret
 ```bash
 # In GitHub Secrets, update:
-VITE_API_URL=https://rest-shop-worker.your-subdomain.workers.dev
+VITE_BACKEND_URL=https://rest-shop-worker.your-subdomain.workers.dev
 ```
 
 ### 5. Re-deploy Frontend
@@ -363,7 +363,7 @@ ALLOWED_ORIGINS=https://rest-shop-frontend.pages.dev,https://rest-shop-worker.yo
 ```
 CLOUDFLARE_API_TOKEN          → For deploying to Cloudflare
 CLOUDFLARE_ACCOUNT_ID         → Your Cloudflare account
-VITE_API_URL            → Worker URL (for frontend builds)
+VITE_BACKEND_URL            → Worker URL (for frontend builds)
 JWT_KEY (optional)           → For CI tests only
 ```
 
@@ -404,7 +404,7 @@ wrangler secret put BACKEND_API_URL
 ### Issue: Frontend can't connect to API
 
 **Check:**
-1. Is `VITE_API_URL` set in GitHub Secrets?
+1. Is `VITE_BACKEND_URL` set in GitHub Secrets?
 2. Does it point to the worker URL (not backend directly)?
 3. Is CORS configured in backend?
 
@@ -463,7 +463,7 @@ For issues:
 # GitHub Secrets (Settings → Secrets → Actions)
 CLOUDFLARE_API_TOKEN=cf_token_here
 CLOUDFLARE_ACCOUNT_ID=account_id_here
-VITE_API_URL=https://worker-url.workers.dev
+VITE_BACKEND_URL=https://worker-url.workers.dev
 
 # Cloudflare Worker Secret (via Wrangler)
 wrangler secret put BACKEND_API_URL

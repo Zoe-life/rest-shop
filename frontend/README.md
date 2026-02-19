@@ -45,7 +45,7 @@ A modern, responsive e-commerce frontend built with React, TypeScript, Vite, and
    
    Update `.env.local` with your API URL:
    ```
-   VITE_API_URL=http://localhost:3001
+   VITE_BACKEND_URL=http://localhost:3001
    ```
 
 3. Start the development server:
@@ -102,7 +102,7 @@ The frontend includes a `wrangler.toml` configuration file for seamless Cloudfla
    - **Build output directory**: `dist`
    - **Root directory**: `frontend`
    - **Environment variables**: 
-     - `VITE_API_URL`: Your backend API URL
+     - `VITE_BACKEND_URL`: Your backend API URL
 5. Click **Save and Deploy**
 
 ### Environment Variables for Production
@@ -110,7 +110,7 @@ The frontend includes a `wrangler.toml` configuration file for seamless Cloudfla
 In Cloudflare Pages settings, add:
 
 ```
-VITE_API_URL=https://your-api-domain.com
+VITE_BACKEND_URL=https://your-api-domain.com
 ```
 
 Replace with your actual backend API URL (e.g., Render or Cloudflare Worker URL).

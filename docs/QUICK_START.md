@@ -56,7 +56,7 @@ cp .env.example .env
 The `frontend/.env` file should contain:
 
 ```env
-VITE_API_URL=http://localhost:3001
+VITE_BACKEND_URL=http://localhost:3001
 ```
 
 ### 3. Seed the Database (Optional)
@@ -103,7 +103,7 @@ Visit http://localhost:3000 in your browser. You should see:
 
 **Solutions:**
 1. Ensure the backend is running on port 3001
-2. Check that `VITE_API_URL=http://localhost:3001` in `frontend/.env`
+2. Check that `VITE_BACKEND_URL=http://localhost:3001` in `frontend/.env`
 3. Verify CORS is configured: `ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000` in `api/.env`
 
 ### OAuth Redirect Issues

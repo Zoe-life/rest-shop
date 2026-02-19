@@ -64,7 +64,7 @@ callbackURL: process.env.GOOGLE_CALLBACK_URL || `${process.env.BACKEND_API_URL |
 ### 3. Updated Documentation
 
 **README.md:**
-- Corrected frontend environment variable from `REACT_APP_API_URL` to `VITE_API_URL`
+- Corrected frontend environment variable from `REACT_APP_API_URL` to `VITE_BACKEND_URL`
 - Added `BACKEND_API_URL` configuration instructions
 - Added OAuth callback URL configuration details
 - Included production deployment notes
@@ -88,7 +88,7 @@ BACKEND_API_URL=http://localhost:3001
 
 **`frontend/.env`:**
 ```env
-VITE_API_URL=http://localhost:3001
+VITE_BACKEND_URL=http://localhost:3001
 ```
 
 ### For Production Deployment
@@ -109,7 +109,7 @@ GOOGLE_CALLBACK_URL=https://your-backend.onrender.com/auth/google/callback
 
 **Frontend Environment Variables (Cloudflare Pages):**
 ```env
-VITE_API_URL=https://your-backend.onrender.com
+VITE_BACKEND_URL=https://your-backend.onrender.com
 ```
 
 **OAuth Provider Console Configuration:**
@@ -164,7 +164,7 @@ If you're migrating from an older version:
    - Match the format: `{BACKEND_API_URL}/auth/{provider}/callback`
 
 3. Frontend environment:
-   - Rename `REACT_APP_API_URL` to `VITE_API_URL` (if migrating from Create React App)
+   - Rename `REACT_APP_API_URL` to `VITE_BACKEND_URL` (if migrating from Create React App)
 
 ## Backward Compatibility
 
