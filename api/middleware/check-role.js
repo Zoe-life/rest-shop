@@ -3,16 +3,18 @@
  * @description Role-based access control middleware
  */
 
+const { logWarn } = require('../utils/logger');
+
 /**
  * Creates middleware for role-based access control
  * @function checkRole
  * @param {string[]} roles - Array of allowed roles for the route
  * @returns {Function} Express middleware function
- * 
+ *
  * @example
  * // Allow only admin access
  * router.delete('/', checkRole(['admin']), deleteHandler);
- * 
+ *
  * // Allow both admin and user access
  * router.get('/', checkRole(['admin', 'user']), getHandler);
  */
@@ -30,12 +32,23 @@ const checkRole = (roles) => {
      */
     return (req, res, next) => {
         if (!req.userData) {
+            logWarn('RBAC: request has no user data', {
+                path: req.originalUrl,
+                method: req.method
+            });
             return res.status(401).json({
                 message: 'Auth failed - No user data'
             });
         }
 
         if (!roles.includes(req.userData.role)) {
+            logWarn('RBAC: access denied – insufficient permissions', {
+                userId: req.userData.userId,
+                userRole: req.userData.role,
+                requiredRoles: roles,
+                path: req.originalUrl,
+                method: req.method
+            });
             return res.status(403).json({
                 message: 'Forbidden - Insufficient permissions'
             });
