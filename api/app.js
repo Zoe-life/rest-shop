@@ -6,6 +6,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./middleware/security');
+const { logWarn, logError } = require('./utils/logger');
 
 // Routes (Payment routes moved to payment-worker.js for microservices architecture)
 const productRoutes = require('./routes/products');
@@ -75,13 +76,18 @@ app.use('/uploads', express.static('uploads'));
 
 // 6. Error Handling
 app.use((req, res, next) => {
+    logWarn('Route not found', { method: req.method, path: req.originalUrl });
     const error = new Error('Not found');
     error.status = 404;
     next(error);
 });
 
 app.use((error, req, res, next) => {
-    res.status(error.status || 500).json({
+    const status = error.status || 500;
+    if (status >= 500) {
+        logError('Unhandled request error', error);
+    }
+    res.status(status).json({
         error: { message: error.message }
     });
 });

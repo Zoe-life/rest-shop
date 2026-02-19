@@ -3,6 +3,7 @@ require('dotenv').config({ path: path.join(__dirname, '.env') });
 const http = require('http');
 const app = require('./app');
 const mongoose = require('mongoose');
+const { logError } = require('./utils/logger');
 
 const port = process.env.PORT || 3001;
 const GRACEFUL_SHUTDOWN_TIMEOUT_MS = 10000; // 10 seconds
@@ -122,3 +123,16 @@ const gracefulShutdown = async (signal) => {
 // Listen for termination signals
 process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
 process.on('SIGINT', () => gracefulShutdown('SIGINT'));
+
+// Catch any exception that escaped all try/catch blocks
+process.on('uncaughtException', (err) => {
+    logError('CRITICAL: uncaught exception – shutting down', err);
+    gracefulShutdown('uncaughtException').finally(() => process.exit(1));
+});
+
+// Catch unhandled promise rejections
+process.on('unhandledRejection', (reason) => {
+    logError('CRITICAL: unhandled promise rejection – shutting down',
+        reason instanceof Error ? reason : new Error(String(reason)));
+    gracefulShutdown('unhandledRejection').finally(() => process.exit(1));
+});

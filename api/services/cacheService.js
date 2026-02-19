@@ -13,13 +13,22 @@ let isConnected = false;
  * Initialize Redis connection
  * @returns {Object} Redis client instance
  */
+const MAX_REDIS_RETRY_ATTEMPTS = 10;
+
 const initializeRedis = () => {
     if (redisClient && isConnected) {
         return redisClient;
     }
 
     try {
-        // Skip Redis in test environment if not explicitly enabled
+        // Skip Redis if not explicitly configured
+        if (!process.env.REDIS_URL && !process.env.REDIS_HOST) {
+            logInfo('Redis not configured (REDIS_URL or REDIS_HOST not set), caching disabled');
+            return null;
+        }
+
+        // In test environments, require REDIS_URL to connect; REDIS_HOST alone is
+        // not sufficient, to avoid accidentally hitting a real Redis server during tests.
         if (process.env.NODE_ENV === 'test' && !process.env.REDIS_URL) {
             logInfo('Redis disabled in test environment');
             return null;
@@ -28,12 +37,15 @@ const initializeRedis = () => {
         const redisConfig = process.env.REDIS_URL 
             ? process.env.REDIS_URL
             : {
-                host: process.env.REDIS_HOST || 'localhost',
+                host: process.env.REDIS_HOST,
                 port: parseInt(process.env.REDIS_PORT) || 6379,
                 password: process.env.REDIS_PASSWORD || undefined,
                 retryStrategy: (times) => {
-                    const delay = Math.min(times * 50, 2000);
-                    return delay;
+                    if (times > MAX_REDIS_RETRY_ATTEMPTS) {
+                        logWarn(`Redis: giving up after ${MAX_REDIS_RETRY_ATTEMPTS} reconnect attempts`);
+                        return null; // stop retrying
+                    }
+                    return Math.min(times * 50, 2000);
                 },
                 maxRetriesPerRequest: 3
             };
