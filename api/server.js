@@ -41,41 +41,96 @@ const mongoOptions = {
     w: 'majority'               // Write concern - wait for majority acknowledgment
 };
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, mongoOptions)
-    .then(() => {
-        console.log('Connected to MongoDB successfully');
-        // Start server only after DB connection is established
-        server.listen(port, () => {
-            console.log(`Server is running on port ${port}`);
-            console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
-            
-            // Initialize WebSocket server
-            try {
-                const socketService = require('./services/socketService');
-                socketService.initializeSocket(server);
-                console.log('WebSocket server initialized');
-            } catch (err) {
-                console.error('WARNING: WebSocket initialization failed:', err.message);
-            }
-        });
-    })
-    .catch((error) => {
-        console.error('MongoDB connection error:', error.message);
-        process.exit(1); // Exit if cannot connect to database
-    });
+/** Human-readable labels for mongoose readyState values */
+const DB_STATE_NAMES = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+
+/**
+ * Attempt to connect to MongoDB, retrying with exponential back-off.
+ * The HTTP server is started independently so Render never sees a crash-loop.
+ *
+ * @param {number} attempt - Current attempt number (1-based)
+ */
+const MAX_DB_RETRIES = 5;
+const DB_RETRY_BASE_DELAY_MS = 5000;
+
+const connectWithRetry = async (attempt = 1) => {
+    const readyState = mongoose.connection.readyState;
+    console.log(
+        `[DB] Connection attempt ${attempt}/${MAX_DB_RETRIES} ` +
+        `(current state: ${DB_STATE_NAMES[readyState] ?? readyState})`
+    );
+    try {
+        await mongoose.connect(process.env.MONGODB_URI, mongoOptions);
+        console.log('[DB] Connected to MongoDB successfully');
+    } catch (error) {
+        const state = mongoose.connection.readyState;
+        console.error(
+            `[DB] Connection attempt ${attempt} failed – ` +
+            `readyState: ${DB_STATE_NAMES[state] ?? state}, ` +
+            `errorName: ${error.name}, errorCode: ${error.code ?? 'N/A'}, ` +
+            `message: ${error.message}`
+        );
+
+        if (attempt < MAX_DB_RETRIES) {
+            const delay = DB_RETRY_BASE_DELAY_MS * attempt; // linear back-off
+            console.warn(`[DB] Retrying in ${delay / 1000}s…`);
+            setTimeout(() => connectWithRetry(attempt + 1), delay);
+        } else {
+            logError(
+                '[DB] CRITICAL: All MongoDB connection attempts failed. ' +
+                'Check MONGODB_URI and ensure the cluster is not paused. ' +
+                'Server will continue running but DB-dependent routes will return 503.',
+                error
+            );
+        }
+    }
+};
+
+// Start HTTP server first so Render's health-check succeeds immediately,
+// then connect to MongoDB in the background.
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+    console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+
+    // Initialize WebSocket server
+    try {
+        const socketService = require('./services/socketService');
+        socketService.initializeSocket(server);
+        console.log('WebSocket server initialized');
+    } catch (err) {
+        console.error('WARNING: WebSocket initialization failed:', err.message);
+    }
+});
+
+// Connect to MongoDB after the HTTP server is already listening.
+connectWithRetry();
 
 // MongoDB Connection Event Handlers
 mongoose.connection.on('connected', () => {
-    console.log('Mongoose connected to MongoDB');
+    console.log(`[DB] Mongoose connected to MongoDB (readyState: ${mongoose.connection.readyState})`);
 });
 
 mongoose.connection.on('error', (err) => {
-    console.error('Mongoose connection error:', err);
+    const state = mongoose.connection.readyState;
+    console.error(
+        `[DB] Mongoose connection error – ` +
+        `readyState: ${DB_STATE_NAMES[state] ?? state}, ` +
+        `errorName: ${err.name}, errorCode: ${err.code ?? 'N/A'}, ` +
+        `message: ${err.message}`
+    );
 });
 
 mongoose.connection.on('disconnected', () => {
-    console.warn('WARNING: Mongoose disconnected from MongoDB');
+    const state = mongoose.connection.readyState;
+    console.warn(
+        `[DB] WARNING: Mongoose disconnected from MongoDB ` +
+        `(readyState: ${DB_STATE_NAMES[state] ?? state}). ` +
+        'DB-dependent routes will return errors until reconnection.'
+    );
+});
+
+mongoose.connection.on('reconnected', () => {
+    console.log(`[DB] Mongoose reconnected to MongoDB (readyState: ${mongoose.connection.readyState})`);
 });
 
 // Graceful Shutdown

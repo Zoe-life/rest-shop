@@ -53,10 +53,28 @@ app.use((req, res, next) => {
 
 // 3. Health Check (Simplified for Serverless)
 app.get('/health', (req, res) => {
-    res.status(200).json({
-        status: 'ok',
-        database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected',
-        environment: req.workerEnv?.NODE_ENV || 'production'
+    const dbReadyState = mongoose.connection.readyState;
+    const dbStateNames = ['disconnected', 'connected', 'connecting', 'disconnecting'];
+    const dbStateName = dbStateNames[dbReadyState] ?? 'unknown';
+    const dbConnected = dbReadyState === 1;
+
+    logInfo('[Health] Health check requested', {
+        dbState: dbStateName,
+        dbReadyState,
+        environment: req.workerEnv?.NODE_ENV || process.env.NODE_ENV || 'production'
+    });
+
+    res.status(dbConnected ? 200 : 503).json({
+        status: dbConnected ? 'ok' : 'degraded',
+        database: {
+            status: dbStateName,
+            readyState: dbReadyState,
+            message: dbConnected
+                ? 'Database connected and ready'
+                : `Database unavailable (state: ${dbStateName}). ` +
+                  'Check that your MongoDB cluster is active and not paused.'
+        },
+        environment: req.workerEnv?.NODE_ENV || process.env.NODE_ENV || 'production'
     });
 });
 
