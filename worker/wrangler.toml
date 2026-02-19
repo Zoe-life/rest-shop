@@ -51,6 +51,10 @@ tag = "v1" # Version tag for this migration
 new_classes = [] # No new classes being added
 deleted_classes = ["DatabaseConnection"] # Remove the DatabaseConnection class
 
+# Cron trigger: pings the Render backend every 14 minutes to prevent cold-start loops
+[triggers]
+crons = ["*/14 * * * *"]
+
 # Note: No build step needed - Workers are lightweight proxies
 
 # This tells the Wrangler to treat HTML files as plain text
