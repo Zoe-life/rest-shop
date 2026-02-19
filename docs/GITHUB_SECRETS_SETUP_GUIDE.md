@@ -2,6 +2,8 @@
 
 This guide explains how to configure GitHub Secrets for automatic deployment of the backend, worker, and frontend.
 
+**All environment variables are managed exclusively through GitHub Secrets.** The CI/CD pipeline automatically syncs them to Render (backend) and Cloudflare (worker/frontend) on every deployment — no manual configuration in external dashboards is required.
+
 ## Overview
 
 The CI/CD pipeline uses GitHub Secrets to deploy:
@@ -15,30 +17,90 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
 
 | Secret Name | Description | How to Get It |
 |-------------|-------------|---------------|
-| `CLOUDFLARE_API_TOKEN` | API token for Cloudflare deployments | [Create Token](https://dash.cloudflare.com/profile/api-tokens) → Use "Edit Cloudflare Workers" template |
-| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID | [Dashboard](https://dash.cloudflare.com/) → Account Home → Account ID (right sidebar) |
+| `CLOUDFLARE_API_TOKEN` | API token for Cloudflare deployments | [Create Token](https://dash.cloudflare.com/profile/api-tokens) → Use "Edit Cloudflare Workers" template, also add "Cloudflare Pages: Edit" permission |
+| `CLOUDFLARE_ACCOUNT_ID` | Your Cloudflare account ID | [Dashboard](https://dash.cloudflare.com/) → Account ID shown in the right sidebar of the main page |
 
-### 2. Backend Deployment Secrets
-
-#### Render
+### 2. Render Deployment Secrets
 
 | Secret Name | Description | How to Get It |
 |-------------|-------------|---------------|
-| `RENDER_DEPLOY_HOOK` | Render deploy webhook URL | Render Dashboard → Your Service → Settings → Deploy Hooks → Create Deploy Hook |
+| `RENDER_DEPLOY_HOOK` | Webhook URL to trigger a new Render deployment | See [How to get RENDER_DEPLOY_HOOK](#how-to-get-render_deploy_hook) below |
+| `RENDER_API_KEY` | Render API key (used to sync env vars from GitHub Secrets) | See [How to get RENDER_API_KEY](#how-to-get-render_api_key) below |
+| `RENDER_SERVICE_ID` | Your Render service ID | See [How to get RENDER_SERVICE_ID](#how-to-get-render_service_id) below |
 
-### 3. Application Configuration Secrets
+### 3. Backend Application Secrets
+
+These are synced automatically from GitHub Secrets to Render on every deploy:
 
 | Secret Name | Description | Example Value |
 |-------------|-------------|---------------|
-| `BACKEND_API_URL` | URL where backend is deployed | `https://your-app.onrender.com` |
-| `VITE_BACKEND_URL` | API URL for frontend to connect to | `https://your-worker.workers.dev` |
+| `MONGODB_URI` | MongoDB connection string | `mongodb+srv://user:pass@cluster0.xxxxx.mongodb.net/` |
 | `JWT_KEY` | JWT secret for authentication (32+ chars) | `your-super-secret-key-min-32-characters-long` |
+| `BACKEND_API_URL` | URL where the backend is deployed | `https://your-app.onrender.com` |
+| `ALLOWED_ORIGINS` | Comma-separated list of allowed CORS origins | `https://your-worker.workers.dev,https://your-frontend.pages.dev` |
+| `FRONTEND_URL` | Frontend URL for redirects | `https://your-frontend.pages.dev` |
 
-### 4. Optional: Testing & Security Secrets
+### 4. Worker & Frontend Secrets
 
-| Secret Name | Description | Required? |
-|-------------|-------------|-----------|
-| `SNYK_TOKEN` | Snyk security scanning | Optional |
+| Secret Name | Description | Example Value |
+|-------------|-------------|---------------|
+| `VITE_BACKEND_URL` | API URL injected into the frontend at build time | `https://your-worker.workers.dev` |
+
+### 5. Optional Application Secrets
+
+Add any of these to GitHub Secrets as needed — only non-empty ones are synced to Render:
+
+| Secret Name | Description |
+|-------------|-------------|
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Google OAuth credentials |
+| `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET` | Microsoft OAuth credentials |
+| `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET` | Stripe payment keys |
+| `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | PayPal payment keys |
+| `MPESA_CONSUMER_KEY` / `MPESA_CONSUMER_SECRET` / `MPESA_CALLBACK_URL` | M-Pesa keys |
+| `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET` | Cloudinary media storage |
+| `SNYK_TOKEN` | Snyk security scanning |
+
+---
+
+## How to Get Each Secret
+
+### How to get RENDER_DEPLOY_HOOK
+
+A deploy hook is a unique webhook URL that triggers a new deployment on your Render service when called.
+
+1. Log in to [Render Dashboard](https://dashboard.render.com/)
+2. Click on **your backend service** (e.g., `rest-shop-backend`)
+3. Go to **Settings** tab
+4. Scroll down to **Deploy Hooks**
+5. Click **Create Deploy Hook**
+6. Give it a name (e.g., `github-actions`)
+7. Click **Create**
+8. **Copy the generated URL** — it looks like:
+   `https://api.render.com/deploy/srv-xxxxxxxxxxxx?key=yyyyyyyy`
+9. Add it to GitHub Secrets as `RENDER_DEPLOY_HOOK`
+
+### How to get RENDER_API_KEY
+
+The Render API key allows the CI/CD pipeline to update your backend's environment variables automatically from GitHub Secrets.
+
+1. Log in to [Render Dashboard](https://dashboard.render.com/)
+2. Click your **profile avatar** (top right) → **Account Settings**
+3. Scroll to **API Keys**
+4. Click **Create API Key**
+5. Give it a name (e.g., `github-actions`)
+6. **Copy the key immediately** (it won't be shown again)
+7. Add it to GitHub Secrets as `RENDER_API_KEY`
+
+### How to get RENDER_SERVICE_ID
+
+1. Log in to [Render Dashboard](https://dashboard.render.com/)
+2. Click on **your backend service**
+3. Go to **Settings** tab
+4. Look for **Service ID** near the top — it starts with `srv-`
+   (e.g., `srv-abc123def456`)
+5. Copy it and add it to GitHub Secrets as `RENDER_SERVICE_ID`
+
+---
 
 ## Step-by-Step Setup
 
@@ -48,85 +110,49 @@ The CI/CD pipeline uses GitHub Secrets to deploy:
    - Go to https://dash.cloudflare.com/profile/api-tokens
    - Click "Create Token"
    - Use "Edit Cloudflare Workers" template
-   - Add permissions for "Cloudflare Pages" if deploying frontend
+   - Add permission: **Account → Cloudflare Pages → Edit**
    - Click "Continue to summary" → "Create Token"
    - **Copy the token** (you won't see it again!)
 
 2. **Get Cloudflare Account ID:**
    - Go to https://dash.cloudflare.com/
-   - Click on any site or Workers & Pages
+   - Click **Workers & Pages** in the sidebar
    - Your Account ID is in the right sidebar
 
 3. **Add to GitHub:**
    - Go to your GitHub repository
    - Settings → Secrets and variables → Actions
    - Click "New repository secret"
-   - Name: `CLOUDFLARE_API_TOKEN`, Value: (paste token)
-   - Click "Add secret"
-   - Repeat for `CLOUDFLARE_ACCOUNT_ID`
+   - Add `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`
 
-### Step 2: Add Backend Deployment Secrets
+### Step 2: Add Render Secrets
 
-#### Using Render:
+Follow the instructions above for `RENDER_DEPLOY_HOOK`, `RENDER_API_KEY`, and `RENDER_SERVICE_ID`.
 
-1. **Get Deploy Hook:**
-   - Go to your Render service dashboard
-   - Settings → Deploy Hooks
-   - Click "Create Deploy Hook"
-   - Copy the webhook URL
+### Step 3: Add Backend Application Secrets
 
-2. **Add to GitHub:**
-   - Add secret `RENDER_DEPLOY_HOOK` with the webhook URL
+Add each of the following as GitHub repository secrets:
 
-### Step 3: Add Application Configuration
-
-1. **BACKEND_API_URL:**
-   - Value: Your backend URL after deployment
-   - Render: `https://your-app.onrender.com`
-   - Render: `https://your-service.onrender.com`
-   - If not deployed yet, deploy backend first, then add this secret
-
-2. **VITE_BACKEND_URL:**
-   - Value: Your worker URL (or backend URL for direct connection)
-   - Worker: `https://rest-shop-api.your-subdomain.workers.dev`
-   - Direct to backend: Use same as BACKEND_API_URL
-
-3. **JWT_KEY:**
-   - Value: Random string (minimum 32 characters)
-   - Generate with: `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`
-   - **IMPORTANT:** Must be the same value used in your backend environment
-
-### Step 4: Configure Backend Environment Variables
-
-**Important:** Backend environment variables should be configured in your hosting platform (Render), not in GitHub Secrets!
-
-#### Render Configuration:
-
-Go to Render Dashboard → Your Service → Variables tab, add:
-
-```bash
-# Required
-MONGODB_URI=mongodb+srv://user:password@cluster.mongodb.net/database
-JWT_KEY=<same-as-github-secret-JWT_KEY>
-NODE_ENV=production
-PORT=3001
-
-# CORS
-ALLOWED_ORIGINS=https://your-worker.workers.dev,https://your-frontend.pages.dev
-FRONTEND_URL=https://your-frontend.pages.dev
-
-# Payment Gateways (if needed)
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_PUBLISHABLE_KEY=pk_live_...
-PAYPAL_CLIENT_ID=...
-PAYPAL_CLIENT_SECRET=...
-
-# See .env.example for complete list
+```
+MONGODB_URI          → Your MongoDB Atlas connection string
+JWT_KEY              → Random 32+ character string
+BACKEND_API_URL      → Your Render service URL (after first deploy)
+ALLOWED_ORIGINS      → Comma-separated frontend/worker URLs
+FRONTEND_URL         → Your Cloudflare Pages URL
+VITE_BACKEND_URL     → Your Cloudflare Worker URL
 ```
 
-#### Render Configuration:
+Generate a secure `JWT_KEY` with:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
 
-Go to Render Dashboard → Your Service → Environment tab, add the same variables as above.
+### Step 4: Add Optional Secrets
+
+Add any payment, OAuth, or media storage secrets you need.
+Only secrets with non-empty values are synced to Render.
+
+---
 
 ## Complete Secrets Checklist
 
@@ -134,53 +160,72 @@ Go to Render Dashboard → Your Service → Environment tab, add the same variab
 
 - [ ] `CLOUDFLARE_API_TOKEN`
 - [ ] `CLOUDFLARE_ACCOUNT_ID`
-- [ ] `BACKEND_API_URL` (after backend is deployed)
 - [ ] `VITE_BACKEND_URL`
 - [ ] `JWT_KEY`
+- [ ] `MONGODB_URI`
 
-### Required for Render Deployment
+### Required for Render Backend Deployment
 
 - [ ] `RENDER_DEPLOY_HOOK`
+- [ ] `RENDER_API_KEY`
+- [ ] `RENDER_SERVICE_ID`
+- [ ] `BACKEND_API_URL` (add after first deploy)
+- [ ] `ALLOWED_ORIGINS`
+- [ ] `FRONTEND_URL`
 
 ### Optional
 
-- [ ] `SNYK_TOKEN` (for security scanning)
+- [ ] `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`
+- [ ] `MICROSOFT_CLIENT_ID` / `MICROSOFT_CLIENT_SECRET`
+- [ ] `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` / `STRIPE_WEBHOOK_SECRET`
+- [ ] `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET`
+- [ ] `MPESA_CONSUMER_KEY` / `MPESA_CONSUMER_SECRET` / `MPESA_CALLBACK_URL`
+- [ ] `CLOUDINARY_CLOUD_NAME` / `CLOUDINARY_API_KEY` / `CLOUDINARY_API_SECRET`
+- [ ] `SNYK_TOKEN`
+
+---
 
 ## Deployment Flow
 
 ### Initial Deployment Order:
 
-1. **Deploy Backend First**
-   ```bash
-   # Render
-   render up
-   # or Render: Push to GitHub → Auto-deploy
-   
-   # Get backend URL: https://your-app.onrender.com
-   ```
+1. **Create Render service** (connect your GitHub repo in the Render dashboard)
+   - Root Directory: `api`
+   - Start Command: `node server.js`
 
-2. **Add BACKEND_API_URL Secret**
-   - Add the backend URL to GitHub Secrets
+2. **Add all GitHub Secrets** (steps 1–4 above)
 
-3. **Push to Main Branch**
-   ```bash
-   git push origin main
-   ```
+3. **Push to main** — GitHub Actions will:
+   - Sync all environment variables from GitHub Secrets → Render
+   - Trigger a new Render deployment via the deploy hook
+   - Deploy the Cloudflare Worker (with `BACKEND_API_URL`)
+   - Build and deploy the frontend (with `VITE_BACKEND_URL`)
 
-4. **CI/CD Pipeline Runs:**
-   - Tests backend
-   - Deploys worker (with BACKEND_API_URL)
-   - Deploys frontend (with VITE_BACKEND_URL)
+4. **After first deploy**, get your Render URL (`https://your-app.onrender.com`) and add it as `BACKEND_API_URL` in GitHub Secrets, then push again.
 
 ### Subsequent Deployments:
 
-Just push to main branch - everything deploys automatically!
+Just push to main — GitHub Actions handles everything automatically.
 
 ```bash
 git push origin main
 ```
 
+---
+
 ## Troubleshooting
+
+### curl: (3) URL rejected — RENDER_DEPLOY_HOOK is empty
+
+**Cause:** `RENDER_DEPLOY_HOOK` secret is missing or empty.
+
+**Fix:** Follow [How to get RENDER_DEPLOY_HOOK](#how-to-get-render_deploy_hook) above and add it to GitHub Secrets.
+
+### Environment variables not updated on Render
+
+**Cause:** `RENDER_API_KEY` or `RENDER_SERVICE_ID` is missing.
+
+**Fix:** Follow the instructions above for both secrets.
 
 ### Worker: "Backend not configured"
 
@@ -189,7 +234,7 @@ git push origin main
 **Fix:**
 1. Ensure backend is deployed and accessible
 2. Add `BACKEND_API_URL` secret in GitHub
-3. Redeploy: Push to main or manually trigger workflow
+3. Redeploy: push to main or manually trigger the workflow
 
 ### Frontend: Can't connect to API
 
@@ -197,152 +242,24 @@ git push origin main
 
 **Fix:**
 1. Check `VITE_BACKEND_URL` in GitHub Secrets
-2. Should point to worker URL (or backend URL if not using worker)
-3. Rebuild frontend after updating
+2. Should point to your Cloudflare Worker URL
+3. Push to main to rebuild the frontend
 
-### Backend: Environment variables not set
-
-**Cause:** Secrets configured in GitHub instead of hosting platform.
-
-**Fix:**
-1. Go to Render dashboard
-2. Add all backend environment variables there
-3. Restart service
-
-### CI/CD: Deployment fails
-
-**Common issues:**
-- Check GitHub Actions logs
-- Verify all required secrets are added
-- Check secret names match exactly (case-sensitive)
-- Verify API tokens haven't expired
-
-## Secrets Security Best Practices
-
-### DO:
-
-- Use GitHub Secrets for deployment credentials
-- Configure backend secrets in hosting platform (Render)
-- Rotate tokens periodically
-- Use minimum required permissions
-- Keep `JWT_KEY` secret and secure
-
-### DON'T:
-
-- Commit secrets to repository
-- Share secrets in plain text
-- Use production secrets in development
-- Store backend secrets in GitHub (use hosting platform)
-- Use weak JWT keys (< 32 characters)
+---
 
 ## Verifying Secrets
 
-### Check GitHub Secrets:
-
 1. Go to repository → Settings → Secrets and variables → Actions
-2. Verify all required secrets are listed
-3. Note: You can't view secret values, only names
-
-### Check Backend Configuration:
-
-```bash
-# Render
-render variables
-
-# Render
-# Check in dashboard → Environment tab
-```
-
-### Test Deployments:
-
-```bash
-# Test backend
-curl https://your-backend-url/health
-
-# Test worker
-curl https://your-worker-url/health
-
-# Test frontend
-# Open in browser: https://your-frontend.pages.dev
-```
-
-## Environment Variables Reference
-
-### Backend (Render Dashboard)
-
-**Set these in your hosting platform:**
-
-```bash
-# Core
-MONGODB_URI=mongodb+srv://...
-JWT_KEY=...
-NODE_ENV=production
-PORT=3001
-
-# CORS
-ALLOWED_ORIGINS=https://worker.dev,https://frontend.dev
-FRONTEND_URL=https://frontend.dev
-
-# Payment (optional)
-STRIPE_SECRET_KEY=...
-PAYPAL_CLIENT_ID=...
-MPESA_CONSUMER_KEY=...
-
-# OAuth (optional)
-GOOGLE_CLIENT_ID=...
-MICROSOFT_CLIENT_ID=...
-```
-
-### Worker (Cloudflare - Set via CI/CD)
-
-**Set in GitHub Secrets, CI/CD configures Cloudflare:**
-
-```bash
-BACKEND_API_URL=https://your-backend-url
-```
-
-### Frontend (Vite - Built into bundle)
-
-**Set in GitHub Secrets, injected at build time:**
-
-```bash
-VITE_BACKEND_URL=https://your-worker-url
-```
-
-## Quick Reference Table
-
-| Component | Where to Set | How |
-|-----------|--------------|-----|
-| **Backend** | Render Dashboard | Manual in UI |
-| **Worker** | GitHub Secrets → Cloudflare | CI/CD pipeline |
-| **Frontend** | GitHub Secrets → Build | CI/CD pipeline |
-
-## Support
-
-If you encounter issues:
-
-1. Check [Troubleshooting Guide](./TROUBLESHOOTING.md)
-2. Review [CI/CD Guide](./GITHUB_SECRETS_CICD_GUIDE.md)
-3. Check GitHub Actions logs
-4. Verify all secrets are correctly named and set
+2. Verify all required secrets are listed (values are hidden for security)
 
 ## Summary
 
 **Key Points:**
 
-1. Use GitHub Secrets for deployment credentials (Cloudflare tokens, Render tokens)
-2. Use hosting platform UI for backend environment variables
-3. `BACKEND_API_URL` connects worker to backend
-4. `VITE_BACKEND_URL` connects frontend to API
-5. Deploy backend first, then add its URL to GitHub Secrets
-6. Push to main → Everything deploys automatically
+1. **GitHub Secrets is the single source of truth** for all environment variables
+2. The CI/CD pipeline automatically syncs backend secrets to Render on every deploy
+3. Worker secrets are configured via `BACKEND_API_URL` in GitHub Secrets
+4. Frontend build variables are injected at build time from GitHub Secrets
+5. Deploy backend first, then add its URL as `BACKEND_API_URL` in GitHub Secrets
+6. Push to main → everything deploys automatically
 
-**Quick Setup:**
-```bash
-# 1. Deploy backend → Get URL
-# 2. Add all GitHub Secrets
-# 3. Configure backend environment in Render
-# 4. Push to main
-git push origin main
-# 5. Done! CI/CD handles the rest
-```

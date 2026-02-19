@@ -147,16 +147,80 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      # Sync all backend environment variables from GitHub Secrets to Render via the Render API.
+      # How to get RENDER_API_KEY:  Render Dashboard → Account Settings → API Keys → Create API Key
+      # How to get RENDER_SERVICE_ID: Render Dashboard → Your Service → Settings → copy the Service ID
+      - name: Sync Environment Variables to Render
+        run: |
+          if [ -n "$RENDER_API_KEY" ] && [ -n "$RENDER_SERVICE_ID" ]; then
+            python3 -c "
+import json, os
+keys = [
+    'MONGODB_URI', 'JWT_KEY', 'BACKEND_API_URL',
+    'ALLOWED_ORIGINS', 'FRONTEND_URL',
+    'GOOGLE_CLIENT_ID', 'GOOGLE_CLIENT_SECRET',
+    'MICROSOFT_CLIENT_ID', 'MICROSOFT_CLIENT_SECRET',
+    'STRIPE_SECRET_KEY', 'STRIPE_PUBLISHABLE_KEY', 'STRIPE_WEBHOOK_SECRET',
+    'PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET',
+    'MPESA_CONSUMER_KEY', 'MPESA_CONSUMER_SECRET', 'MPESA_CALLBACK_URL',
+    'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET',
+]
+env_vars = [{'key': k, 'value': os.environ[k]} for k in keys if k in os.environ and os.environ[k]]
+env_vars += [{'key': 'NODE_ENV', 'value': 'production'}, {'key': 'PORT', 'value': '3001'}]
+print(json.dumps(env_vars))
+" | curl -sS -X PUT \
+              "https://api.render.com/v1/services/$RENDER_SERVICE_ID/env-vars" \
+              -H "Authorization: Bearer $RENDER_API_KEY" \
+              -H "Content-Type: application/json" \
+              -d @- && echo "Environment variables synced to Render" \
+              || echo "Warning: Failed to sync environment variables to Render. Check that RENDER_API_KEY is valid and RENDER_SERVICE_ID is correct."
+          else
+            echo "RENDER_API_KEY or RENDER_SERVICE_ID not configured, skipping env var sync"
+          fi
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          JWT_KEY: ${{ secrets.JWT_KEY }}
+          BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+          ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
+          FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
+          MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
+          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
+          PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          MPESA_CONSUMER_KEY: ${{ secrets.MPESA_CONSUMER_KEY }}
+          MPESA_CONSUMER_SECRET: ${{ secrets.MPESA_CONSUMER_SECRET }}
+          MPESA_CALLBACK_URL: ${{ secrets.MPESA_CALLBACK_URL }}
+          CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
+          CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+          CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        continue-on-error: true
+      # How to get RENDER_DEPLOY_HOOK:
+      #   Render Dashboard → Your Service → Settings → Deploy Hooks → Create Deploy Hook
+      #   Copy the generated URL and add it as a GitHub Secret named RENDER_DEPLOY_HOOK
       - name: Deploy to Render
         run: |
-          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+          if [ -n "$RENDER_DEPLOY_HOOK" ]; then
+            curl -X POST "$RENDER_DEPLOY_HOOK"
+          else
+            echo "RENDER_DEPLOY_HOOK not configured, skipping deployment trigger"
+            echo "To configure: Render Dashboard → Your Service → Settings → Deploy Hooks → Create Deploy Hook"
+          fi
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         continue-on-error: true
-      - name: Deployment Note
+      - name: Deployment Status
         run: |
           echo "Backend deployment status:"
-          echo "- Triggered via RENDER_DEPLOY_HOOK"
-          echo "- Environment variables should be configured in Render dashboard"
-          echo "- Required variables: MONGODB_URI, JWT_KEY, BACKEND_API_URL, etc."
+          echo "- Environment variables synced from GitHub Secrets to Render"
+          echo "- Deployment triggered via RENDER_DEPLOY_HOOK"
+          echo "- All backend secrets are managed exclusively via GitHub Secrets"
 
   # Job 7: Deploy Frontend to Cloudflare Pages
   deploy-frontend:
