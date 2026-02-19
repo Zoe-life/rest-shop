@@ -13,6 +13,22 @@
  */
 
 export default {
+  // Keep-alive cron: pings the Render backend every 14 minutes to prevent cold starts
+  async scheduled(event, env, ctx) {
+    const backendUrl = env.BACKEND_API_URL || env.NODE_BACKEND_URL;
+
+    if (!backendUrl) {
+      console.error('Keep-alive: Missing BACKEND_API_URL / NODE_BACKEND_URL secret');
+      return;
+    }
+
+    ctx.waitUntil(
+      fetch(`${backendUrl}/health`, { headers: { 'User-Agent': 'Keep-Alive-Bot' } })
+        .then(r => console.log(`Keep-alive ping: ${r.status}`))
+        .catch(err => console.error(`Keep-alive ping failed: ${err.message}`, err.stack))
+    );
+  },
+
   async fetch(request, env) {
     const url = new URL(request.url);
     
