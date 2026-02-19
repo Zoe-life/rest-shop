@@ -1,6 +1,6 @@
 /**
  * @module routes/auth
- * @description OAuth 2.0 authentication routes for Google, Microsoft, and Apple
+ * @description OAuth 2.0 authentication routes for Google and Microsoft
  */
 
 const express = require('express');
@@ -164,57 +164,6 @@ router.get('/microsoft/callback',
                 outcome: 'failure',
                 reason: 'Token generation failed',
                 metadata: { provider: 'microsoft' }
-            });
-            res.redirect('/auth/failure');
-        }
-    }
-);
-
-/**
- * @route GET /auth/apple
- * @description Initiate Apple OAuth 2.0 authentication
- * @access Public
- */
-router.get('/apple',
-    passport.authenticate('apple', { 
-        scope: ['email', 'name'],
-        session: false 
-    })
-);
-
-/**
- * @route GET /auth/apple/callback
- * @description Apple OAuth 2.0 callback - Secure token handling
- * @access Public
- */
-router.post('/apple/callback',
-    passport.authenticate('apple', { 
-        failureRedirect: '/auth/failure',
-        session: false 
-    }),
-    (req, res) => {
-        try {
-            // Generate JWT token
-            const token = generateToken(req.user, req);
-            
-            // Set token in HTTP-only cookie for security
-            res.cookie('authToken', token, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
-                maxAge: 3600000 // 1 hour
-            });
-            
-            // Redirect to frontend success page (token is in cookie, not URL)
-            const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            res.redirect(`${frontendUrl}/auth/success`);
-        } catch (error) {
-            logError('Apple OAuth callback error', error);
-            logAuthFailure({
-                email: req.user?.email,
-                outcome: 'failure',
-                reason: 'Token generation failed',
-                metadata: { provider: 'apple' }
             });
             res.redirect('/auth/failure');
         }

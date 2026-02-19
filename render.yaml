@@ -10,7 +10,7 @@ services:
     # has successfully synced all secrets via the Render API
     autoDeploy: false
     envVars:
-      # Critical – app will not start without these
+      # Critical - app will not start without these
       - key: JWT_KEY
         sync: false
       - key: MONGODB_URI
@@ -27,7 +27,7 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
-      # Redis (optional – caching)
+      # Redis (optional - caching)
       - key: REDIS_URL
         sync: false
       - key: REDIS_HOST
@@ -49,28 +49,19 @@ services:
         sync: false
       - key: MICROSOFT_CLIENT_SECRET
         sync: false
-      # Apple OAuth
-      - key: APPLE_CLIENT_ID
-        sync: false
-      - key: APPLE_TEAM_ID
-        sync: false
-      - key: APPLE_KEY_ID
-        sync: false
-      - key: APPLE_PRIVATE_KEY
-        sync: false
-      # Stripe
+      # Stripe (optional - only needed if using Stripe payments)
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
-      # PayPal
+      # PayPal (optional - only needed if using PayPal payments)
       - key: PAYPAL_CLIENT_ID
         sync: false
       - key: PAYPAL_CLIENT_SECRET
         sync: false
-      # M-Pesa
+      # M-Pesa (optional - only needed if using M-Pesa payments)
       - key: MPESA_CONSUMER_KEY
         sync: false
       - key: MPESA_CONSUMER_SECRET

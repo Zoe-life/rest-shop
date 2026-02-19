@@ -148,13 +148,31 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       # Sync all backend environment variables from GitHub Secrets to Render via the Render API.
-      # How to get RENDER_API_KEY:  Render Dashboard → Account Settings → API Keys → Create API Key
-      # How to get RENDER_SERVICE_ID: Render Dashboard → Your Service → Settings → copy the Service ID
+      #
+      # ── How to get RENDER_API_KEY ────────────────────────────────────────────────
+      #   1. Log in to https://dashboard.render.com
+      #   2. Click your profile avatar (top-right) → Account Settings
+      #   3. Scroll to "API Keys" → click "Create API Key"
+      #   4. Copy the key and add it as a GitHub Secret named RENDER_API_KEY:
+      #      GitHub repo → Settings → Secrets and variables → Actions → New repository secret
+      #
+      # ── How to get RENDER_SERVICE_ID ────────────────────────────────────────────
+      #   1. Log in to https://dashboard.render.com
+      #   2. Click your backend web service (e.g. "rest-shop-api")
+      #   3. Go to Settings → the Service ID is shown at the top (starts with "srv-")
+      #   4. Add it as a GitHub Secret named RENDER_SERVICE_ID
+      #
+      # ── How to get RENDER_DEPLOY_HOOK ───────────────────────────────────────────
+      #   1. Log in to https://dashboard.render.com
+      #   2. Click your backend web service → Settings
+      #   3. Scroll to "Deploy Hooks" → click "Add Deploy Hook"
+      #   4. Give it a name (e.g. "GitHub Actions"), copy the generated URL
+      #   5. Add it as a GitHub Secret named RENDER_DEPLOY_HOOK
       - name: Sync Environment Variables to Render
         run: |
           if [ -z "$RENDER_API_KEY" ] || [ -z "$RENDER_SERVICE_ID" ]; then
             echo "ERROR: RENDER_API_KEY and RENDER_SERVICE_ID must be set as GitHub Secrets."
-            echo "Go to your repository Settings > Secrets and variables > Actions and add them."
+            echo "See the comments in this workflow step for instructions on where to find them."
             exit 1
           fi
           python3 .github/scripts/sync_render_env.py | curl -sSf -X PUT \
@@ -166,35 +184,36 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
           RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          # ── Required ──────────────────────────────────────────────────────────────
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           JWT_KEY: ${{ secrets.JWT_KEY }}
           BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
           ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          # ── Optional: Redis caching (app works without it) ────────────────────────
           REDIS_URL: ${{ secrets.REDIS_URL }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
+          # ── Optional: Google OAuth ────────────────────────────────────────────────
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          # ── Optional: Microsoft OAuth ─────────────────────────────────────────────
           MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
           MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
-          APPLE_CLIENT_ID: ${{ secrets.APPLE_CLIENT_ID }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          APPLE_KEY_ID: ${{ secrets.APPLE_KEY_ID }}
-          APPLE_PRIVATE_KEY: ${{ secrets.APPLE_PRIVATE_KEY }}
+          # ── Optional: Stripe payments ─────────────────────────────────────────────
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          # ── Optional: PayPal payments ─────────────────────────────────────────────
           PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
           PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          # ── Optional: M-Pesa payments ─────────────────────────────────────────────
           MPESA_CONSUMER_KEY: ${{ secrets.MPESA_CONSUMER_KEY }}
           MPESA_CONSUMER_SECRET: ${{ secrets.MPESA_CONSUMER_SECRET }}
           MPESA_CALLBACK_URL: ${{ secrets.MPESA_CALLBACK_URL }}
+          # ── Optional: Cloudinary file storage ────────────────────────────────────
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
-      # How to get RENDER_DEPLOY_HOOK:
-      #   Render Dashboard → Your Service → Settings → Deploy Hooks → Create Deploy Hook
-      #   Copy the generated URL and add it as a GitHub Secret named RENDER_DEPLOY_HOOK
       - name: Deploy to Render
         run: |
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then
