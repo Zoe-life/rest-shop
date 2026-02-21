@@ -51,7 +51,10 @@ app.use((req, res, next) => {
     next();
 });
 
-// 3. Health Check (Simplified for Serverless)
+// 3. Root route (Render health-check ping returns 200 instead of 404)
+app.get('/', (req, res) => res.send('OK'));
+
+// Health Check (Simplified for Serverless)
 app.get('/health', (req, res) => {
     const dbReadyState = mongoose.connection.readyState;
     const dbStateNames = ['disconnected', 'connected', 'connecting', 'disconnecting'];
