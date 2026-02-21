@@ -9,7 +9,6 @@ const multer = require('multer');
 const checkAuth = require('../middleware/check-auth');
 const ProductsController = require('../controllers/products');
 const checkRole = require('../middleware/check-role');
-const { cacheMiddleware, invalidateCache } = require('../middleware/cacheMiddleware');
 
 /**
  * Multer storage configuration
@@ -61,7 +60,7 @@ const upload = multer({
  * @description Retrieve all products
  * @access Public
  */
-router.get('/', cacheMiddleware({ ttl: 300 }), ProductsController.products_get_all);
+router.get('/', ProductsController.products_get_all);
 
 /**
  * @route POST /products
@@ -74,7 +73,6 @@ router.post('/',
     checkRole(['admin']), 
     upload,
     require('../middleware/security').productValidation.create,
-    invalidateCache('cache:GET:/products*'),
     ProductsController.products_create_product
 );
 
@@ -87,7 +85,6 @@ router.post('/',
  */
 router.get('/:productId', 
     require('../middleware/security').validateObjectId('productId'),
-    cacheMiddleware({ ttl: 600 }),
     ProductsController.products_get_product
 );
 
@@ -103,7 +100,6 @@ router.patch('/:productId',
     checkRole(['admin']),
     require('../middleware/security').validateObjectId('productId'),
     require('../middleware/security').productValidation.update,
-    invalidateCache('cache:GET:/products*'),
     ProductsController.products_update_product
 );
 
@@ -118,7 +114,6 @@ router.delete('/:productId',
     checkAuth, 
     checkRole(['admin']),
     require('../middleware/security').validateObjectId('productId'),
-    invalidateCache('cache:GET:/products*'),
     ProductsController.products_delete_product
 );
 
