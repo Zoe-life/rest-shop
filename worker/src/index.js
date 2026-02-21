@@ -32,11 +32,52 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     
+    // CORS: determine the allowed frontend origin
+    const frontendUrl = env.FRONTEND_URL || '';
+    const allowedOrigins = frontendUrl
+      ? frontendUrl.split(',').map(o => o.trim()).filter(Boolean)
+      : [];
+
+    const requestOrigin = request.headers.get('Origin') || '';
+    const isAllowedOrigin = requestOrigin &&
+      requestOrigin !== 'null' &&
+      allowedOrigins.includes(requestOrigin);
+
+    // Handle CORS preflight
+    if (request.method === 'OPTIONS') {
+      const preflightHeaders = {
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, PATCH, DELETE, OPTIONS',
+        'Access-Control-Allow-Headers': 'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+        'Access-Control-Max-Age': '86400'
+      };
+      if (isAllowedOrigin) {
+        preflightHeaders['Access-Control-Allow-Origin'] = requestOrigin;
+        preflightHeaders['Access-Control-Allow-Credentials'] = 'true';
+      }
+      return new Response(null, { status: 204, headers: preflightHeaders });
+    }
+
+    /**
+     * Helper: attach CORS headers to a Response
+     */
+    const addCorsHeaders = (response) => {
+      if (!isAllowedOrigin) return response;
+      const headers = new Headers(response.headers);
+      headers.set('Access-Control-Allow-Origin', requestOrigin);
+      headers.set('Access-Control-Allow-Credentials', 'true');
+      headers.set('Vary', 'Origin');
+      return new Response(response.body, {
+        status: response.status,
+        statusText: response.statusText,
+        headers
+      });
+    };
+
     // Get the backend URL from environment variable
     const backendUrl = env.BACKEND_API_URL || env.NODE_BACKEND_URL;
     
     if (!backendUrl) {
-      return new Response(
+      return addCorsHeaders(new Response(
         JSON.stringify({
           error: {
             message: 'Backend API URL not configured. Please set BACKEND_API_URL or NODE_BACKEND_URL environment variable.',
@@ -47,7 +88,7 @@ export default {
           status: 500,
           headers: { 'Content-Type': 'application/json' }
         }
-      );
+      ));
     }
 
     // Health check endpoint - check both worker and backend
@@ -64,7 +105,7 @@ export default {
 
         const backendHealth = await backendResponse.json();
         
-        return new Response(
+        return addCorsHeaders(new Response(
           JSON.stringify({
             worker: 'ok',
             backend: backendHealth,
@@ -74,9 +115,9 @@ export default {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
           }
-        );
+        ));
       } catch (error) {
-        return new Response(
+        return addCorsHeaders(new Response(
           JSON.stringify({
             worker: 'ok',
             backend: 'unreachable',
@@ -87,7 +128,7 @@ export default {
             status: 503,
             headers: { 'Content-Type': 'application/json' }
           }
-        );
+        ));
       }
     }
 
@@ -134,18 +175,18 @@ export default {
       responseHeaders.set('X-Served-By', 'Cloudflare-Worker-Proxy');
       responseHeaders.set('X-Backend-Status', backendResponse.status.toString());
 
-      // Return the response from backend
-      return new Response(backendResponse.body, {
+      // Return the response from backend with CORS headers
+      return addCorsHeaders(new Response(backendResponse.body, {
         status: backendResponse.status,
         statusText: backendResponse.statusText,
         headers: responseHeaders
-      });
+      }));
 
     } catch (error) {
       // Log error and return 502 Bad Gateway
       console.error('Error proxying request to backend:', error);
       
-      return new Response(
+      return addCorsHeaders(new Response(
         JSON.stringify({
           error: {
             message: 'Backend service unavailable',
@@ -157,7 +198,7 @@ export default {
           status: 502,
           headers: { 'Content-Type': 'application/json' }
         }
-      );
+      ));
     }
   }
 };
