@@ -1,6 +1,7 @@
 import React from 'react';
 
-const API_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:3001';
+const API_URL = import.meta.env.VITE_BACKEND_URL ||
+  (import.meta.env.DEV ? 'http://localhost:3001' : '');
 
 interface OAuthButtonsProps {
   mode?: 'login' | 'signup';

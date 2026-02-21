@@ -99,7 +99,7 @@ jobs:
       - name: Build Frontend
         run: cd frontend && npm run build
         env:
-          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL || 'https://rest-shop-worker.workers.dev' }}
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL || 'https://rest-shop-api.workers.dev' }}
 
   # Job 5: Deploy Worker to Cloudflare
   deploy-worker:
@@ -250,6 +250,19 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
       - name: Install Frontend dependencies
         run: cd frontend && npm ci
+      # Validate required secrets before building
+      - name: Validate required secrets
+        run: |
+          if [ -z "$VITE_BACKEND_URL" ]; then
+            echo "ERROR: VITE_BACKEND_URL secret is not configured."
+            echo "Please set VITE_BACKEND_URL in GitHub repository secrets."
+            echo "It should point to your Cloudflare Worker URL (e.g. https://rest-shop-api.<account>.workers.dev)."
+            echo "Without it, the frontend falls back to http://localhost:3001, which browsers block"
+            echo "as mixed content when the frontend is served over HTTPS, causing ERR_NETWORK errors."
+            exit 1
+          fi
+        env:
+          VITE_BACKEND_URL: ${{ secrets.VITE_BACKEND_URL }}
       # Build with environment variables from GitHub Secrets
       - name: Build Frontend with Environment Variables
         run: cd frontend && npm run build
