@@ -1,5 +1,3 @@
-const path = require('path');
-require('dotenv').config({ path: path.join(__dirname, '.env') });
 const http = require('http');
 const app = require('./app');
 const mongoose = require('mongoose');
@@ -11,7 +9,7 @@ const GRACEFUL_SHUTDOWN_TIMEOUT_MS = 10000; // 10 seconds
 // Security: Validate critical environment variables on startup
 if (!process.env.JWT_KEY) {
     console.error('CRITICAL: JWT_KEY environment variable is not set');
-    console.error('Please set JWT_KEY in your environment variables or .env file');
+    console.error('Please set JWT_KEY in your environment variables (via GitHub Secrets)');
     console.error('For Render: Go to Dashboard > Environment > Add JWT_KEY variable');
     process.exit(1);
 }
@@ -24,7 +22,7 @@ if (process.env.JWT_KEY.length < 32) {
 
 if (!process.env.MONGODB_URI) {
     console.error('CRITICAL: MONGODB_URI environment variable is not set');
-    console.error('Please set MONGODB_URI in your environment variables or .env file');
+    console.error('Please set MONGODB_URI in your environment variables (via GitHub Secrets)');
     process.exit(1);
 }
 

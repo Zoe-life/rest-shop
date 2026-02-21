@@ -8,6 +8,7 @@ services:
     startCommand: node api/server.js
     # Disable auto-deploy so Render only deploys after GitHub Actions
     # has successfully synced all secrets via the Render API
+    healthCheckPath: /health
     autoDeploy: false
     envVars:
       # Critical - app will not start without these
