@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
 const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./middleware/security');
-const { logWarn, logError } = require('./utils/logger');
+const { logInfo, logWarn, logError } = require('./utils/logger');
 
 // Routes (Payment routes moved to payment-worker.js for microservices architecture)
 const productRoutes = require('./routes/products');
