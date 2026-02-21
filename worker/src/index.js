@@ -42,6 +42,8 @@ export default {
     const isAllowedOrigin = requestOrigin &&
       requestOrigin !== 'null' &&
       allowedOrigins.includes(requestOrigin);
+    // Use wildcard only when no explicit allowlist is configured
+    const useWildcard = allowedOrigins.length === 0;
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
@@ -53,6 +55,8 @@ export default {
       if (isAllowedOrigin) {
         preflightHeaders['Access-Control-Allow-Origin'] = requestOrigin;
         preflightHeaders['Access-Control-Allow-Credentials'] = 'true';
+      } else if (useWildcard) {
+        preflightHeaders['Access-Control-Allow-Origin'] = '*';
       }
       return new Response(null, { status: 204, headers: preflightHeaders });
     }
@@ -61,11 +65,14 @@ export default {
      * Helper: attach CORS headers to a Response
      */
     const addCorsHeaders = (response) => {
-      if (!isAllowedOrigin) return response;
       const headers = new Headers(response.headers);
-      headers.set('Access-Control-Allow-Origin', requestOrigin);
-      headers.set('Access-Control-Allow-Credentials', 'true');
-      headers.set('Vary', 'Origin');
+      if (isAllowedOrigin) {
+        headers.set('Access-Control-Allow-Origin', requestOrigin);
+        headers.set('Access-Control-Allow-Credentials', 'true');
+        headers.set('Vary', 'Origin');
+      } else if (useWildcard) {
+        headers.set('Access-Control-Allow-Origin', '*');
+      }
       return new Response(response.body, {
         status: response.status,
         statusText: response.statusText,
@@ -133,7 +140,9 @@ export default {
     }
 
     // Build the backend URL with the same path and query string
-    const backendTargetUrl = `${backendUrl}${url.pathname}${url.search}`;
+    // Strip trailing slash from backendUrl to avoid double-slash when pathname starts with /
+    const normalizedBackendUrl = backendUrl.replace(/\/+$/, '');
+    const backendTargetUrl = `${normalizedBackendUrl}${url.pathname}${url.search}`;
 
     try {
       // Clone the request to forward to backend
