@@ -9,9 +9,6 @@ jobs:
   update-about:
     name: Set description, homepage, and topics
     runs-on: ubuntu-latest
-    permissions:
-      administration: write
-
     steps:
       - name: Update repository description and homepage
         env:
