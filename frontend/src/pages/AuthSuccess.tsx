@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { api } from '../api/axios';
+import { useAuth } from '../contexts/AuthContext';
 
 const AuthSuccess: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
+  const { loginWithToken } = useAuth();
 
   useEffect(() => {
     const handleOAuthCallback = async () => {
@@ -27,12 +29,8 @@ const AuthSuccess: React.FC = () => {
               role: payload.role
             };
 
-            // Store token and user in localStorage
-            localStorage.setItem('token', token);
-            localStorage.setItem('user', JSON.stringify(user));
-            
-            // Set the token in axios defaults
-            api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            // Update AuthContext state, localStorage, and axios headers
+            loginWithToken(token, user);
 
             // Clear the cookie by calling logout endpoint
             await api.get('/auth/logout', { withCredentials: true });
@@ -58,7 +56,7 @@ const AuthSuccess: React.FC = () => {
     };
 
     handleOAuthCallback();
-  }, [navigate]);
+  }, [navigate, loginWithToken]);
 
   if (error) {
     return (

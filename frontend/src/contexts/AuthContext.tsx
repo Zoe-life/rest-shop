@@ -11,6 +11,7 @@ interface AuthContextType {
   user: User | null;
   token: string | null;
   login: (email: string, password: string) => Promise<void>;
+  loginWithToken: (token: string, user: User) => void;
   signup: (email: string, password: string) => Promise<void>;
   logout: () => void;
   isLoading: boolean;
@@ -46,6 +47,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
   };
 
+  const loginWithToken = (newToken: string, userData: User) => {
+    setToken(newToken);
+    setUser(userData);
+    localStorage.setItem('token', newToken);
+    localStorage.setItem('user', JSON.stringify(userData));
+    api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
+  };
+
   const signup = async (email: string, password: string) => {
     const response = await api.post('/user/signup', { email, password });
     const { token: newToken, user: userData } = response.data;
@@ -66,7 +75,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, login, signup, logout, isLoading }}>
+    <AuthContext.Provider value={{ user, token, login, loginWithToken, signup, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );
