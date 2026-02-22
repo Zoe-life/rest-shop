@@ -1,7 +1,7 @@
 {
   "name": "rest-shop",
   "version": "1.0.0",
-  "description": "A Node.js RESTful API Project with Cloudflare Worker",
+  "description": "A full-stack e-commerce platform with a React TypeScript frontend, Node.js REST API, and Cloudflare Workers edge proxy.",
   "scripts": {
     "start": "cd api && npm start",
     "test": "cd api && npm test",
