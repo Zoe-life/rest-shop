@@ -1,0 +1,47 @@
+name: Update Repository About
+
+# Run this workflow manually from the Actions tab to set the repository
+# description, homepage URL, and topics to reflect the current application.
+on:
+  workflow_dispatch:
+
+jobs:
+  update-about:
+    name: Set description, homepage, and topics
+    runs-on: ubuntu-latest
+    permissions:
+      administration: write
+
+    steps:
+      - name: Update repository description and homepage
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo edit Zoe-life/rest-shop \
+            --description "A full-stack e-commerce platform with a React TypeScript frontend, Node.js REST API, and Cloudflare Workers edge proxy. Features JWT and OAuth authentication, Stripe, PayPal, and M-Pesa payments, an admin dashboard, and automated CI/CD." \
+            --homepage "https://rest-shop-frontend.pages.dev"
+
+      - name: Replace all repository topics
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh repo edit Zoe-life/rest-shop \
+            --add-topic e-commerce \
+            --add-topic react \
+            --add-topic typescript \
+            --add-topic nodejs \
+            --add-topic expressjs \
+            --add-topic mongodb \
+            --add-topic cloudflare-workers \
+            --add-topic rest-api \
+            --add-topic tailwindcss \
+            --add-topic jwt-authentication \
+            --add-topic oauth \
+            --add-topic stripe \
+            --add-topic mpesa \
+            --add-topic vite
+          # Remove the outdated topics that no longer reflect the full project
+          gh repo edit Zoe-life/rest-shop \
+            --remove-topic api-rest \
+            --remove-topic backend \
+            --remove-topic restful-api
