@@ -121,10 +121,21 @@ jobs:
         run: cd worker && npm ci || npm install
       # Configure worker secrets from GitHub Secrets
       # BACKEND_API_URL tells the worker where the Node.js backend is deployed
+      - name: Validate required secrets
+        run: |
+          if [ -z "$BACKEND_API_URL" ]; then
+            echo "ERROR: BACKEND_API_URL secret is not configured."
+            echo "Please set BACKEND_API_URL in GitHub repository secrets."
+            echo "It should point to your Node.js backend URL (e.g. https://rest-shop-api.onrender.com)."
+            echo "Without it, the Cloudflare Worker cannot proxy requests to the backend."
+            exit 1
+          fi
+        env:
+          BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
       - name: Configure Worker Secrets
         run: |
           cd worker
-          echo "${{ secrets.BACKEND_API_URL }}" | npx wrangler secret put BACKEND_API_URL --env production || echo "Secret may already exist"
+          echo "${{ secrets.BACKEND_API_URL }}" | npx wrangler secret put BACKEND_API_URL
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
