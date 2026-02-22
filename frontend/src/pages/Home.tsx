@@ -10,8 +10,19 @@ interface Product {
   description?: string;
 }
 
+const HERO_VIDEOS = [
+  'https://videos.pexels.com/video-files/3195394/3195394-hd_1280_720_25fps.mp4',
+  'https://videos.pexels.com/video-files/5324879/5324879-hd_1280_720_30fps.mp4',
+  'https://videos.pexels.com/video-files/4481328/4481328-hd_1280_720_30fps.mp4',
+  'https://videos.pexels.com/video-files/4065383/4065383-hd_1280_720_30fps.mp4',
+  'https://videos.pexels.com/video-files/6214345/6214345-hd_1280_720_30fps.mp4',
+];
+
 const Home: React.FC = () => {
   const [featured, setFeatured] = useState<Product[]>([]);
+  const [heroVideo] = useState<string>(
+    () => HERO_VIDEOS[Math.floor(Math.random() * HERO_VIDEOS.length)]
+  );
 
   useEffect(() => {
     api.get('/products')
@@ -22,8 +33,25 @@ const Home: React.FC = () => {
   return (
     <div>
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-navy-600 to-navy-800 text-white py-24 px-4">
-        <div className="container mx-auto text-center">
+      <section className="relative text-white py-24 px-4 overflow-hidden">
+        {/* Background video */}
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          aria-hidden="true"
+          poster="https://images.pexels.com/videos/3195394/free-video-3195394.jpg?auto=compress&cs=tinysrgb&dpr=1&w=1280"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source
+            src={heroVideo}
+            type="video/mp4"
+          />
+        </video>
+        {/* Semi-transparent navy gradient overlay so video shows through */}
+        <div className="absolute inset-0 bg-gradient-to-br from-navy-600/60 to-navy-800/70" />
+        <div className="container mx-auto text-center relative z-10">
           <h1 className="text-5xl font-extrabold mb-6 leading-tight">
             Welcome to <span className="text-saffron-400">Rest Shop</span>
           </h1>
@@ -46,8 +74,8 @@ const Home: React.FC = () => {
           </div>
         </div>
         {/* Decorative circles */}
-        <div className="absolute top-10 left-10 w-32 h-32 bg-saffron-500/20 rounded-full blur-2xl" />
-        <div className="absolute bottom-10 right-10 w-48 h-48 bg-navy-400/20 rounded-full blur-3xl" />
+        <div className="absolute top-10 left-10 w-32 h-32 bg-saffron-500/20 rounded-full blur-2xl z-10" />
+        <div className="absolute bottom-10 right-10 w-48 h-48 bg-navy-400/20 rounded-full blur-3xl z-10" />
       </section>
 
       {/* Features Section */}
@@ -123,9 +151,9 @@ const Home: React.FC = () => {
                   </div>
                   <div className="p-5">
                     <h3 className="font-semibold text-navy-600 dark:text-white mb-1">{p.name}</h3>
-                    {p.description && (
-                      <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">{p.description}</p>
-                    )}
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2">
+                      {p.description || 'A quality product at an unbeatable price. View details on the products page.'}
+                    </p>
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-bold text-saffron-500">${p.price.toFixed(2)}</span>
                       <Link
