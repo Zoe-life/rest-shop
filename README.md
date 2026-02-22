@@ -92,17 +92,21 @@ This is a comprehensive, **professional-grade full-stack e-commerce platform** w
 - **Clean Interface**: Professional, intuitive, and user-friendly
 
 ### Technology Stack
-- **React 18** with TypeScript
+- **React 19** with TypeScript
 - **Tailwind CSS** for styling
 - **React Router** for navigation
-- **Context API** for state management
+- **Context API** for state management (Auth, Theme, Cart)
 - **Axios** for API communication
 
 ### Pages & Features
-- **Product Browsing**: Grid layout with images, prices, and stock status
-- **Authentication**: Login and signup pages
+- **Home**: Hero section with featured products and value propositions
+- **Product Browsing**: Grid layout with images, prices, and stock status; add-to-cart support
+- **Shopping Cart & Checkout**: Persistent cart with multi-payment checkout (Card, Stripe, PayPal, M-Pesa)
+- **Authentication**: Login, signup, and OAuth social login pages
 - **Order Management**: View order history and status
-- **User Profile**: Account information display
+- **Payment History**: Full transaction log for authenticated users
+- **About & Contact**: Informational pages with a contact form
+- **Admin Interface**: Protected dashboard for managing products, orders, and users
 - **Theme Toggle**: Seamless day/night mode switching
 
 See [Frontend README](./frontend/README.md) for detailed frontend documentation.
@@ -332,7 +336,7 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 ## Technologies Used
 
 ### Frontend
-- **React 18**: Modern UI library
+- **React 19**: Modern UI library
 - **TypeScript**: Type-safe JavaScript
 - **Tailwind CSS**: Utility-first CSS framework
 - **React Router**: Client-side routing
@@ -410,8 +414,8 @@ Create a `.env` file in the `api/` directory (or copy from `.env.example`):
    MONGO_ATLAS_PW=your_mongo_password
    JWT_KEY=your_jwt_secret_key
    NODE_ENV=development
-   ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
-   FRONTEND_URL=http://localhost:3000
+   ALLOWED_ORIGINS=http://localhost:3001,http://localhost:5173
+   FRONTEND_URL=http://localhost:5173
    PORT=3001
    
    # Backend API URL (used for OAuth callbacks)
@@ -530,11 +534,11 @@ cd api && npm start
 
 **Terminal 2 - Frontend:**
 ```bash
-cd frontend && npm start
-# Frontend runs on http://localhost:3000
+cd frontend && npm run dev
+# Frontend runs on http://localhost:5173
 ```
 
-Visit [http://localhost:3000](http://localhost:3000) to see the application.
+Visit [http://localhost:5173](http://localhost:5173) to see the application.
 
 #### Development Mode - API Only
 ```bash

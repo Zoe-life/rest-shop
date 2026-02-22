@@ -39,8 +39,8 @@ Edit `api/.env` and update these essential variables:
 # Essential Configuration
 MONGODB_URI=mongodb+srv://username:password@cluster0.lifak.mongodb.net/
 JWT_KEY=your_long_random_jwt_secret_key_here
-ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000
-FRONTEND_URL=http://localhost:3000
+ALLOWED_ORIGINS=http://localhost:3001,http://localhost:5173
+FRONTEND_URL=http://localhost:5173
 BACKEND_API_URL=http://localhost:3001
 PORT=3001
 ```
@@ -86,11 +86,11 @@ cd frontend
 npm run dev
 ```
 
-Frontend will run on http://localhost:3000
+Frontend will run on http://localhost:5173
 
 ### 5. Test the Application
 
-Visit http://localhost:3000 in your browser. You should see:
+Visit http://localhost:5173 in your browser. You should see:
 - Products page with sample products
 - Login/Signup functionality
 - No "failed to fetch products" error
@@ -104,7 +104,7 @@ Visit http://localhost:3000 in your browser. You should see:
 **Solutions:**
 1. Ensure the backend is running on port 3001
 2. Check that `VITE_BACKEND_URL=http://localhost:3001` in `frontend/.env`
-3. Verify CORS is configured: `ALLOWED_ORIGINS=http://localhost:3001,http://localhost:3000` in `api/.env`
+3. Verify CORS is configured: `ALLOWED_ORIGINS=http://localhost:3001,http://localhost:5173` in `api/.env`
 
 ### OAuth Redirect Issues
 
