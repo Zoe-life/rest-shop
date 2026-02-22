@@ -8,7 +8,7 @@ A modern, full-stack e-commerce platform with dual-backend architecture (Node.js
 
 ## Frontend Demo
 
-- **Live Demo**: [Cloudflare Pages](https://rest-shop-frontend.pages.dev) *(after deployment)*
+- **Live Demo**: [Cloudflare Pages](https://rest-shop-frontend.pages.dev)
 - **Features**: 
   - Day/Night mode toggle
   - Fully responsive design
@@ -1141,4 +1141,5 @@ For issues and questions:
 - Express.js community
 - MongoDB Atlas
 - Cloudflare Workers
+
 - All contributors
