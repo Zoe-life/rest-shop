@@ -168,19 +168,26 @@ export default {
       // Forward request to backend
       const backendResponse = await fetch(forwardedRequest);
 
-      // Clone response to return to client
+      // Build response with a single-pass header copy to preserve Set-Cookie headers.
+      // Chaining new Headers() copies can mangle Set-Cookie for multi-cookie responses.
       const responseHeaders = new Headers(backendResponse.headers);
-      
+
       // Add headers to indicate this came through the worker
       responseHeaders.set('X-Served-By', 'Cloudflare-Worker-Proxy');
       responseHeaders.set('X-Backend-Status', backendResponse.status.toString());
 
-      // Return the response from backend with CORS headers
-      return addCorsHeaders(new Response(backendResponse.body, {
+      // Inline CORS headers (avoids a second new Headers() pass via addCorsHeaders)
+      if (isAllowedOrigin) {
+        responseHeaders.set('Access-Control-Allow-Origin', requestOrigin);
+        responseHeaders.set('Access-Control-Allow-Credentials', 'true');
+        responseHeaders.set('Vary', 'Origin');
+      }
+
+      return new Response(backendResponse.body, {
         status: backendResponse.status,
         statusText: backendResponse.statusText,
         headers: responseHeaders
-      }));
+      });
 
     } catch (error) {
       // Log error and return 502 Bad Gateway

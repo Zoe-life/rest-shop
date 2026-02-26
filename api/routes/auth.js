@@ -10,6 +10,8 @@ const jwt = require('jsonwebtoken');
 const { logInfo, logError } = require('../utils/logger');
 const { logTokenGenerated, logAuthFailure } = require('../utils/auditLogger');
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 /**
  * Safely extract IP address from request
  * @param {Object} req - Express request object
@@ -96,10 +98,12 @@ router.get('/google/callback',
             const token = generateToken(req.user, req);
             
             // Set token in HTTP-only cookie for security
+            // sameSite: 'none' is required in production because the frontend and backend
+            // are on different origins; 'none' must be paired with secure: true (HTTPS).
             res.cookie('authToken', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production', // HTTPS only in production
-                sameSite: 'lax',
+                secure: isProduction, // HTTPS only in production
+                sameSite: isProduction ? 'none' : 'lax',
                 maxAge: 3600000 // 1 hour
             });
             
@@ -147,10 +151,12 @@ router.get('/microsoft/callback',
             const token = generateToken(req.user, req);
             
             // Set token in HTTP-only cookie for security
+            // sameSite: 'none' is required in production because the frontend and backend
+            // are on different origins; 'none' must be paired with secure: true (HTTPS).
             res.cookie('authToken', token, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax',
+                secure: isProduction,
+                sameSite: isProduction ? 'none' : 'lax',
                 maxAge: 3600000 // 1 hour
             });
             
@@ -194,8 +200,8 @@ router.get('/logout', (req, res) => {
     // Clear the auth cookie
     res.clearCookie('authToken', {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax'
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax'
     });
     
     res.status(200).json({
@@ -232,8 +238,8 @@ router.get('/token', (req, res) => {
         // Token is invalid or expired
         res.clearCookie('authToken', {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax'
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax'
         });
         return res.status(401).json({
             message: 'Invalid or expired token'
