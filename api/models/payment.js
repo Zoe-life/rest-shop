@@ -59,9 +59,7 @@ const paymentSchema = mongoose.Schema({
         enum: ['USD', 'KES', 'EUR', 'GBP']
     },
     transactionId: {
-        type: String,
-        sparse: true,
-        index: true
+        type: String
     },
     metadata: {
         type: mongoose.Schema.Types.Mixed,
