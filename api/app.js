@@ -14,6 +14,9 @@ const orderRoutes = require('./routes/orders');
 const userRoutes = require('./routes/user');
 const authRoutes = require('./routes/auth');
 
+// Trust the first proxy (required for express-rate-limit behind Render.com / reverse proxies)
+app.set('trust proxy', 1);
+
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
 app.use(morgan('dev'));
