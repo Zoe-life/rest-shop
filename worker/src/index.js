@@ -162,7 +162,7 @@ export default {
         method: request.method,
         headers: headers,
         body: request.method !== 'GET' && request.method !== 'HEAD' ? request.body : undefined,
-        redirect: 'follow'
+        redirect: 'manual'
       });
 
       // Forward request to backend
