@@ -211,13 +211,23 @@ router.get('/logout', (req, res) => {
 
 /**
  * @route GET /auth/token
- * @description Get token from cookie - For frontend to retrieve token securely
- * @access Public (but requires cookie to be present)
- * @note This endpoint should only be called from the same-origin frontend after OAuth redirect
+ * @description Get token from cookie or verify token from Authorization header
+ * @access Public (but requires cookie or valid Authorization header to be present)
+ * @note Cookie flow: called from the same-origin frontend after OAuth redirect.
+ *       Header flow: clients may send "Authorization: Bearer <token>" to verify
+ *       and retrieve token metadata.
  */
 router.get('/token', (req, res) => {
-    const token = req.cookies?.authToken;
-    
+    // Prefer Authorization: Bearer header when present
+    const authHeader = req.headers.authorization;
+    let token;
+
+    if (authHeader && authHeader.startsWith('Bearer ')) {
+        token = authHeader.split(' ')[1];
+    } else {
+        token = req.cookies?.authToken;
+    }
+
     if (!token) {
         return res.status(401).json({
             message: 'No authentication token found'
@@ -235,12 +245,14 @@ router.get('/token', (req, res) => {
             expiresAt: new Date(decoded.exp * 1000).toISOString()
         });
     } catch (error) {
-        // Token is invalid or expired
-        res.clearCookie('authToken', {
-            httpOnly: true,
-            secure: isProduction,
-            sameSite: isProduction ? 'none' : 'lax'
-        });
+        // Token is invalid or expired; only clear the cookie when it was the source
+        if (!authHeader) {
+            res.clearCookie('authToken', {
+                httpOnly: true,
+                secure: isProduction,
+                sameSite: isProduction ? 'none' : 'lax'
+            });
+        }
         return res.status(401).json({
             message: 'Invalid or expired token'
         });

@@ -9,6 +9,7 @@ const User = require('../../models/user');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
+const jwt = require('jsonwebtoken');
 
 describe('Auth Controller', () => {
     let testUser;
@@ -183,5 +184,42 @@ describe('Auth Controller', () => {
             res.should.have.status(400);
             res.body.should.have.property('message').eql('Invalid or expired reset token');
         });
+    });
+});
+
+describe('GET /auth/token', () => {
+    const jwtKey = process.env.JWT_KEY || 'test_jwt_key';
+
+    it('should return token info when a valid Bearer token is provided in Authorization header', async () => {
+        const token = jwt.sign(
+            { email: 'test@example.com', userId: new mongoose.Types.ObjectId(), role: 'user' },
+            jwtKey,
+            { expiresIn: '1h' }
+        );
+
+        const res = await request(app)
+            .get('/auth/token')
+            .set('Authorization', `Bearer ${token}`);
+
+        res.should.have.status(200);
+        res.body.should.have.property('token').eql(token);
+        res.body.should.have.property('expiresAt');
+    });
+
+    it('should return 401 when an invalid Bearer token is provided in Authorization header', async () => {
+        const res = await request(app)
+            .get('/auth/token')
+            .set('Authorization', 'Bearer invalid.token.value');
+
+        res.should.have.status(401);
+        res.body.should.have.property('message').eql('Invalid or expired token');
+    });
+
+    it('should return 401 when no token is provided (no cookie and no Authorization header)', async () => {
+        const res = await request(app)
+            .get('/auth/token');
+
+        res.should.have.status(401);
+        res.body.should.have.property('message').eql('No authentication token found');
     });
 });
