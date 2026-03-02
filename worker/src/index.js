@@ -31,7 +31,7 @@ export default {
 
   async fetch(request, env) {
     const url = new URL(request.url);
-    
+
     // CORS: determine the allowed frontend origin
     const frontendUrl = env.FRONTEND_URL || '';
     const allowedOrigins = frontendUrl
@@ -75,7 +75,7 @@ export default {
 
     // Get the backend URL from environment variable
     const backendUrl = env.BACKEND_API_URL || env.NODE_BACKEND_URL;
-    
+
     if (!backendUrl) {
       return addCorsHeaders(new Response(
         JSON.stringify({
@@ -104,7 +104,7 @@ export default {
         });
 
         const backendHealth = await backendResponse.json();
-        
+
         return addCorsHeaders(new Response(
           JSON.stringify({
             worker: 'ok',
@@ -138,12 +138,12 @@ export default {
     try {
       // Clone the request to forward to backend
       const headers = new Headers(request.headers);
-      
+
       // Add proxy identification header
       headers.set('X-Forwarded-By', 'Cloudflare-Worker');
       headers.set('X-Forwarded-Proto', url.protocol.replace(':', ''));
       headers.set('X-Forwarded-Host', url.host);
-      
+
       // Forward the original IP if available
       const clientIP = request.headers.get('CF-Connecting-IP');
       if (clientIP) {
@@ -176,6 +176,12 @@ export default {
       responseHeaders.set('X-Served-By', 'Cloudflare-Worker-Proxy');
       responseHeaders.set('X-Backend-Status', backendResponse.status.toString());
 
+      // Preservation of the Redirect Location
+      const redirectLocation = backendResponse.headers.get('Location');
+      if (redirectLocation) {
+        responseHeaders.set('Location', redirectLocation);
+      }
+
       // Inline CORS headers (avoids a second new Headers() pass via addCorsHeaders)
       if (isAllowedOrigin) {
         responseHeaders.set('Access-Control-Allow-Origin', requestOrigin);
@@ -192,7 +198,7 @@ export default {
     } catch (error) {
       // Log error and return 502 Bad Gateway
       console.error('Error proxying request to backend:', error);
-      
+
       return addCorsHeaders(new Response(
         JSON.stringify({
           error: {
