@@ -165,30 +165,35 @@ export default {
         redirect: 'manual'
       });
 
-      // Forward request to backend
-      const backendResponse = await fetch(forwardedRequest);
+      // --- WORKER FETCH HANDLER ---
+      const backendResponse = await fetch(forwardedRequest, {
+        redirect: 'manual' // Browser must handle the jump, not the Worker
+      });
 
-      // Build response with a single-pass header copy to preserve Set-Cookie headers.
-      // Chaining new Headers() copies can mangle Set-Cookie for multi-cookie responses.
+      // 1. CLONE HEADERS from the backend response
       const responseHeaders = new Headers(backendResponse.headers);
 
-      // Add headers to indicate this came through the worker
+      // 2. YOUR DEBUGGING HEADERS (Place them here!)
       responseHeaders.set('X-Served-By', 'Cloudflare-Worker-Proxy');
       responseHeaders.set('X-Backend-Status', backendResponse.status.toString());
 
-      // Preservation of the Redirect Location
+      // 3. OAUTH REDIRECT LOGIC
+      // If Render says "Go to Google", we must pass that 'Location' to the browser
       const redirectLocation = backendResponse.headers.get('Location');
       if (redirectLocation) {
         responseHeaders.set('Location', redirectLocation);
       }
 
-      // Inline CORS headers (avoids a second new Headers() pass via addCorsHeaders)
-      if (isAllowedOrigin) {
+      // 4. CORS & CREDENTIALS LOGIC
+      // This is what fixes the 401 error you are seeing now
+      const requestOrigin = request.headers.get('Origin');
+      if (requestOrigin) {
         responseHeaders.set('Access-Control-Allow-Origin', requestOrigin);
         responseHeaders.set('Access-Control-Allow-Credentials', 'true');
         responseHeaders.set('Vary', 'Origin');
       }
 
+      // 5. RETURN THE COMPLETE RESPONSE
       return new Response(backendResponse.body, {
         status: backendResponse.status,
         statusText: backendResponse.statusText,
