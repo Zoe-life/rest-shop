@@ -103,7 +103,7 @@ Also update your OAuth provider consoles to use the production callback URLs.
 
 ## Testing
 
- **All 70 automated tests passing**  
+ **All 89 automated tests passing**  
  **CodeQL security scan: 0 vulnerabilities**  
  **Code review completed**  
 
