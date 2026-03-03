@@ -10,10 +10,10 @@ This API supports OAuth 2.0 authentication with the following providers:
 
 ### 1. User initiates authentication
 ```
-Frontend → GET /auth/google (or /microsoft, /apple)
+Frontend → GET /auth/google (or /microsoft)
 ```
-The backend generates a random CSRF state value, stores it in a short-lived
-`httpOnly` cookie, and forwards it to the OAuth provider.
+The backend generates an HMAC-signed CSRF state value and forwards it to the OAuth provider.
+No cookie is needed — the HMAC encodes the verification material inside the state string itself.
 
 ### 2. User is redirected to provider
 ```
@@ -30,36 +30,49 @@ OAuth Provider → User Authorization
 OAuth Provider → GET /auth/google/callback?code=...&state=...
 ```
 
-### 5. API validates CSRF state and exchanges code for user info
+### 5. API verifies HMAC state and exchanges code for user info
 ```
-API validates state cookie === state query param (CSRF check)
+API verifies HMAC(nonce, JWT_KEY) === state signature (CSRF check)
 API ← OAuth Provider (User Profile Data)
 ```
 
-### 6. API creates/updates user and generates JWT
+### 6. API creates/updates user and issues an exchange code
 ```
 API → MongoDB (Create/Update User)
-API → Generate JWT Token
+API → Generate short-lived exchange code (16-char hex, 30 s TTL, stored in memory)
 ```
 
-### 7. User is redirected to frontend with token; token is wiped from URL
+### 7. User is redirected to frontend with the exchange code
 ```
-API → Frontend: /auth/success?token=<JWT>
-Frontend saves token to localStorage, then immediately calls
-window.history.replaceState() to remove the token from the URL bar
-and browser history.
+API → Frontend: /auth/success?code=<exchange-code>
 ```
+The URL carries only an opaque, short-lived code — **not** the real JWT.
+This keeps the JWT out of browser history, server logs, and `Referer` headers.
+
+### 8. Frontend exchanges the code for the real JWT
+```
+Frontend → POST /auth/exchange { code }
+API validates code, deletes it (single-use), returns JWT in JSON response body
+Frontend saves token to localStorage, clears the code from the URL bar
+```
+
+See [OAuth Exchange Code Guide](./OAUTH_EXCHANGE_CODE.md) for a full explanation of the security design.
 
 ## Security: CSRF Protection
 
-All OAuth routes (`/auth/google`, `/auth/microsoft`) now implement CSRF protection
-following [RFC 6749 §10.12](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12):
+All OAuth routes (`/auth/google`, `/auth/microsoft`) implement CSRF protection
+following [RFC 6749 §10.12](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12)
+using a **stateless HMAC-signed state parameter** (see `api/utils/oauthState.js`):
 
-1. A cryptographically random 128-bit `state` value is generated per OAuth request.
-2. It is stored in a `httpOnly; SameSite` cookie on the API domain.
-3. The same value is forwarded to the OAuth provider.
-4. On callback the API verifies `cookie.oauth_state === query.state` before proceeding.
-5. A mismatch aborts the flow with a 401 redirect to `/auth/failure`.
+1. A cryptographically random 128-bit nonce is generated per OAuth request.
+2. An HMAC-SHA256 signature over the nonce is computed using `JWT_KEY`.
+3. The combined `nonce.signature` string is forwarded to the OAuth provider as the `state` parameter.
+4. On callback the API re-derives the HMAC and compares using `crypto.timingSafeEqual`.
+5. A mismatch aborts the flow with a redirect to `/auth/failure`.
+
+This is fully stateless — no cookie is required. This avoids cross-domain cookie failures
+when the OAuth initiation travels through the Cloudflare Worker proxy (different origin) but
+the provider callback goes directly to the Node.js backend.
 
 ## Setup Instructions
 
@@ -202,9 +215,9 @@ Redirects user to Google login page
 
 ### Google Callback
 ```http
-GET /auth/google/callback?code=...
+GET /auth/google/callback?code=...&state=...
 ```
-Handles Google OAuth callback
+Handles Google OAuth callback. On success, redirects to `FRONTEND_URL/auth/success?code=<exchange-code>`.
 
 ### Initiate Microsoft Authentication
 ```http
@@ -214,21 +227,29 @@ Redirects user to Microsoft login page
 
 ### Microsoft Callback
 ```http
-GET /auth/microsoft/callback?code=...
+GET /auth/microsoft/callback?code=...&state=...
 ```
-Handles Microsoft OAuth callback
+Handles Microsoft OAuth callback. On success, redirects to `FRONTEND_URL/auth/success?code=<exchange-code>`.
 
-### Initiate Apple Authentication
+### Exchange Code for JWT
 ```http
-GET /auth/apple
-```
-Redirects user to Apple login page
+POST /auth/exchange
+Content-Type: application/json
 
-### Apple Callback
-```http
-POST /auth/apple/callback
+{
+  "code": "<exchange-code>"
+}
 ```
-Handles Apple OAuth callback (POST request)
+Validates the single-use exchange code and returns the real JWT in the response body.
+The code is deleted on first use and expires after 30 seconds.
+
+**Success (200)**
+```json
+{
+  "token": "<JWT>",
+  "expiresAt": "2026-03-03T18:12:43.000Z"
+}
+```
 
 ### Authentication Failure
 ```http
@@ -237,8 +258,7 @@ GET /auth/failure
 Returns:
 ```json
 {
-  "message": "Authentication failed",
-  "error": "OAuth authentication was unsuccessful"
+  "message": "Authentication failed"
 }
 ```
 
@@ -249,8 +269,7 @@ GET /auth/logout
 Returns:
 ```json
 {
-  "message": "Logged out successfully",
-  "note": "Please delete your JWT token on the client side"
+  "message": "Logged out successfully"
 }
 ```
 
@@ -258,7 +277,7 @@ Returns:
 
 ### React Example
 
-```javascript
+```typescript
 // Login button component
 const GoogleLoginButton = () => {
   const handleGoogleLogin = () => {
@@ -272,51 +291,36 @@ const GoogleLoginButton = () => {
   );
 };
 
-// Success page to handle OAuth callback
+// AuthSuccess page — handles the exchange code callback
 const AuthSuccess = () => {
+  const { loginWithToken } = useAuth();
+
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const token = urlParams.get('token');
-    
-    if (token) {
-      // Store token in localStorage
-      localStorage.setItem('jwt_token', token);
-      
-      // Redirect to dashboard
-      window.location.href = '/dashboard';
-    }
+    const handleCallback = async () => {
+      const params = new URLSearchParams(window.location.search);
+      const code = params.get('code');
+
+      // Remove the code from the URL immediately
+      window.history.replaceState({}, document.title, window.location.pathname);
+
+      if (code) {
+        // Exchange the short-lived code for the real JWT
+        const { data } = await api.post('/auth/exchange', { code });
+        const payload = JSON.parse(atob(data.token.split('.')[1]));
+        loginWithToken(data.token, {
+          _id: payload.userId,
+          email: payload.email,
+          role: payload.role
+        });
+        navigate('/products');
+      }
+    };
+
+    handleCallback();
   }, []);
 
-  return <div>Authenticating...</div>;
+  return <div>Signing in...</div>;
 };
-```
-
-### Vue.js Example
-
-```javascript
-// Login methods
-methods: {
-  loginWithGoogle() {
-    window.location.href = 'http://localhost:3001/auth/google';
-  },
-  loginWithMicrosoft() {
-    window.location.href = 'http://localhost:3001/auth/microsoft';
-  },
-  loginWithApple() {
-    window.location.href = 'http://localhost:3001/auth/apple';
-  }
-}
-
-// Success page
-mounted() {
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get('token');
-  
-  if (token) {
-    localStorage.setItem('jwt_token', token);
-    this.$router.push('/dashboard');
-  }
-}
 ```
 
 ## User Model Updates
@@ -379,7 +383,8 @@ ngrok http 3001
 1. Start server: `npm start`
 2. Navigate to: `http://localhost:3001/auth/google`
 3. Complete OAuth flow
-4. Check redirect URL for JWT token
+4. Verify the redirect URL contains `?code=` (not `?token=`)
+5. Check that the frontend completes the exchange and navigates to `/products`
 
 ### Automated Testing
 ```bash

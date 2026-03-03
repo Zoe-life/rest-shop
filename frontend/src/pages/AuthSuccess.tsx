@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { api } from '../api/axios';
 
 const AuthSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -10,21 +11,25 @@ const AuthSuccess: React.FC = () => {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // Read the JWT token passed as a query parameter by the backend redirect.
-        // This avoids cross-domain cookie issues: the backend may be on a different
-        // origin (Render) from the Cloudflare Worker proxy the frontend talks to.
+        // Read the single-use exchange code passed as a query parameter.
+        // The real JWT is never placed in the URL — the code is exchanged for
+        // the JWT via a POST request, keeping the JWT out of browser history,
+        // server logs, and Referer headers.
         const params = new URLSearchParams(window.location.search);
-        const token = params.get('token');
+        const code = params.get('code');
 
-        // Remove the token from the URL immediately to avoid it lingering in
-        // browser history or being leaked via the Referer header.
+        // Remove the code from the URL immediately to limit its exposure.
         window.history.replaceState({}, document.title, window.location.pathname);
 
-        if (token) {
-          // Safely decode the token to get user info
+        if (code) {
           try {
+            // Exchange the short-lived code for the real JWT via a secure POST request.
+            const response = await api.post('/auth/exchange', { code });
+            const { token } = response.data;
+
+            // Safely decode the token to get user info
             const payload = JSON.parse(atob(token.split('.')[1]));
-            
+
             const user = {
               _id: payload.userId,
               email: payload.email,
@@ -36,17 +41,17 @@ const AuthSuccess: React.FC = () => {
 
             // Redirect to products page
             navigate('/products');
-          } catch (decodeError) {
-            console.error('Failed to decode token:', decodeError);
-            setError('Invalid token format received');
+          } catch (exchangeError) {
+            console.error('Failed to exchange code for token:', exchangeError);
+            setError('Authentication failed. Please try again.');
           }
         } else {
-          setError('No authentication token received');
+          setError('No authentication code received');
         }
       } catch (err: any) {
         console.error('OAuth callback error:', err);
         setError(err.message || 'Authentication failed');
-        
+
         // Redirect to login after a delay
         setTimeout(() => {
           navigate('/login');

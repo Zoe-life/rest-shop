@@ -85,6 +85,26 @@ const userSchema = mongoose.Schema({
     passwordResetExpires: {
         type: Date
     },
+    // Extended profile fields
+    phone: {
+        type: String,
+        match: /^[+\d\s\-().]*$/,
+        maxlength: 20
+    },
+    bio: {
+        type: String,
+        maxlength: 300
+    },
+    avatarUrl: {
+        type: String
+    },
+    address: {
+        street: { type: String, maxlength: 200 },
+        city: { type: String, maxlength: 100 },
+        state: { type: String, maxlength: 100 },
+        postalCode: { type: String, maxlength: 20 },
+        country: { type: String, maxlength: 100 }
+    },
     // Two-Factor Authentication
     twoFactorEnabled: {
         type: Boolean,

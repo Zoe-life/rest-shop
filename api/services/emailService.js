@@ -7,6 +7,22 @@ const nodemailer = require('nodemailer');
 const { logInfo, logError } = require('../utils/logger');
 
 /**
+ * Escape HTML meta-characters in a string to prevent HTML injection in email
+ * templates.  All user-controlled values that are interpolated into the HTML
+ * body of outgoing emails MUST be passed through this function.
+ * @param {*} value - Any value; non-strings are converted with String().
+ * @returns {string} HTML-safe string.
+ */
+function escapeHtml(value) {
+    return String(value)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;');
+}
+
+/**
  * Create email transporter
  * @returns {Object} Nodemailer transporter
  */
@@ -48,6 +64,7 @@ exports.sendVerificationEmail = async (email, token) => {
     try {
         const transporter = createTransporter();
         const verificationUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email?token=${token}`;
+        const safeVerificationUrl = escapeHtml(verificationUrl);
         
         const mailOptions = {
             from: process.env.EMAIL_FROM || 'noreply@rest-shop.com',
@@ -57,8 +74,8 @@ exports.sendVerificationEmail = async (email, token) => {
                 <h2>Email Verification</h2>
                 <p>Thank you for registering with REST Shop!</p>
                 <p>Please click the link below to verify your email address:</p>
-                <a href="${verificationUrl}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
-                <p>Or copy this link: ${verificationUrl}</p>
+                <a href="${safeVerificationUrl}" style="padding: 10px 20px; background-color: #4CAF50; color: white; text-decoration: none; border-radius: 5px;">Verify Email</a>
+                <p>Or copy this link: ${safeVerificationUrl}</p>
                 <p>This link will expire in 24 hours.</p>
                 <p>If you did not register for an account, please ignore this email.</p>
             `,
@@ -95,6 +112,7 @@ exports.sendPasswordResetEmail = async (email, token) => {
     try {
         const transporter = createTransporter();
         const resetUrl = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password?token=${token}`;
+        const safeResetUrl = escapeHtml(resetUrl);
         
         const mailOptions = {
             from: process.env.EMAIL_FROM || 'noreply@rest-shop.com',
@@ -104,8 +122,8 @@ exports.sendPasswordResetEmail = async (email, token) => {
                 <h2>Password Reset Request</h2>
                 <p>You requested to reset your password for your REST Shop account.</p>
                 <p>Please click the link below to reset your password:</p>
-                <a href="${resetUrl}" style="padding: 10px 20px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
-                <p>Or copy this link: ${resetUrl}</p>
+                <a href="${safeResetUrl}" style="padding: 10px 20px; background-color: #2196F3; color: white; text-decoration: none; border-radius: 5px;">Reset Password</a>
+                <p>Or copy this link: ${safeResetUrl}</p>
                 <p>This link will expire in 1 hour.</p>
                 <p>If you did not request a password reset, please ignore this email and your password will remain unchanged.</p>
             `,
@@ -148,12 +166,12 @@ exports.sendOrderNotification = async (email, orderDetails) => {
             subject: `Order ${orderDetails.status} - Order #${orderDetails.orderId}`,
             html: `
                 <h2>Order Update</h2>
-                <p>Your order status has been updated to: <strong>${orderDetails.status}</strong></p>
+                <p>Your order status has been updated to: <strong>${escapeHtml(orderDetails.status)}</strong></p>
                 <h3>Order Details:</h3>
                 <ul>
-                    <li>Order ID: ${orderDetails.orderId}</li>
-                    <li>Status: ${orderDetails.status}</li>
-                    <li>Total: ${orderDetails.currency} ${orderDetails.totalAmount}</li>
+                    <li>Order ID: ${escapeHtml(orderDetails.orderId)}</li>
+                    <li>Status: ${escapeHtml(orderDetails.status)}</li>
+                    <li>Total: ${escapeHtml(orderDetails.currency)} ${escapeHtml(orderDetails.totalAmount)}</li>
                 </ul>
                 <p>Thank you for shopping with REST Shop!</p>
             `,

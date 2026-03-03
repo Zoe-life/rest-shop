@@ -4,6 +4,7 @@ const morgan = require('morgan');
 // const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const mongoose = require('mongoose');
+const path = require('path');
 const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./middleware/security');
 const { logInfo, logWarn, logError } = require('./utils/logger');
@@ -97,7 +98,7 @@ app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 
 // 5. Static Files (Note: Cloudflare handles this better via R2, but keeping for compatibility)
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // 6. Error Handling
 app.use((req, res, next) => {

@@ -1,8 +1,40 @@
 # Security Summary
 
+## Single-Use OAuth Exchange Code Pattern
+Date: 2026-03-03
+Status:  **IMPLEMENTED**
+
+### Overview
+The OAuth callback previously redirected users to `FRONTEND_URL/auth/success?token=<JWT>`,
+placing the real JWT in the browser history, server access logs, and `Referer` headers.
+This has been replaced with a **single-use exchange code pattern** that keeps the JWT
+entirely out of URLs.
+
+### How It Works
+1. After OAuth authentication succeeds, the backend generates a random 16-character hex code.
+2. The code is stored in an in-memory `Map` with a 30-second TTL (`api/utils/authCodeStore.js`).
+3. The user is redirected to `FRONTEND_URL/auth/success?code=<exchange-code>`.
+4. The frontend immediately POSTs the code to `POST /auth/exchange`.
+5. The backend validates the code, **deletes it atomically** (single-use), and returns the JWT in the JSON response body.
+
+### Security Properties
+- **JWT never appears in a URL** — eliminates browser history, server log, and Referer leakage.
+- **Single-use** — `consumeCode()` deletes the Map entry atomically on first read.
+- **Short-lived** — 30-second TTL enforced by `setTimeout`; codes expire automatically.
+- **64-bit random space** — `crypto.randomBytes(8)` makes brute-force infeasible within the TTL window.
+
+### Files Changed
+- `api/utils/authCodeStore.js` — new in-memory code store
+- `api/routes/auth.js` — OAuth callbacks now issue codes; new `POST /auth/exchange` endpoint
+- `frontend/src/pages/AuthSuccess.tsx` — reads `?code=`, POSTs to `/auth/exchange`
+
+See [OAuth Exchange Code Guide](./OAUTH_EXCHANGE_CODE.md) for full details.
+
+---
+
 ## CodeQL Security Analysis
 Date: 2026-02-10
-Status: ✅ **PASSED**
+Status:  **PASSED**
 
 ### Scan Results
 - **Language:** JavaScript
@@ -12,7 +44,7 @@ Status: ✅ **PASSED**
 ## Changes Made
 
 ### 1. OAuth Callback URL Configuration (`api/config/passport.js`)
-**Security Impact:** ✅ Positive
+**Security Impact:**  Positive
 - Changed from relative to absolute callback URLs
 - Added `buildCallbackUrl()` helper function with proper fallback logic
 - Prevents potential OAuth redirect manipulation
@@ -24,7 +56,7 @@ Status: ✅ **PASSED**
 - Default localhost for development only
 
 ### 2. CORS Configuration (`api/app.js`)
-**Security Impact:** ✅ Neutral (maintains existing security)
+**Security Impact:**  Neutral (maintains existing security)
 - Added `process.env.ALLOWED_ORIGINS` support for Node.js deployments
 - Maintains strict origin checking
 - Does not weaken existing CORS security
@@ -36,7 +68,7 @@ Status: ✅ **PASSED**
 - No wildcard origins allowed
 
 ### 3. Documentation Updates
-**Security Impact:** ✅ Positive
+**Security Impact:**  Positive
 - Clear instructions for OAuth callback URL configuration
 - Production deployment security best practices
 - Environment variable security reminders
@@ -52,6 +84,8 @@ None - no vulnerabilities were present in the original code or introduced by cha
    - `.env` files in `.gitignore`
 
 2. **OAuth Security:**
+   - Single-use exchange codes prevent JWT leakage via URLs
+   - HMAC-signed state parameter for stateless CSRF protection (RFC 6749 §10.12)
    - Absolute callback URLs prevent redirect attacks
    - Environment-based configuration
    - Proper fallback chain (specific → general → default)
@@ -87,15 +121,17 @@ None - no vulnerabilities were present in the original code or introduced by cha
 
 ## Testing Summary
 
-- ✅ All 70 automated tests passing
-- ✅ CodeQL security scan: 0 vulnerabilities
-- ✅ Code review completed
-- ✅ No breaking changes introduced
+-  All 83 automated tests passing
+-  CodeQL security scan: 0 vulnerabilities
+-  Code review completed
+-  No breaking changes introduced
 
 ## Conclusion
 
 All changes have been implemented with security in mind. No new vulnerabilities were introduced, and the changes improve the overall security posture by:
-1. Making OAuth callbacks more explicit and secure
-2. Improving configuration clarity
-3. Maintaining strict CORS policies
-4. Providing clear security documentation
+1. Eliminating JWT leakage through OAuth redirect URLs (exchange code pattern)
+2. Making OAuth CSRF protection stateless via HMAC-signed state (no cookie dependency)
+3. Making OAuth callbacks more explicit and secure
+4. Improving configuration clarity
+5. Maintaining strict CORS policies
+6. Providing clear security documentation

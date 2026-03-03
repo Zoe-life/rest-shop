@@ -5,6 +5,8 @@
 
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const path = require('path');
 const { body } = require('express-validator');
 const UserController = require('../controllers/user');
 const AuthController = require('../controllers/auth');
@@ -16,6 +18,36 @@ const {
     userValidation,
     validateObjectId 
 } = require('../middleware/security');
+
+/**
+ * Multer configuration for avatar uploads (reuses the shared uploads/ directory).
+ * Accepts JPEG and PNG only; capped at 2 MB.
+ */
+const avatarStorage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, path.join(__dirname, '../../uploads')),
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+        // Derive the extension from the already-validated MIME type, not from the
+        // client-supplied filename (file.originalname). Trusting file.originalname
+        // would allow an attacker to upload Content-Type: image/jpeg with
+        // filename="evil.html", causing express.static to serve the stored file
+        // as text/html and execute any embedded script (stored XSS).
+        const ext = file.mimetype === 'image/png' ? '.png' : '.jpg';
+        cb(null, 'avatar-' + uniqueSuffix + ext);
+    }
+});
+
+const avatarUpload = multer({
+    storage: avatarStorage,
+    limits: { fileSize: 2 * 1024 * 1024, files: 1 },
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+            cb(null, true);
+        } else {
+            cb(new Error('Only JPEG and PNG images are accepted for avatars.'), false);
+        }
+    }
+}).single('avatar');
 
 /**
  * @route POST /signup
@@ -43,7 +75,7 @@ router.get('/profile', checkAuth, UserController.user_get_profile);
 
 /**
  * @route PATCH /user/profile
- * @description Update current user's profile (displayName)
+ * @description Update current user's profile (displayName, phone, bio, address)
  * @access Private
  * @middleware Authentication required, Input validation
  */
@@ -56,9 +88,45 @@ router.patch(
             .trim()
             .isLength({ min: 1, max: 100 })
             .withMessage('Display name must be between 1 and 100 characters'),
+        body('phone')
+            .optional()
+            .trim()
+            .matches(/^[+\d\s\-().]*$/)
+            .isLength({ max: 20 })
+            .withMessage('Invalid phone number format'),
+        body('bio')
+            .optional()
+            .trim()
+            .isLength({ max: 300 })
+            .withMessage('Bio must not exceed 300 characters'),
+        body('address.street').optional().trim().isLength({ max: 200 }),
+        body('address.city').optional().trim().isLength({ max: 100 }),
+        body('address.state').optional().trim().isLength({ max: 100 }),
+        body('address.postalCode').optional().trim().isLength({ max: 20 }),
+        body('address.country').optional().trim().isLength({ max: 100 }),
         require('../middleware/security').handleValidationErrors
     ],
     UserController.user_update_profile
+);
+
+/**
+ * @route POST /user/profile/avatar
+ * @description Upload or replace the current user's profile photo
+ * @access Private
+ * @middleware Authentication required, Multer file upload (field: "avatar", max 2 MB, JPEG/PNG)
+ */
+router.post(
+    '/profile/avatar',
+    checkAuth,
+    (req, res, next) => {
+        avatarUpload(req, res, (err) => {
+            if (err) {
+                return res.status(400).json({ message: err.message });
+            }
+            next();
+        });
+    },
+    UserController.user_upload_avatar
 );
 
 /**

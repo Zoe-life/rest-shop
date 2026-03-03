@@ -8,7 +8,7 @@
 The original fix had a fallback to `http://localhost:3001` even in production:
 
 ```javascript
-// BEFORE - Could use localhost in production ❌
+// BEFORE - Could use localhost in production 
 const baseUrl = process.env.BACKEND_API_URL || 'http://localhost:3001';
 return `${baseUrl}/auth/${provider}/callback`;
 ```
@@ -20,7 +20,7 @@ return `${baseUrl}/auth/${provider}/callback`;
 Added production environment check that **fails fast** instead of silently using localhost:
 
 ```javascript
-// AFTER - Throws error in production if not configured ✅
+// AFTER - Throws error in production if not configured 
 function buildCallbackUrl(provider, envVarValue) {
     if (envVarValue) {
         return envVarValue;
@@ -45,13 +45,13 @@ function buildCallbackUrl(provider, envVarValue) {
 ## Behavior Now
 
 ### In Production (NODE_ENV=production)
-- ✅ If `GOOGLE_CALLBACK_URL` is set → Uses that exact URL
-- ✅ If `BACKEND_API_URL` is set → Constructs: `${BACKEND_API_URL}/auth/google/callback`
-- ❌ If neither is set → **Throws error immediately** (app won't start)
+-  If `GOOGLE_CALLBACK_URL` is set → Uses that exact URL
+-  If `BACKEND_API_URL` is set → Constructs: `${BACKEND_API_URL}/auth/google/callback`
+-  If neither is set → **Throws error immediately** (app won't start)
 
 ### In Development (NODE_ENV=development or not set)
-- ✅ Falls back to `http://localhost:3001/auth/google/callback`
-- ⚠️ Shows warning message if `BACKEND_API_URL` not set
+-  Falls back to `http://localhost:3001/auth/google/callback`
+-  Shows warning message if `BACKEND_API_URL` not set
 
 ## Required Production Configuration
 
@@ -80,15 +80,15 @@ APPLE_CALLBACK_URL=https://your-backend.onrender.com/auth/apple/callback
 ## Why This Is Better
 
 ### Before
-- ❌ Silent failure - uses localhost in production
-- ❌ OAuth fails with cryptic errors
-- ❌ Hard to debug
+-  Silent failure - uses localhost in production
+-  OAuth fails with cryptic errors
+-  Hard to debug
 
 ### After
-- ✅ Fails fast with clear error message
-- ✅ Forces proper configuration
-- ✅ Easy to understand what's wrong
-- ✅ Prevents production deployment without proper setup
+-  Fails fast with clear error message
+-  Forces proper configuration
+-  Easy to understand what's wrong
+-  Prevents production deployment without proper setup
 
 ## Testing
 
@@ -111,9 +111,9 @@ This immediately tells you what's wrong and how to fix it!
 
 ## Summary
 
-✅ **Fixed:** OAuth will never use localhost in production  
-✅ **Added:** Production validation that fails fast  
-✅ **Improved:** Clear error messages for misconfiguration  
-✅ **Documented:** Complete production deployment guide  
+ **Fixed:** OAuth will never use localhost in production  
+ **Added:** Production validation that fails fast  
+ **Improved:** Clear error messages for misconfiguration  
+ **Documented:** Complete production deployment guide  
 
 See `PRODUCTION_DEPLOYMENT.md` for the full deployment checklist.

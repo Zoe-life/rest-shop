@@ -112,8 +112,8 @@ CLOUDFLARE_ACCOUNT_ID    - Your Cloudflare account ID
 VITE_BACKEND_URL        - Worker URL for frontend to connect to
 
 Optional Secrets:
-⚪ JWT_KEY                  - Only for CI tests (not production)
-⚪ SNYK_TOKEN               - For Snyk security scanning
+ JWT_KEY                  - Only for CI tests (not production)
+ SNYK_TOKEN               - For Snyk security scanning
 ```
 
 ## Cloudflare Secrets Setup

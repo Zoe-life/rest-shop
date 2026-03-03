@@ -1,6 +1,6 @@
 # PRODUCTION DEPLOYMENT CHECKLIST
 
-## ⚠️ CRITICAL: OAuth Configuration Requirements
+##  CRITICAL: OAuth Configuration Requirements
 
 **OAuth will NOT work in production unless you properly configure these environment variables!**
 
@@ -168,20 +168,20 @@ After deployment:
 
 ## Common Mistakes to Avoid
 
-❌ **DON'T:** Leave `BACKEND_API_URL` unset or set to localhost in production  
-✅ **DO:** Set it to your actual production backend URL
+ **DON'T:** Leave `BACKEND_API_URL` unset or set to localhost in production  
+ **DO:** Set it to your actual production backend URL
 
-❌ **DON'T:** Use HTTP in production OAuth callbacks  
-✅ **DO:** Use HTTPS for all production OAuth callbacks
+ **DON'T:** Use HTTP in production OAuth callbacks  
+ **DO:** Use HTTPS for all production OAuth callbacks
 
-❌ **DON'T:** Forget to update OAuth provider consoles  
-✅ **DO:** Update redirect URIs in all OAuth provider consoles
+ **DON'T:** Forget to update OAuth provider consoles  
+ **DO:** Update redirect URIs in all OAuth provider consoles
 
-❌ **DON'T:** Use development JWT keys in production  
-✅ **DO:** Generate new, strong JWT keys for production
+ **DON'T:** Use development JWT keys in production  
+ **DO:** Generate new, strong JWT keys for production
 
-❌ **DON'T:** Copy `.env` file directly to production  
-✅ **DO:** Set each environment variable individually in your platform's dashboard
+ **DON'T:** Copy `.env` file directly to production  
+ **DO:** Set each environment variable individually in your platform's dashboard
 
 ---
 

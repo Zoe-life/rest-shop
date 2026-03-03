@@ -270,10 +270,26 @@ exports.user_get_profile = async (req, res) => {
  */
 exports.user_update_profile = async (req, res) => {
     try {
-        const { displayName } = req.body;
+        const { displayName, phone, bio, address } = req.body;
+
+        // Build a $set payload from only the fields supplied in the request body.
+        // Using $set with dot-notation for the address sub-document means individual
+        // address fields can be updated without overwriting the whole object.
+        const updates = {};
+        if (displayName !== undefined) updates.displayName = displayName;
+        if (phone !== undefined) updates.phone = phone;
+        if (bio !== undefined) updates.bio = bio;
+        if (address && typeof address === 'object') {
+            if (address.street !== undefined) updates['address.street'] = address.street;
+            if (address.city !== undefined) updates['address.city'] = address.city;
+            if (address.state !== undefined) updates['address.state'] = address.state;
+            if (address.postalCode !== undefined) updates['address.postalCode'] = address.postalCode;
+            if (address.country !== undefined) updates['address.country'] = address.country;
+        }
+
         const user = await User.findByIdAndUpdate(
             req.userData.userId,
-            { displayName },
+            { $set: updates },
             { new: true, runValidators: true }
         ).select('-password -twoFactorSecret -twoFactorBackupCodes -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires')
          .exec();
@@ -285,6 +301,39 @@ exports.user_update_profile = async (req, res) => {
     } catch (err) {
         logError('Update profile error', err);
         res.status(500).json({ message: 'Server error occurred while updating profile' });
+    }
+};
+
+/**
+ * Upload or replace the current user's profile avatar
+ * @async
+ * @function user_upload_avatar
+ * @param {Object} req - Express request object (requires req.userData from checkAuth, req.file from multer)
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {400} - If no file is provided
+ * @throws {404} - If user not found
+ * @throws {500} - If server error occurs
+ */
+exports.user_upload_avatar = async (req, res) => {
+    try {
+        if (!req.file) {
+            return res.status(400).json({ message: 'No image file provided' });
+        }
+        const user = await User.findByIdAndUpdate(
+            req.userData.userId,
+            { $set: { avatarUrl: req.file.path } },
+            { new: true }
+        ).select('-password -twoFactorSecret -twoFactorBackupCodes -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires')
+         .exec();
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        logInfo('User avatar updated', { userId: user._id });
+        res.status(200).json({ message: 'Avatar updated successfully', user });
+    } catch (err) {
+        logError('Upload avatar error', err);
+        res.status(500).json({ message: 'Server error occurred while uploading avatar' });
     }
 };
 
