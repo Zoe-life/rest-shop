@@ -142,6 +142,94 @@ const sampleProducts = [
     stock: 52,
     sku: 'SPORT-SHOE-012',
     isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Mechanical Gaming Keyboard',
+    price: 119.99,
+    productImage: 'https://images.unsplash.com/photo-1618384887929-16ec33fab9ef?w=400&h=400&fit=crop',
+    description: 'Full-size mechanical keyboard with RGB backlighting, tactile switches, and anti-ghosting. Built for serious gamers and productivity enthusiasts alike.',
+    category: 'Electronics',
+    stock: 37,
+    sku: 'ELECT-KBGM-013',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Scented Soy Candle Set',
+    price: 28.99,
+    productImage: 'https://images.unsplash.com/photo-1602874801006-5dec1b3e39da?w=400&h=400&fit=crop',
+    description: 'Set of 3 hand-poured soy wax candles in relaxing lavender, eucalyptus, and vanilla scents. Each candle burns for 40+ hours. Perfect for gifting or self-care.',
+    category: 'Home & Kitchen',
+    stock: 63,
+    sku: 'HOME-CNDL-014',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Fitness Resistance Bands',
+    price: 19.99,
+    productImage: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=400&h=400&fit=crop',
+    description: 'Set of 5 resistance bands in varying strength levels. Ideal for strength training, stretching, and rehabilitation. Portable, durable, and latex-free.',
+    category: 'Sports & Fitness',
+    stock: 95,
+    sku: 'SPORT-BAND-015',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Wool Blend Beanie',
+    price: 22.99,
+    productImage: 'https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=400&h=400&fit=crop',
+    description: 'Soft wool-blend beanie with a ribbed knit design and fleece-lined interior. Keeps you warm in style during the colder months. One size fits most.',
+    category: 'Clothing',
+    stock: 80,
+    sku: 'CLOTH-BEAN-016',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Adjustable Laptop Stand',
+    price: 34.99,
+    productImage: 'https://images.unsplash.com/photo-1593642632559-0c6d3fc62b89?w=400&h=400&fit=crop',
+    description: 'Ergonomic aluminum laptop stand with 6 adjustable height settings. Compatible with laptops 10-16 inches. Improves posture and keeps your laptop cool.',
+    category: 'Electronics',
+    stock: 44,
+    sku: 'ELECT-STND-017',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Cast Iron Skillet',
+    price: 42.99,
+    productImage: 'https://images.unsplash.com/photo-1585515656264-9d40a4e43953?w=400&h=400&fit=crop',
+    description: 'Pre-seasoned 10-inch cast iron skillet for even heat distribution and superior heat retention. Oven-safe up to 500°F. Perfect for searing, baking, and frying.',
+    category: 'Home & Kitchen',
+    stock: 31,
+    sku: 'HOME-SKLT-018',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'Travel Neck Pillow',
+    price: 17.99,
+    productImage: 'https://images.unsplash.com/photo-1548618140-bb8bb7ae7b51?w=400&h=400&fit=crop',
+    description: 'Memory foam travel pillow with ergonomic neck support and machine-washable cover. Compresses to a compact size for easy packing. Ideal for flights and long journeys.',
+    category: 'Accessories',
+    stock: 72,
+    sku: 'ACCS-PILW-019',
+    isActive: true
+  },
+  {
+    _id: new mongoose.Types.ObjectId(),
+    name: 'USB-C Hub 7-in-1',
+    price: 49.99,
+    productImage: 'https://images.unsplash.com/photo-1625842268584-8f3296236761?w=400&h=400&fit=crop',
+    description: 'Compact 7-in-1 USB-C hub with 4K HDMI, 100W PD charging, USB-A 3.0, SD card reader, and Gigabit Ethernet. Compatible with all USB-C laptops and tablets.',
+    category: 'Electronics',
+    stock: 58,
+    sku: 'ELECT-HUB-020',
+    isActive: true
   }
 ];
 
