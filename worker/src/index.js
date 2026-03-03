@@ -181,7 +181,7 @@ export default {
 
       // 4. CORS & CREDENTIALS LOGIC
       const requestOrigin = request.headers.get('Origin');
-      if (requestOrigin) {
+      if (requestOrigin&& requestOrigin.includes('pages.dev')) {
         responseHeaders.set('Access-Control-Allow-Origin', requestOrigin);
         responseHeaders.set('Access-Control-Allow-Credentials', 'true');
         responseHeaders.set('Vary', 'Origin');
