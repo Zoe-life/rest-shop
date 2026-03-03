@@ -10,6 +10,7 @@ const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
+const { generateOAuthState, verifyOAuthState } = require('../../utils/oauthState');
 
 describe('Auth Controller', () => {
     let testUser;
@@ -221,5 +222,84 @@ describe('GET /auth/token', () => {
 
         res.should.have.status(401);
         res.body.should.have.property('message').eql('No authentication token found');
+    });
+});
+
+describe('OAuth HMAC State (utils/oauthState)', () => {
+    const secret = process.env.JWT_KEY || 'test_jwt_key';
+
+    describe('generateOAuthState()', () => {
+        it('should return a string of the form <nonce>.<hmac>', () => {
+            const state = generateOAuthState();
+            state.should.be.a('string');
+            const parts = state.split('.');
+            parts.length.should.equal(2);
+            const [nonce, sig] = parts;
+            nonce.should.have.lengthOf(32); // 16 bytes hex
+            sig.should.have.lengthOf(64);   // SHA-256 hex
+        });
+
+        it('should produce a different state on each call', () => {
+            const s1 = generateOAuthState();
+            const s2 = generateOAuthState();
+            s1.should.not.equal(s2);
+        });
+    });
+
+    describe('verifyOAuthState()', () => {
+        it('should return true for a freshly generated state', () => {
+            const state = generateOAuthState();
+            verifyOAuthState(state).should.equal(true);
+        });
+
+        it('should return false for a tampered nonce', () => {
+            const state = generateOAuthState();
+            const [, sig] = state.split('.');
+            const tamperedState = `00000000000000000000000000000000.${sig}`;
+            verifyOAuthState(tamperedState).should.equal(false);
+        });
+
+        it('should return false for a tampered signature', () => {
+            const state = generateOAuthState();
+            const [nonce] = state.split('.');
+            const badSig = 'a'.repeat(64);
+            verifyOAuthState(`${nonce}.${badSig}`).should.equal(false);
+        });
+
+        it('should return false when the state has no dot separator', () => {
+            verifyOAuthState('nodotinthisstring').should.equal(false);
+        });
+
+        it('should return false for an empty string', () => {
+            verifyOAuthState('').should.equal(false);
+        });
+
+        it('should return false for null / undefined', () => {
+            verifyOAuthState(null).should.equal(false);
+            verifyOAuthState(undefined).should.equal(false);
+        });
+
+        it('should return false for a state signed with a different secret', () => {
+            // Manually build a state with a wrong key
+            const nonce = crypto.randomBytes(16).toString('hex');
+            const badSig = crypto
+                .createHmac('sha256', 'wrong-secret')
+                .update(nonce)
+                .digest('hex');
+            verifyOAuthState(`${nonce}.${badSig}`).should.equal(false);
+        });
+    });
+
+    describe('GET /auth/google (no oauth_state cookie set)', () => {
+        it('should not set an oauth_state cookie on the initiation redirect', async () => {
+            // Without OAuth credentials configured, Passport will throw.
+            // We only need to confirm no oauth_state cookie leaks out regardless.
+            const res = await request(app).get('/auth/google');
+            const setCookieHeader = res.headers['set-cookie'];
+            const hasStateCookie = setCookieHeader
+                ? setCookieHeader.some(c => c.startsWith('oauth_state='))
+                : false;
+            hasStateCookie.should.equal(false);
+        });
     });
 });
