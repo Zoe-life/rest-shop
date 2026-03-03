@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { api } from '../api/axios';
 import { useAuth } from '../contexts/AuthContext';
 
 const AuthSuccess: React.FC = () => {
@@ -11,12 +10,15 @@ const AuthSuccess: React.FC = () => {
   useEffect(() => {
     const handleOAuthCallback = async () => {
       try {
-        // Get the token from the backend (it's stored in an HTTP-only cookie)
-        const response = await api.get('/auth/token', {
-          withCredentials: true // Important: include cookies in the request
-        });
+        // Read the JWT token passed as a query parameter by the backend redirect.
+        // This avoids cross-domain cookie issues: the backend may be on a different
+        // origin (Render) from the Cloudflare Worker proxy the frontend talks to.
+        const params = new URLSearchParams(window.location.search);
+        const token = params.get('token');
 
-        const { token } = response.data;
+        // Remove the token from the URL immediately to avoid it lingering in
+        // browser history or being leaked via the Referer header.
+        window.history.replaceState({}, document.title, window.location.pathname);
 
         if (token) {
           // Safely decode the token to get user info
@@ -32,9 +34,6 @@ const AuthSuccess: React.FC = () => {
             // Update AuthContext state, localStorage, and axios headers
             loginWithToken(token, user);
 
-            // Clear the cookie by calling logout endpoint
-            await api.get('/auth/logout', { withCredentials: true });
-
             // Redirect to products page
             navigate('/products');
           } catch (decodeError) {
@@ -46,7 +45,7 @@ const AuthSuccess: React.FC = () => {
         }
       } catch (err: any) {
         console.error('OAuth callback error:', err);
-        setError(err.response?.data?.message || 'Authentication failed');
+        setError(err.message || 'Authentication failed');
         
         // Redirect to login after a delay
         setTimeout(() => {
