@@ -17,13 +17,13 @@ The function now:
 ### 2. Validation Rules
 
 #### Production Environment (`NODE_ENV=production`)
-- ❌ **BLOCKS** any URL containing 'localhost'
-- ❌ **BLOCKS** missing `BACKEND_API_URL` 
-- ✅ **REQUIRES** explicit production URL
+-  **BLOCKS** any URL containing 'localhost'
+-  **BLOCKS** missing `BACKEND_API_URL` 
+-  **REQUIRES** explicit production URL
 
 #### Development Environment (`NODE_ENV=development`)
-- ✅ **ALLOWS** localhost URLs
-- ❌ **BLOCKS** missing `BACKEND_API_URL`
+-  **ALLOWS** localhost URLs
+-  **BLOCKS** missing `BACKEND_API_URL`
 
 ## Configuration Requirements
 
@@ -71,12 +71,12 @@ Validation scenarios tested:
 
 | Scenario | NODE_ENV | BACKEND_API_URL | Callback URL | Result |
 |----------|----------|-----------------|--------------|--------|
-| Prod, no URL | production | (not set) | (not set) | ❌ Error |
-| Prod, localhost URL | production | `localhost:3001` | (not set) | ❌ Error |
-| Prod, localhost callback | production | `api.example.com` | `localhost:3001/...` | ❌ Error |
-| Prod, valid URL | production | `api.example.com` | (not set) | ✅ Works |
-| Prod, valid callback | production | (not set) | `api.example.com/...` | ✅ Works |
-| Dev, localhost | development | `localhost:3001` | (not set) | ✅ Works |
+| Prod, no URL | production | (not set) | (not set) |  Error |
+| Prod, localhost URL | production | `localhost:3001` | (not set) |  Error |
+| Prod, localhost callback | production | `api.example.com` | `localhost:3001/...` |  Error |
+| Prod, valid URL | production | `api.example.com` | (not set) |  Works |
+| Prod, valid callback | production | (not set) | `api.example.com/...` |  Works |
+| Dev, localhost | development | `localhost:3001` | (not set) |  Works |
 
 ## Deployment Checklist
 
@@ -122,11 +122,11 @@ Before deploying to production:
 
 ## Benefits
 
-✅ **Security**: Prevents localhost URLs in production
-✅ **Fail-fast**: Errors on startup instead of runtime
-✅ **Clear errors**: Developers know exactly what to fix
-✅ **No surprises**: Explicit configuration required
-✅ **Production-ready**: Forces proper deployment configuration
+ **Security**: Prevents localhost URLs in production
+ **Fail-fast**: Errors on startup instead of runtime
+ **Clear errors**: Developers know exactly what to fix
+ **No surprises**: Explicit configuration required
+ **Production-ready**: Forces proper deployment configuration
 
 ## Support
 

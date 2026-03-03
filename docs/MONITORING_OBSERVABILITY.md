@@ -472,7 +472,7 @@ const axios = require('axios');
 
 async function sendSlackAlert(alert) {
     await axios.post(process.env.SLACK_WEBHOOK_URL, {
-        text: `🚨 *${alert.severity.toUpperCase()}*: ${alert.name}`,
+        text: ` *${alert.severity.toUpperCase()}*: ${alert.name}`,
         blocks: [
             {
                 type: 'section',

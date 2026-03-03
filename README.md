@@ -314,8 +314,8 @@ See the [Payment API Documentation](docs/PAYMENT_API_DOCUMENTATION.md) and [M-Pe
 - **Request Sanitization**: Comprehensive XSS prevention with xss library
 - **ObjectId Validation**: Prevents injection attacks
 - **JWT**: 1-hour token expiration
-- **Connection Pooling**: Optimized MongoDB connections
-- **OAuth 2.0**: Secure third-party authentication
+- **OAuth 2.0**: Secure third-party authentication with single-use exchange codes — the JWT is never placed in a redirect URL (eliminates browser history, server log, and `Referer` leakage)
+- **HMAC State**: Stateless CSRF protection for OAuth flows (RFC 6749 §10.12)
 - **Payment Security**: Encrypted payment data, transaction logging
 - **PCI Compliance Ready**: No card data storage on servers
 
@@ -599,25 +599,32 @@ Content-Type: application/json
 
 #### OAuth 2.0 Authentication
 
+The OAuth flow uses a **single-use exchange code** pattern to keep the real JWT out of browser
+history, server logs, and `Referer` headers. See [OAuth Exchange Code Guide](docs/OAUTH_EXCHANGE_CODE.md).
+
 **Sign in with Google**
 ```http
 GET /auth/google
 # Redirects to Google login page
-# On success, redirects to: FRONTEND_URL/auth/success?token=<JWT>
+# On success, redirects to: FRONTEND_URL/auth/success?code=<exchange-code>
 ```
 
 **Sign in with Microsoft**
 ```http
 GET /auth/microsoft
 # Redirects to Microsoft login page
-# On success, redirects to: FRONTEND_URL/auth/success?token=<JWT>
+# On success, redirects to: FRONTEND_URL/auth/success?code=<exchange-code>
 ```
 
-**Sign in with Apple**
+**Exchange Code for JWT** *(called automatically by the frontend)*
 ```http
-GET /auth/apple
-# Redirects to Apple login page
-# On success, redirects to: FRONTEND_URL/auth/success?token=<JWT>
+POST /auth/exchange
+Content-Type: application/json
+
+{ "code": "<exchange-code>" }
+
+# Returns: { "token": "<JWT>", "expiresAt": "..." }
+# Code is deleted on first use and expires after 30 seconds
 ```
 
 See [OAuth Setup Guide](docs/OAUTH_SETUP.md) for detailed configuration instructions.
@@ -830,6 +837,7 @@ Content-Type: application/json
 #### Getting Started
 - [Installation & Configuration](#getting-started) - Setup and configuration guide
 - [OAuth Setup Guide](docs/OAUTH_SETUP.md) - Configure Google, Microsoft, and Apple OAuth
+- [OAuth Exchange Code Guide](docs/OAUTH_EXCHANGE_CODE.md) - Single-use exchange code security pattern
 
 #### Architecture & Deployment
 - **[Complete Deployment Guide](docs/FULL_DEPLOYMENT_GUIDE.md)** - Full-stack deployment walkthrough
