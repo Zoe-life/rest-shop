@@ -14,6 +14,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
 import PaymentHistory from './pages/PaymentHistory';
+import Profile from './pages/Profile';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageProducts from './pages/admin/ManageProducts';
@@ -66,6 +67,11 @@ function App() {
                 <Route path="/payments/history" element={
                   <ProtectedRoute>
                     <PaymentHistory />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
                   </ProtectedRoute>
                 } />
               </Route>

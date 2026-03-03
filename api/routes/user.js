@@ -5,6 +5,7 @@
 
 const express = require('express');
 const router = express.Router();
+const { body } = require('express-validator');
 const UserController = require('../controllers/user');
 const AuthController = require('../controllers/auth');
 const TwoFactorController = require('../controllers/twoFactor');
@@ -31,6 +32,55 @@ router.post('/signup', signupLimiter, userValidation.signup, UserController.user
  * @middleware Rate limiter (5 requests per 15 minutes), Input validation
  */
 router.post('/login', authLimiter, userValidation.login, UserController.user_login);
+
+/**
+ * @route GET /user/profile
+ * @description Get current user's profile
+ * @access Private
+ * @middleware Authentication required
+ */
+router.get('/profile', checkAuth, UserController.user_get_profile);
+
+/**
+ * @route PATCH /user/profile
+ * @description Update current user's profile (displayName)
+ * @access Private
+ * @middleware Authentication required, Input validation
+ */
+router.patch(
+    '/profile',
+    checkAuth,
+    [
+        body('displayName')
+            .optional()
+            .trim()
+            .isLength({ min: 1, max: 100 })
+            .withMessage('Display name must be between 1 and 100 characters'),
+        require('../middleware/security').handleValidationErrors
+    ],
+    UserController.user_update_profile
+);
+
+/**
+ * @route PUT /user/profile/password
+ * @description Change current user's password (local accounts only)
+ * @access Private
+ * @middleware Authentication required, Input validation
+ */
+router.put(
+    '/profile/password',
+    checkAuth,
+    [
+        body('currentPassword').notEmpty().withMessage('Current password is required'),
+        body('newPassword')
+            .isLength({ min: 8 })
+            .withMessage('Password must be at least 8 characters long')
+            .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z\d\s])[^\s]+$/)
+            .withMessage('Password must contain uppercase, lowercase, number, and special character'),
+        require('../middleware/security').handleValidationErrors
+    ],
+    UserController.user_change_password
+);
 
 /**
  * @route DELETE /:userId
