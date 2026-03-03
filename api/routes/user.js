@@ -6,7 +6,6 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const path = require('path');
 const { body } = require('express-validator');
 const UserController = require('../controllers/user');
 const AuthController = require('../controllers/auth');
@@ -27,7 +26,12 @@ const avatarStorage = multer.diskStorage({
     destination: (req, file, cb) => cb(null, './uploads/'),
     filename: (req, file, cb) => {
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-        const ext = path.extname(file.originalname).toLowerCase();
+        // Derive the extension from the already-validated MIME type, not from the
+        // client-supplied filename (file.originalname). Trusting file.originalname
+        // would allow an attacker to upload Content-Type: image/jpeg with
+        // filename="evil.html", causing express.static to serve the stored file
+        // as text/html and execute any embedded script (stored XSS).
+        const ext = file.mimetype === 'image/png' ? '.png' : '.jpg';
         cb(null, 'avatar-' + uniqueSuffix + ext);
     }
 });

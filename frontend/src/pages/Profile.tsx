@@ -28,10 +28,19 @@ interface ProfileData {
 
 const EMPTY_ADDRESS: Address = { street: '', city: '', state: '', postalCode: '', country: '' };
 
-/** Returns the backend-absolute URL for a stored file path (e.g. "uploads/avatar-xxx.jpg"). */
+/**
+ * Returns the backend-absolute URL for a stored avatar path.
+ *
+ * Only paths that match the exact pattern written by the server
+ * (uploads/avatar-{timestamp}-{random}.jpg|jpeg|png) are accepted.
+ * Any other value — including absolute http(s) URLs, javascript: URIs,
+ * data: URIs, or path-traversal sequences — is rejected (returns undefined)
+ * to prevent stored XSS and cross-origin tracking pixel injection.
+ */
 function resolveMediaUrl(filePath: string | undefined): string | undefined {
   if (!filePath) return undefined;
-  if (filePath.startsWith('http')) return filePath;
+  // Strict allow-list: relative path, no traversal, safe extension only.
+  if (!/^uploads\/avatar-\d+-\d+\.(jpg|jpeg|png)$/i.test(filePath)) return undefined;
   const base = (api.defaults.baseURL ?? '').replace(/\/$/, '');
   return `${base}/${filePath}`;
 }

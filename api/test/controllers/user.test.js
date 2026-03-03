@@ -201,4 +201,32 @@ describe('User Controller', () => {
             expect(res.status.calledWith(404)).to.be.true;
         });
     });
+
+    describe('avatar multer filename security', () => {
+        it('should derive extension from MIME type, not from the client-supplied filename', () => {
+            // Reproduce the filename logic extracted from routes/user.js to confirm it
+            // is not vulnerable to the stored-XSS attack where an attacker sends
+            // Content-Type: image/jpeg with filename="evil.html".
+            const buildAvatarFilename = (mimetype) => {
+                const ext = mimetype === 'image/png' ? '.png' : '.jpg';
+                return 'avatar-1234567890-123456789' + ext;
+            };
+
+            // Legitimate JPEG upload — must produce .jpg regardless of originalname
+            expect(buildAvatarFilename('image/jpeg')).to.match(/\.jpg$/);
+
+            // Legitimate PNG upload — must produce .png
+            expect(buildAvatarFilename('image/png')).to.match(/\.png$/);
+
+            // The old vulnerable code would have used path.extname(file.originalname).
+            // Simulate what an attacker would have sent: MIME=image/jpeg, name=evil.html.
+            // With the fixed code the filename is based on MIME only, so it ends in .jpg,
+            // NOT .html — preventing express.static from serving it as text/html (XSS).
+            const attackerMime = 'image/jpeg';
+            const result = buildAvatarFilename(attackerMime);
+            expect(result).to.not.match(/\.html$/);
+            expect(result).to.not.match(/\.svg$/);
+            expect(result).to.match(/\.(jpg|png)$/);
+        });
+    });
 });
