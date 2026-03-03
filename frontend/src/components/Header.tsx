@@ -58,6 +58,7 @@ const Header: React.FC = () => {
               <>
                 <Link to="/orders" className={navLinkClass('/orders')}>My Orders</Link>
                 <Link to="/payments/history" className={navLinkClass('/payments/history')}>Payments</Link>
+                <Link to="/profile" className={navLinkClass('/profile')}>Profile</Link>
                 {user.role === 'admin' && (
                   <Link to="/admin" className={`${navLinkClass('/admin')} font-semibold`}>Admin</Link>
                 )}
@@ -166,6 +167,9 @@ const Header: React.FC = () => {
               </Link>
               <Link to="/payments/history" onClick={() => setMenuOpen(false)} className={`block py-2 ${navLinkClass('/payments/history')}`}>
                 Payment History
+              </Link>
+              <Link to="/profile" onClick={() => setMenuOpen(false)} className={`block py-2 ${navLinkClass('/profile')}`}>
+                Profile
               </Link>
               {user.role === 'admin' && (
                 <Link to="/admin" onClick={() => setMenuOpen(false)} className={`block py-2 font-semibold ${navLinkClass('/admin')}`}>

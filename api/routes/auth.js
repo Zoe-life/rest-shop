@@ -9,6 +9,7 @@ const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
 const { logInfo, logError } = require('../utils/logger');
 const { logTokenGenerated, logAuthFailure } = require('../utils/auditLogger');
+const { generateOAuthState, verifyOAuthState } = require('../utils/oauthState');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -75,12 +76,19 @@ const generateToken = (user, req = null) => {
  * @description Initiate Google OAuth 2.0 authentication
  * @access Public
  */
-router.get('/google',
-    passport.authenticate('google', { 
+router.get('/google', (req, res, next) => {
+    // Generate an HMAC-signed state value for CSRF protection (RFC 6749 §10.12).
+    // The state is self-verifying at callback time — no cookie is needed.
+    // This avoids the cross-domain cookie problem that occurs when OAuth initiation
+    // passes through the Cloudflare Worker proxy but the provider callback goes
+    // directly to the Node.js backend on a different origin.
+    const state = generateOAuthState();
+    passport.authenticate('google', {
         scope: ['profile', 'email'],
-        session: false 
-    })
-);
+        session: false,
+        state
+    })(req, res, next);
+});
 
 /**
  * @route GET /auth/google/callback
@@ -88,6 +96,21 @@ router.get('/google',
  * @access Public
  */
 router.get('/google/callback',
+    (req, res, next) => {
+        // Verify the HMAC-signed state to prevent CSRF (RFC 6749 §10.12).
+        // We use a stateless HMAC check instead of a cookie so that this works
+        // correctly even when the initiation request travelled through a different
+        // origin (e.g. the Cloudflare Worker proxy) than the callback.
+        if (!verifyOAuthState(req.query.state)) {
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth state verification failed (possible CSRF attack)',
+                metadata: { provider: 'google' }
+            });
+            return res.redirect('/auth/failure');
+        }
+        next();
+    },
     passport.authenticate('google', { 
         failureRedirect: '/auth/failure',
         session: false 
@@ -121,12 +144,16 @@ router.get('/google/callback',
  * @description Initiate Microsoft OAuth 2.0 authentication
  * @access Public
  */
-router.get('/microsoft',
-    passport.authenticate('microsoft', { 
+router.get('/microsoft', (req, res, next) => {
+    // Generate an HMAC-signed state value for CSRF protection (RFC 6749 §10.12).
+    // Stateless — no cookie required. See /auth/google for full rationale.
+    const state = generateOAuthState();
+    passport.authenticate('microsoft', {
         scope: ['user.read'],
-        session: false 
-    })
-);
+        session: false,
+        state
+    })(req, res, next);
+});
 
 /**
  * @route GET /auth/microsoft/callback
@@ -134,6 +161,19 @@ router.get('/microsoft',
  * @access Public
  */
 router.get('/microsoft/callback',
+    (req, res, next) => {
+        // Verify the HMAC-signed state to prevent CSRF (RFC 6749 §10.12).
+        // Stateless — no cookie required. See /auth/google/callback for full rationale.
+        if (!verifyOAuthState(req.query.state)) {
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth state verification failed (possible CSRF attack)',
+                metadata: { provider: 'microsoft' }
+            });
+            return res.redirect('/auth/failure');
+        }
+        next();
+    },
     passport.authenticate('microsoft', { 
         failureRedirect: '/auth/failure',
         session: false 

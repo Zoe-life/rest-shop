@@ -233,6 +233,99 @@ exports.user_login = async (req, res, next) => {
 };
 
 /**
+ * Get the current user's profile
+ * @async
+ * @function user_get_profile
+ * @param {Object} req - Express request object (requires req.userData from checkAuth)
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {404} - If user not found
+ * @throws {500} - If server error occurs
+ */
+exports.user_get_profile = async (req, res) => {
+    try {
+        const user = await User.findById(req.userData.userId)
+            .select('-password -twoFactorSecret -twoFactorBackupCodes -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires')
+            .exec();
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        res.status(200).json({ user });
+    } catch (err) {
+        logError('Get profile error', err);
+        res.status(500).json({ message: 'Server error occurred while fetching profile' });
+    }
+};
+
+/**
+ * Update the current user's profile (displayName)
+ * @async
+ * @function user_update_profile
+ * @param {Object} req - Express request object (requires req.userData from checkAuth)
+ * @param {Object} req.body.displayName - New display name
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {404} - If user not found
+ * @throws {500} - If server error occurs
+ */
+exports.user_update_profile = async (req, res) => {
+    try {
+        const { displayName } = req.body;
+        const user = await User.findByIdAndUpdate(
+            req.userData.userId,
+            { displayName },
+            { new: true, runValidators: true }
+        ).select('-password -twoFactorSecret -twoFactorBackupCodes -emailVerificationToken -emailVerificationExpires -passwordResetToken -passwordResetExpires')
+         .exec();
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        logInfo('User profile updated', { userId: user._id });
+        res.status(200).json({ message: 'Profile updated successfully', user });
+    } catch (err) {
+        logError('Update profile error', err);
+        res.status(500).json({ message: 'Server error occurred while updating profile' });
+    }
+};
+
+/**
+ * Change the current user's password (local accounts only)
+ * @async
+ * @function user_change_password
+ * @param {Object} req - Express request object (requires req.userData from checkAuth)
+ * @param {Object} req.body.currentPassword - Current password
+ * @param {Object} req.body.newPassword - New password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>}
+ * @throws {400} - If OAuth user or passwords don't match
+ * @throws {404} - If user not found
+ * @throws {500} - If server error occurs
+ */
+exports.user_change_password = async (req, res) => {
+    try {
+        const user = await User.findById(req.userData.userId).exec();
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        if (user.provider && user.provider !== 'local') {
+            return res.status(400).json({ message: 'Password change is not available for OAuth accounts' });
+        }
+        const match = await bcrypt.compare(req.body.currentPassword, user.password);
+        if (!match) {
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+        const hash = await bcrypt.hash(req.body.newPassword, 10);
+        user.password = hash;
+        await user.save();
+        logInfo('User password changed', { userId: user._id });
+        res.status(200).json({ message: 'Password changed successfully' });
+    } catch (err) {
+        logError('Change password error', err);
+        res.status(500).json({ message: 'Server error occurred while changing password' });
+    }
+};
+
+/**
  * Delete a user account
  * @async
  * @function user_delete

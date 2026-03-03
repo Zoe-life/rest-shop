@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Outlet } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
@@ -14,11 +14,21 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import Checkout from './pages/Checkout';
 import PaymentHistory from './pages/PaymentHistory';
+import Profile from './pages/Profile';
 import AdminLayout from './pages/admin/AdminLayout';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import ManageProducts from './pages/admin/ManageProducts';
 import ManageOrders from './pages/admin/ManageOrders';
 import ManageUsers from './pages/admin/ManageUsers';
+
+const MainLayout = () => (
+  <div className="min-h-screen bg-gray-50 dark:bg-navy-900 transition-colors duration-300">
+    <Header />
+    <main>
+      <Outlet />
+    </main>
+  </div>
+);
 
 function App() {
   return (
@@ -39,34 +49,32 @@ function App() {
                 <Route path="users" element={<ManageUsers />} />
               </Route>
 
-              {/* Public Routes */}
-              <Route path="*" element={
-                <div className="min-h-screen bg-gray-50 dark:bg-navy-900 transition-colors duration-300">
-                  <Header />
-                  <main>
-                    <Routes>
-                      <Route path="/" element={<Home />} />
-                      <Route path="/about" element={<About />} />
-                      <Route path="/products" element={<Products />} />
-                      <Route path="/contact" element={<Contact />} />
-                      <Route path="/login" element={<Login />} />
-                      <Route path="/signup" element={<Signup />} />
-                      <Route path="/auth/success" element={<AuthSuccess />} />
-                      <Route path="/checkout" element={<Checkout />} />
-                      <Route path="/orders" element={
-                        <ProtectedRoute>
-                          <Orders />
-                        </ProtectedRoute>
-                      } />
-                      <Route path="/payments/history" element={
-                        <ProtectedRoute>
-                          <PaymentHistory />
-                        </ProtectedRoute>
-                      } />
-                    </Routes>
-                  </main>
-                </div>
-              } />
+              {/* Public Routes with shared layout */}
+              <Route element={<MainLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/products" element={<Products />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<Signup />} />
+                <Route path="/auth/success" element={<AuthSuccess />} />
+                <Route path="/checkout" element={<Checkout />} />
+                <Route path="/orders" element={
+                  <ProtectedRoute>
+                    <Orders />
+                  </ProtectedRoute>
+                } />
+                <Route path="/payments/history" element={
+                  <ProtectedRoute>
+                    <PaymentHistory />
+                  </ProtectedRoute>
+                } />
+                <Route path="/profile" element={
+                  <ProtectedRoute>
+                    <Profile />
+                  </ProtectedRoute>
+                } />
+              </Route>
             </Routes>
           </CartProvider>
         </AuthProvider>

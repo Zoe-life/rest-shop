@@ -8,9 +8,9 @@ const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./middleware/security');
 const { logInfo, logWarn, logError } = require('./utils/logger');
 
-// Routes (Payment routes moved to payment-worker.js for microservices architecture)
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
+const paymentRoutes = require('./routes/payments');
 const userRoutes = require('./routes/user');
 const authRoutes = require('./routes/auth');
 
@@ -92,6 +92,7 @@ app.use('/api/v1', v1Routes);
 // Legacy non-versioned routes (backward compatibility)
 app.use('/products', productRoutes);
 app.use('/orders', orderRoutes);
+app.use('/payments', paymentRoutes);
 app.use('/user', userRoutes);
 app.use('/auth', authRoutes);
 
