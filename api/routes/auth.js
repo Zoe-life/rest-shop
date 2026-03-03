@@ -10,6 +10,8 @@ const jwt = require('jsonwebtoken');
 const { logInfo, logError } = require('../utils/logger');
 const { logTokenGenerated, logAuthFailure } = require('../utils/auditLogger');
 const { generateOAuthState, verifyOAuthState } = require('../utils/oauthState');
+const { createCode, consumeCode } = require('../utils/authCodeStore');
+const User = require('../models/user');
 
 const isProduction = process.env.NODE_ENV === 'production';
 
@@ -115,23 +117,23 @@ router.get('/google/callback',
         failureRedirect: '/auth/failure',
         session: false 
     }),
-    (req, res) => {
+    async (req, res) => {
         try {
-            // Generate JWT token
-            const token = generateToken(req.user, req);
-            
-            // Pass token as a URL query parameter so the frontend can read it
-            // regardless of which domain set the OAuth callback (avoids cross-domain
-            // cookie issues when the backend and the Cloudflare Worker proxy are on
-            // different origins).
+            // Issue a short-lived, single-use exchange code instead of a real JWT.
+            // The real JWT is never placed in the URL, keeping it out of browser
+            // history, server logs, and Referer headers (see POST /auth/exchange).
+            const code = createCode(req.user._id);
+
+            logInfo('OAuth exchange code issued', { userId: req.user._id, provider: 'google' });
+
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            res.redirect(`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}`);
+            res.redirect(`${frontendUrl}/auth/success?code=${code}`);
         } catch (error) {
             logError('Google OAuth callback error', error);
             logAuthFailure({
                 email: req.user?.email,
                 outcome: 'failure',
-                reason: 'Token generation failed',
+                reason: 'Exchange code generation failed',
                 metadata: { provider: 'google' }
             });
             res.redirect('/auth/failure');
@@ -178,29 +180,80 @@ router.get('/microsoft/callback',
         failureRedirect: '/auth/failure',
         session: false 
     }),
-    (req, res) => {
+    async (req, res) => {
         try {
-            // Generate JWT token
-            const token = generateToken(req.user, req);
-            
-            // Pass token as a URL query parameter so the frontend can read it
-            // regardless of which domain set the OAuth callback (avoids cross-domain
-            // cookie issues when the backend and the Cloudflare Worker proxy are on
-            // different origins).
+            // Issue a short-lived, single-use exchange code instead of a real JWT.
+            // See the Google callback and POST /auth/exchange for full rationale.
+            const code = createCode(req.user._id);
+
+            logInfo('OAuth exchange code issued', { userId: req.user._id, provider: 'microsoft' });
+
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            res.redirect(`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}`);
+            res.redirect(`${frontendUrl}/auth/success?code=${code}`);
         } catch (error) {
             logError('Microsoft OAuth callback error', error);
             logAuthFailure({
                 email: req.user?.email,
                 outcome: 'failure',
-                reason: 'Token generation failed',
+                reason: 'Exchange code generation failed',
                 metadata: { provider: 'microsoft' }
             });
             res.redirect('/auth/failure');
         }
     }
 );
+
+/**
+ * @route POST /auth/exchange
+ * @description Exchange a single-use code for a real JWT.
+ *
+ * The code is a short-lived (30 s) random token kept in an in-memory Map after
+ * OAuth authentication.  The frontend sends it here immediately after being
+ * redirected, receives the JWT in the JSON response body, and the code is
+ * deleted so it can never be reused.  This keeps the real JWT out of browser
+ * history, server logs, and Referer headers.
+ *
+ * @access Public
+ */
+router.post('/exchange', async (req, res) => {
+    const { code } = req.body;
+
+    if (!code || typeof code !== 'string') {
+        return res.status(400).json({ message: 'Exchange code is required' });
+    }
+
+    try {
+        // consumeCode atomically retrieves and removes the entry (single-use guarantee).
+        const userId = consumeCode(code);
+
+        if (!userId) {
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'Invalid or expired OAuth exchange code'
+            });
+            return res.status(401).json({ message: 'Invalid or expired exchange code' });
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(401).json({ message: 'User not found' });
+        }
+
+        const token = generateToken(user, req);
+
+        logInfo('JWT issued via exchange code', { userId: user._id, email: user.email });
+
+        // Decode the token to report the accurate expiry derived from the JWT itself.
+        const decoded = jwt.decode(token);
+        res.status(200).json({
+            token,
+            expiresAt: new Date(decoded.exp * 1000).toISOString()
+        });
+    } catch (error) {
+        logError('Auth exchange error', error);
+        res.status(500).json({ message: 'Authentication exchange failed' });
+    }
+});
 
 /**
  * @route GET /auth/failure

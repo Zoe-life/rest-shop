@@ -6,6 +6,7 @@
 const request = require('supertest');
 const app = require('../../app');
 const User = require('../../models/user');
+const { createCode, consumeCode } = require('../../utils/authCodeStore');
 const crypto = require('crypto');
 const bcrypt = require('bcryptjs');
 const mongoose = require('mongoose');
@@ -301,5 +302,91 @@ describe('OAuth HMAC State (utils/oauthState)', () => {
                 : false;
             hasStateCookie.should.equal(false);
         });
+    });
+});
+
+describe('POST /auth/exchange', () => {
+    let testUser;
+
+    beforeEach(async function() {
+        if (mongoose.connection.readyState !== 1) {
+            this.skip();
+        }
+        const hashedPassword = await bcrypt.hash('TestPass123!', 10);
+        testUser = new User({
+            _id: new mongoose.Types.ObjectId(),
+            email: 'exchangetest@example.com',
+            password: hashedPassword,
+            emailVerified: true
+        });
+        await testUser.save();
+    });
+
+    afterEach(async function() {
+        if (mongoose.connection.readyState !== 1) return;
+        await User.deleteMany({});
+    });
+
+    it('should return a JWT for a valid exchange code', async () => {
+        const code = createCode(testUser._id);
+
+        const res = await request(app)
+            .post('/auth/exchange')
+            .send({ code });
+
+        res.should.have.status(200);
+        res.body.should.have.property('token');
+        res.body.should.have.property('expiresAt');
+
+        const decoded = jwt.verify(res.body.token, process.env.JWT_KEY || 'test_jwt_key');
+        decoded.should.have.property('email').eql(testUser.email);
+    });
+
+    it('should delete the exchange code after use (single-use guarantee)', async () => {
+        const code = createCode(testUser._id);
+
+        // First use succeeds
+        const res1 = await request(app)
+            .post('/auth/exchange')
+            .send({ code });
+        res1.should.have.status(200);
+
+        // Second use with the same code must fail
+        const res2 = await request(app)
+            .post('/auth/exchange')
+            .send({ code });
+        res2.should.have.status(401);
+        res2.body.should.have.property('message').eql('Invalid or expired exchange code');
+    });
+
+    it('should return 401 for an unknown exchange code', async () => {
+        const res = await request(app)
+            .post('/auth/exchange')
+            .send({ code: 'nonexistentcode1' });
+
+        res.should.have.status(401);
+        res.body.should.have.property('message').eql('Invalid or expired exchange code');
+    });
+
+    it('should return 401 for a code that has been manually consumed', async () => {
+        const code = createCode(testUser._id);
+        // Consume it before the HTTP request
+        consumeCode(code);
+
+        const res = await request(app)
+            .post('/auth/exchange')
+            .send({ code });
+
+        res.should.have.status(401);
+        res.body.should.have.property('message').eql('Invalid or expired exchange code');
+    });
+
+    it('should return 400 when no code is provided', async () => {
+        const res = await request(app)
+            .post('/auth/exchange')
+            .send({});
+
+        res.should.have.status(400);
+        res.body.should.have.property('message').eql('Exchange code is required');
     });
 });
