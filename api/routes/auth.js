@@ -98,11 +98,11 @@ router.get('/google/callback',
             const token = generateToken(req.user, req);
             
             // Set token in HTTP-only cookie for security
-            // sameSite: 'none' is required in production because the frontend and backend
+            // sameSite: 'none' with secure: true is required because the frontend and backend
             // are on different origins; 'none' must be paired with secure: true (HTTPS).
             res.cookie('authToken', token, {
                 httpOnly: true,
-                secure: isProduction, // HTTPS only in production
+                secure: isProduction,
                 sameSite: isProduction ? 'none' : 'lax',
                 maxAge: 3600000 // 1 hour
             });
@@ -151,7 +151,7 @@ router.get('/microsoft/callback',
             const token = generateToken(req.user, req);
             
             // Set token in HTTP-only cookie for security
-            // sameSite: 'none' is required in production because the frontend and backend
+            // sameSite: 'none' with secure: true is required because the frontend and backend
             // are on different origins; 'none' must be paired with secure: true (HTTPS).
             res.cookie('authToken', token, {
                 httpOnly: true,
