@@ -97,19 +97,12 @@ router.get('/google/callback',
             // Generate JWT token
             const token = generateToken(req.user, req);
             
-            // Set token in HTTP-only cookie for security
-            // sameSite: 'none' is required in production because the frontend and backend
-            // are on different origins; 'none' must be paired with secure: true (HTTPS).
-            res.cookie('authToken', token, {
-                httpOnly: true,
-                secure: isProduction, // HTTPS only in production
-                sameSite: isProduction ? 'none' : 'lax',
-                maxAge: 3600000 // 1 hour
-            });
-            
-            // Redirect to frontend success page (token is in cookie, not URL)
+            // Pass token as a URL query parameter so the frontend can read it
+            // regardless of which domain set the OAuth callback (avoids cross-domain
+            // cookie issues when the backend and the Cloudflare Worker proxy are on
+            // different origins).
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            res.redirect(`${frontendUrl}/auth/success`);
+            res.redirect(`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}`);
         } catch (error) {
             logError('Google OAuth callback error', error);
             logAuthFailure({
@@ -150,19 +143,12 @@ router.get('/microsoft/callback',
             // Generate JWT token
             const token = generateToken(req.user, req);
             
-            // Set token in HTTP-only cookie for security
-            // sameSite: 'none' is required in production because the frontend and backend
-            // are on different origins; 'none' must be paired with secure: true (HTTPS).
-            res.cookie('authToken', token, {
-                httpOnly: true,
-                secure: isProduction,
-                sameSite: isProduction ? 'none' : 'lax',
-                maxAge: 3600000 // 1 hour
-            });
-            
-            // Redirect to frontend success page (token is in cookie, not URL)
+            // Pass token as a URL query parameter so the frontend can read it
+            // regardless of which domain set the OAuth callback (avoids cross-domain
+            // cookie issues when the backend and the Cloudflare Worker proxy are on
+            // different origins).
             const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
-            res.redirect(`${frontendUrl}/auth/success`);
+            res.redirect(`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}`);
         } catch (error) {
             logError('Microsoft OAuth callback error', error);
             logAuthFailure({
