@@ -151,11 +151,6 @@ export default {
         headers.set('X-Real-IP', clientIP);
       }
 
-      // Security Note: Secrets should be configured in the backend environment
-      // directly, not forwarded from workers. The backend should read from its
-      // own environment variables. Workers only handle routing.
-      // If you need to pass authentication between worker and backend, use
-      // mutual TLS or signed tokens instead of forwarding raw secrets.
 
       // Create forwarded request
       const forwardedRequest = new Request(backendTargetUrl, {
@@ -185,12 +180,18 @@ export default {
       }
 
       // 4. CORS & CREDENTIALS LOGIC
-      // This is what fixes the 401 error you are seeing now
       const requestOrigin = request.headers.get('Origin');
       if (requestOrigin) {
         responseHeaders.set('Access-Control-Allow-Origin', requestOrigin);
         responseHeaders.set('Access-Control-Allow-Credentials', 'true');
         responseHeaders.set('Vary', 'Origin');
+      }
+      // This tells the browser it's allowed to "see" the cookie coming from the backend
+      responseHeaders.set('Access-Control-Expose-Headers', 'Set-Cookie');
+
+      // This ensures the worker doesn't strip the cookie header during the proxying
+      if (backendResponse.headers.has('Set-Cookie')) {
+        responseHeaders.set('Set-Cookie', backendResponse.headers.get('Set-Cookie'));
       }
 
       // 5. RETURN THE COMPLETE RESPONSE
