@@ -12,6 +12,8 @@ This API supports OAuth 2.0 authentication with the following providers:
 ```
 Frontend → GET /auth/google (or /microsoft, /apple)
 ```
+The backend generates a random CSRF state value, stores it in a short-lived
+`httpOnly` cookie, and forwards it to the OAuth provider.
 
 ### 2. User is redirected to provider
 ```
@@ -25,11 +27,12 @@ OAuth Provider → User Authorization
 
 ### 4. Provider redirects back to callback URL
 ```
-OAuth Provider → GET /auth/google/callback?code=...
+OAuth Provider → GET /auth/google/callback?code=...&state=...
 ```
 
-### 5. API exchanges code for user info
+### 5. API validates CSRF state and exchanges code for user info
 ```
+API validates state cookie === state query param (CSRF check)
 API ← OAuth Provider (User Profile Data)
 ```
 
@@ -39,10 +42,24 @@ API → MongoDB (Create/Update User)
 API → Generate JWT Token
 ```
 
-### 7. User is redirected to frontend with token
+### 7. User is redirected to frontend with token; token is wiped from URL
 ```
 API → Frontend: /auth/success?token=<JWT>
+Frontend saves token to localStorage, then immediately calls
+window.history.replaceState() to remove the token from the URL bar
+and browser history.
 ```
+
+## Security: CSRF Protection
+
+All OAuth routes (`/auth/google`, `/auth/microsoft`) now implement CSRF protection
+following [RFC 6749 §10.12](https://datatracker.ietf.org/doc/html/rfc6749#section-10.12):
+
+1. A cryptographically random 128-bit `state` value is generated per OAuth request.
+2. It is stored in a `httpOnly; SameSite` cookie on the API domain.
+3. The same value is forwarded to the OAuth provider.
+4. On callback the API verifies `cookie.oauth_state === query.state` before proceeding.
+5. A mismatch aborts the flow with a 401 redirect to `/auth/failure`.
 
 ## Setup Instructions
 
@@ -55,17 +72,31 @@ API → Frontend: /auth/success?token=<JWT>
    - Application type: "Web application"
    - Add authorized redirect URIs:
      - `http://localhost:3001/auth/google/callback` (development)
-     - `https://your-domain.com/auth/google/callback` (production)
+     - `https://your-backend-domain.com/auth/google/callback` (production)
    - Save Client ID and Client Secret
 
-2. **Configure Environment Variables**
+2. **Configure the OAuth Consent Screen** *(important for what Google shows users)*
+
+   Google's account-picker shows the application name and domain configured
+   on your OAuth consent screen—**not** the raw callback URL. To show your
+   app name instead of the backend API domain:
+
+   - Go to **APIs & Services → OAuth consent screen**
+   - Set **App name** to your application name (e.g. "Rest Shop")
+   - Set **Application home page** to your **frontend** URL
+     (e.g. `https://your-frontend.pages.dev`)
+   - Add your frontend domain to **Authorized domains**
+   - Add your backend domain to **Authorized domains** (for the callback)
+   - Complete the consent screen and submit for verification if needed
+
+3. **Configure Environment Variables**
    ```env
    GOOGLE_CLIENT_ID=your_client_id.apps.googleusercontent.com
    GOOGLE_CLIENT_SECRET=your_client_secret
    GOOGLE_CALLBACK_URL=http://localhost:3001/auth/google/callback
    ```
 
-3. **Test the Integration**
+4. **Test the Integration**
    ```bash
    # Start the server
    npm start

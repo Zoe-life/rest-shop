@@ -7,6 +7,7 @@ const express = require('express');
 const router = express.Router();
 const passport = require('../config/passport');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 const { logInfo, logError } = require('../utils/logger');
 const { logTokenGenerated, logAuthFailure } = require('../utils/auditLogger');
 
@@ -75,12 +76,21 @@ const generateToken = (user, req = null) => {
  * @description Initiate Google OAuth 2.0 authentication
  * @access Public
  */
-router.get('/google',
-    passport.authenticate('google', { 
+router.get('/google', (req, res, next) => {
+    // Generate a cryptographically random state value for CSRF protection (RFC 6749 §10.12)
+    const state = crypto.randomBytes(16).toString('hex');
+    res.cookie('oauth_state', state, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        maxAge: 10 * 60 * 1000 // 10 minutes
+    });
+    passport.authenticate('google', {
         scope: ['profile', 'email'],
-        session: false 
-    })
-);
+        session: false,
+        state
+    })(req, res, next);
+});
 
 /**
  * @route GET /auth/google/callback
@@ -88,6 +98,25 @@ router.get('/google',
  * @access Public
  */
 router.get('/google/callback',
+    (req, res, next) => {
+        // Validate CSRF state to prevent cross-site request forgery (RFC 6749 §10.12)
+        const cookieState = req.cookies?.oauth_state;
+        const queryState = req.query.state;
+        if (!cookieState || !queryState || cookieState !== queryState) {
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth state mismatch (possible CSRF attack)',
+                metadata: { provider: 'google' }
+            });
+            return res.redirect('/auth/failure');
+        }
+        res.clearCookie('oauth_state', {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax'
+        });
+        next();
+    },
     passport.authenticate('google', { 
         failureRedirect: '/auth/failure',
         session: false 
@@ -121,12 +150,21 @@ router.get('/google/callback',
  * @description Initiate Microsoft OAuth 2.0 authentication
  * @access Public
  */
-router.get('/microsoft',
-    passport.authenticate('microsoft', { 
+router.get('/microsoft', (req, res, next) => {
+    // Generate a cryptographically random state value for CSRF protection (RFC 6749 §10.12)
+    const state = crypto.randomBytes(16).toString('hex');
+    res.cookie('oauth_state', state, {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax',
+        maxAge: 10 * 60 * 1000 // 10 minutes
+    });
+    passport.authenticate('microsoft', {
         scope: ['user.read'],
-        session: false 
-    })
-);
+        session: false,
+        state
+    })(req, res, next);
+});
 
 /**
  * @route GET /auth/microsoft/callback
@@ -134,6 +172,25 @@ router.get('/microsoft',
  * @access Public
  */
 router.get('/microsoft/callback',
+    (req, res, next) => {
+        // Validate CSRF state to prevent cross-site request forgery (RFC 6749 §10.12)
+        const cookieState = req.cookies?.oauth_state;
+        const queryState = req.query.state;
+        if (!cookieState || !queryState || cookieState !== queryState) {
+            logAuthFailure({
+                outcome: 'failure',
+                reason: 'OAuth state mismatch (possible CSRF attack)',
+                metadata: { provider: 'microsoft' }
+            });
+            return res.redirect('/auth/failure');
+        }
+        res.clearCookie('oauth_state', {
+            httpOnly: true,
+            secure: isProduction,
+            sameSite: isProduction ? 'none' : 'lax'
+        });
+        next();
+    },
     passport.authenticate('microsoft', { 
         failureRedirect: '/auth/failure',
         session: false 
