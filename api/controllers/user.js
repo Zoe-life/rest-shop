@@ -50,8 +50,8 @@ function getUserAgent(req) {
  */
 exports.user_signup = async (req, res, next) => {
     try {
-        const user = await User.find({email: req.body.email}).exec();
-        if (user.length >= 1) {
+        const user = await User.findOne({email: req.body.email}).exec();
+        if (user) {
             return res.status(409).json({
                 message: 'User email already exists'
             });
@@ -165,13 +165,13 @@ exports.user_login = async (req, res, next) => {
         // normalize email to a trimmed string to avoid passing non-primitive values into the query
         req.body.email = email.trim();
 
-        const user = await User.find({ email: req.body.email }).exec();
-        if (user.length < 1) {
+        const user = await User.findOne({ email: req.body.email }).exec();
+        if (!user) {
             return res.status(401).json({
                 message: 'Auth failed'
             });
         }
-        bcrypt.compare(req.body.password, user[0].password, (err, result) => {
+        bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (err || !result) {
                 logAuthFailure({
                     email: req.body.email,
@@ -187,9 +187,9 @@ exports.user_login = async (req, res, next) => {
             
             const token = jwt.sign(
                 {
-                    email: user[0].email,
-                    userId: user[0]._id,
-                    role: user[0].role
+                    email: user.email,
+                    userId: user._id,
+                    role: user.role
                 },
                 process.env.JWT_KEY,
                 {
@@ -198,10 +198,10 @@ exports.user_login = async (req, res, next) => {
             );
             
             // Log successful login with audit trail (without exposing email in logs)
-            logInfo('User logged in successfully', { userId: user[0]._id });
+            logInfo('User logged in successfully', { userId: user._id });
             logUserLogin({
-                userId: user[0]._id.toString(),
-                email: user[0].email,
+                userId: user._id.toString(),
+                email: user.email,
                 ipAddress: getClientIp(req),
                 userAgent: getUserAgent(req),
                 outcome: 'success'
@@ -211,9 +211,9 @@ exports.user_login = async (req, res, next) => {
                 message: 'Auth successful',
                 token: token,
                 user: {
-                    _id: user[0]._id,
-                    email: user[0].email,
-                    role: user[0].role
+                    _id: user._id,
+                    email: user.email,
+                    role: user.role
                 }
             });
         });

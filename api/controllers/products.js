@@ -233,9 +233,19 @@ exports.products_get_product = (req, res, next) => {
  */
 exports.products_update_product = (req, res, next) => {
     const id = req.params.productId;
+
+    // Whitelist allowed fields to prevent arbitrary field injection
+    const ALLOWED_FIELDS = ['name', 'price', 'productImage', 'description', 'category', 'stock', 'sku', 'isActive'];
+    const updateFields = {};
+    for (const field of ALLOWED_FIELDS) {
+        if (req.body[field] !== undefined) {
+            updateFields[field] = req.body[field];
+        }
+    }
+
     Product.updateOne(
         {_id: id },
-        {$set: req.body }
+        {$set: updateFields }
     )
     .exec()
     .then(result => {
@@ -276,6 +286,9 @@ exports.products_delete_product = (req, res, next) => {
     Product.deleteOne({_id: id })
     .exec()
     .then(result => {
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Product not found' });
+        }
         logInfo('Product deleted successfully', { productId: id });
         res.status(200).json({
             message: 'Product deleted',

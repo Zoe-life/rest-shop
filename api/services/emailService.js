@@ -23,14 +23,24 @@ function escapeHtml(value) {
 }
 
 /**
- * Create email transporter
+ * Cached transporter instance (created once per process lifecycle)
+ * @type {Object|null}
+ */
+let _transporter = null;
+
+/**
+ * Create (or return cached) email transporter
  * @returns {Object} Nodemailer transporter
  */
 const createTransporter = () => {
+    if (_transporter) {
+        return _transporter;
+    }
+
     // In production, use actual SMTP credentials
     // For development/testing, use ethereal email or console logging
     if (process.env.NODE_ENV === 'production' && process.env.SMTP_HOST) {
-        return nodemailer.createTransporter({
+        _transporter = nodemailer.createTransporter({
             host: process.env.SMTP_HOST,
             port: parseInt(process.env.SMTP_PORT) || 587,
             secure: process.env.SMTP_SECURE === 'true',
@@ -39,19 +49,21 @@ const createTransporter = () => {
                 pass: process.env.SMTP_PASS
             }
         });
+    } else {
+        // For testing - log to console
+        _transporter = {
+            sendMail: async (mailOptions) => {
+                logInfo('Email (test mode)', {
+                    to: mailOptions.to,
+                    subject: mailOptions.subject,
+                    text: mailOptions.text
+                });
+                return { messageId: 'test-' + Date.now() };
+            }
+        };
     }
-    
-    // For testing - log to console
-    return {
-        sendMail: async (mailOptions) => {
-            logInfo('Email (test mode)', {
-                to: mailOptions.to,
-                subject: mailOptions.subject,
-                text: mailOptions.text
-            });
-            return { messageId: 'test-' + Date.now() };
-        }
-    };
+
+    return _transporter;
 };
 
 /**
