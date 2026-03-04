@@ -18,19 +18,19 @@ NC='\033[0m' # No Color
 # 1. Deploy Base Service (Products, Orders, User, Auth)
 echo -e "${BLUE}Step 1/3: Deploying Base Service...${NC}"
 npx wrangler deploy --config wrangler.toml
-echo -e "${GREEN}✓ Base Service deployed${NC}"
+echo -e "${GREEN}[OK] Base Service deployed${NC}"
 echo ""
 
 # 2. Deploy Payment Service
 echo -e "${BLUE}Step 2/3: Deploying Payment Service...${NC}"
 npx wrangler deploy --config wrangler-payments.toml
-echo -e "${GREEN}✓ Payment Service deployed${NC}"
+echo -e "${GREEN}[OK] Payment Service deployed${NC}"
 echo ""
 
 # 3. Deploy Gateway (must be last so it can bind to the other services)
 echo -e "${BLUE}Step 3/3: Deploying Gateway...${NC}"
 npx wrangler deploy --config wrangler-gateway.toml
-echo -e "${GREEN}✓ Gateway deployed${NC}"
+echo -e "${GREEN}[OK] Gateway deployed${NC}"
 echo ""
 
 echo "=========================================="

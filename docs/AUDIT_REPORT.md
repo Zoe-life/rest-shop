@@ -414,13 +414,13 @@ The following items were **not changed** but are flagged for future consideratio
 
 | ID | Area | Severity | File(s) | Fixed |
 |----|------|----------|---------|-------|
-| S-1 | Error details leaked in 500 responses | Medium | `controllers/payments.js` | ✅ |
-| S-2 | Arbitrary field injection via `$set: req.body` | Medium | `controllers/products.js` | ✅ |
-| S-3 | Missing BOLA/IDOR check on order retrieval | **High** | `controllers/orders.js` | ✅ |
-| S-4 | PII logged via duplicate `logInfo` call | Medium | `controllers/payments.js` | ✅ |
-| S-5 | `for...in` iterates prototype chain in sanitizer | Low | `middleware/security.js` | ✅ |
-| P-1 | `User.find()` instead of `User.findOne()` | **High** | `controllers/user.js` | ✅ |
-| P-2 | Email transporter re-created per send | Low-Medium | `services/emailService.js` | ✅ |
-| D-1 | Non-atomic stock decrement / overselling race | **High** | `controllers/orders.js` | ✅ |
-| D-2 | Delete returns 200 when nothing was deleted | Low | `controllers/orders.js`, `controllers/products.js` | ✅ |
-| A-1 | Hardcoded `localhost` URLs in responses | Medium | `controllers/orders.js` | ✅ |
+| S-1 | Error details leaked in 500 responses | Medium | `controllers/payments.js` | Yes |
+| S-2 | Arbitrary field injection via `$set: req.body` | Medium | `controllers/products.js` | Yes |
+| S-3 | Missing BOLA/IDOR check on order retrieval | **High** | `controllers/orders.js` | Yes |
+| S-4 | PII logged via duplicate `logInfo` call | Medium | `controllers/payments.js` | Yes |
+| S-5 | `for...in` iterates prototype chain in sanitizer | Low | `middleware/security.js` | Yes |
+| P-1 | `User.find()` instead of `User.findOne()` | **High** | `controllers/user.js` | Yes |
+| P-2 | Email transporter re-created per send | Low-Medium | `services/emailService.js` | Yes |
+| D-1 | Non-atomic stock decrement / overselling race | **High** | `controllers/orders.js` | Yes |
+| D-2 | Delete returns 200 when nothing was deleted | Low | `controllers/orders.js`, `controllers/products.js` | Yes |
+| A-1 | Hardcoded `localhost` URLs in responses | Medium | `controllers/orders.js` | Yes |
