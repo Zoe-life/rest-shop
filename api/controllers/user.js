@@ -50,7 +50,22 @@ function getUserAgent(req) {
  */
 exports.user_signup = async (req, res, next) => {
     try {
-        const user = await User.findOne({email: req.body.email}).exec();
+        // Validate and normalize email to prevent NoSQL injection with query objects
+        if (!req.body || typeof req.body.email !== 'string') {
+            return res.status(400).json({
+                message: 'A valid email address is required'
+            });
+        }
+        const email = req.body.email.trim();
+        // Basic email shape check; adjust as needed for your requirements
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email || !emailRegex.test(email)) {
+            return res.status(400).json({
+                message: 'A valid email address is required'
+            });
+        }
+
+        const user = await User.findOne({ email: email }).exec();
         if (user) {
             return res.status(409).json({
                 message: 'User email already exists'
@@ -66,7 +81,7 @@ exports.user_signup = async (req, res, next) => {
             }
             const newUser = new User({
                 _id: new mongoose.Types.ObjectId(),
-                email: req.body.email,
+                email: email,
                 password: hash
             });
             try {
