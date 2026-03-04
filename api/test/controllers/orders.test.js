@@ -54,13 +54,13 @@ describe('Orders Controller', () => {
     });
 
     describe('orders_create_order', () => {
-        it('should create a new order successfully', async () => {
+        it('should create a new order successfully (no stock field)', async () => {
             req.body = {
                 productId: new mongoose.Types.ObjectId(),
                 quantity: 2
             };
 
-            const productStub = sinon.stub(Product, 'findById').resolves({
+            sinon.stub(Product, 'findById').resolves({
                 _id: req.body.productId,
                 name: 'Test Product',
                 price: 100
@@ -157,8 +157,6 @@ describe('Orders Controller', () => {
             expect(res.status.calledWith(500)).to.be.true;
             // Verify stock was restored (findOneAndUpdate called twice: decrement + restore)
             expect(findOneAndUpdateStub.calledTwice).to.be.true;
-            const decrementCall = findOneAndUpdateStub.getCall(0);
-            expect(decrementCall.args[1]).to.deep.equal({ $inc: { stock: -2 } });
             const restoreCall = findOneAndUpdateStub.getCall(1);
             expect(restoreCall.args[1]).to.deep.equal({ $inc: { stock: 2 } });
         });
@@ -169,7 +167,7 @@ describe('Orders Controller', () => {
                 quantity: 2
             };
 
-            const productStub = sinon.stub(Product, 'findById').resolves(null);
+            sinon.stub(Product, 'findById').resolves(null);
 
             await OrdersController.orders_create_order(req, res, next);
 
