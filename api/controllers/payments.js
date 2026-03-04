@@ -125,8 +125,7 @@ exports.payments_initiate = async (req, res) => {
     } catch (error) {
         logError('Failed to initiate payment', error);
         res.status(500).json({
-            message: 'Server error occurred while initiating payment',
-            error: error.message
+            message: 'Server error occurred while initiating payment'
         });
     }
 };
@@ -198,8 +197,7 @@ exports.payments_verify = async (req, res) => {
     } catch (error) {
         logError('Failed to verify payment', error);
         res.status(500).json({
-            message: 'Server error occurred while verifying payment',
-            error: error.message
+            message: 'Server error occurred while verifying payment'
         });
     }
 };
@@ -260,7 +258,6 @@ exports.payments_mpesa_callback = async (req, res) => {
             hasBody: !!callbackData,
             bodyKeys: callbackData ? Object.keys(callbackData) : []
         });
-        logInfo('M-Pesa callback received', callbackData);
 
         // Process callback
         const mpesaService = PaymentFactory.getPaymentService('mpesa');

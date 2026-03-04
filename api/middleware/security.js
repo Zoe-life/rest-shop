@@ -103,7 +103,7 @@ const sanitizeInput = (req, res, next) => {
             return value.map(item => sanitizeValue(item));
         } else if (value !== null && typeof value === 'object') {
             const sanitizedObj = {};
-            for (let key in value) {
+            for (const key of Object.keys(value)) {
                 sanitizedObj[key] = sanitizeValue(value[key]);
             }
             return sanitizedObj;

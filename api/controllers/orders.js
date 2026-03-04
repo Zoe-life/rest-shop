@@ -9,6 +9,20 @@ const mongoose = require('mongoose');
 const { logInfo, logError } = require('../utils/logger');
 
 /**
+ * Helper function to construct base URL dynamically
+ * @param {Object} req - Express request object
+ * @returns {string} Base URL
+ */
+function getBaseUrl(req) {
+    if (process.env.API_BASE_URL) {
+        return process.env.API_BASE_URL;
+    }
+    const protocol = req.protocol || 'http';
+    const host = (typeof req.get === 'function' ? req.get('host') : req.headers?.host) || 'localhost:3001';
+    return `${protocol}://${host}`;
+}
+
+/**
  * Retrieve all orders
  * @async
  * @function orders_get_all
@@ -66,7 +80,7 @@ exports.orders_get_all = async (req, res, next) => {
                     createdAt: doc.createdAt,
                     requests: {
                         type: 'GET',
-                        url: 'http://localhost:3001/orders/' + doc._id
+                        url: `${getBaseUrl(req)}/orders/${doc._id}`
                     }
                 }
             }),
@@ -107,11 +121,18 @@ exports.orders_get_order = (req, res, next) => {
                 message: 'Order not found'
             });
         }
+
+        // Authorization: non-admin users may only view their own orders
+        if (req.userData && req.userData.role !== 'admin' &&
+            order.userId && order.userId.toString() !== req.userData.userId.toString()) {
+            return res.status(403).json({ message: 'Access denied' });
+        }
+
         res.status(200).json({
             order: order,
             request: {
                 type: 'GET',
-                url: 'http://localhost:3001/orders/'
+                url: `${getBaseUrl(req)}/orders/`
             }
         });
     })
@@ -143,6 +164,16 @@ exports.orders_create_order = async (req, res, next) => {
     let stockDecremented = false;
 
     try {
+        const quantity = req.body.quantity || 1;
+        const productId = req.body.productId;
+
+        // Validate productId to prevent injection and malformed ObjectId usage
+        if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({
+                message: "Invalid productId"
+            });
+        }
+
         const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({
@@ -159,14 +190,12 @@ exports.orders_create_order = async (req, res, next) => {
                 { new: true }
             );
             if (!updated) {
-                const fresh = await Product.findById(productId, 'stock');
                 return res.status(400).json({
                     message: "Insufficient stock",
-                    available: fresh ? fresh.stock : 0,
+                    available: product.stock,
                     requested: quantity
                 });
             }
-            stockDecremented = true;
         }
 
         // Calculate total amount
@@ -200,7 +229,7 @@ exports.orders_create_order = async (req, res, next) => {
             },
             request: {
                 type: 'GET',
-                url: 'http://localhost:3001/orders/' + result._id
+                url: `${getBaseUrl(req)}/orders/${result._id}`
             }
         });
     } catch (err) {
@@ -238,12 +267,15 @@ exports.orders_delete_order = (req, res, next) => {
     Order.deleteOne({ _id: req.params.orderId })
     .exec()
     .then(result => {
+        if (result.deletedCount === 0) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
         logInfo('Order deleted successfully', { orderId: req.params.orderId });
         res.status(200).json({
             message: 'Order deleted',
             request: {
                 type: 'POST',
-                url: 'http://localhost:3001/orders',
+                url: `${getBaseUrl(req)}/orders`,
                 body: { productId: 'ID', quantity: 'Number' }
             }
         });

@@ -11,6 +11,7 @@
     "seed": "node scripts/seed-products.js",
     "seed:force": "node scripts/seed-products.js --force",
     "seed:clear": "node scripts/seed-products.js --clear",
+    "restore-demo-stock": "node scripts/restore-demo-stock.js",
     "postinstall": "patch-package"
   },
   "keywords": [
