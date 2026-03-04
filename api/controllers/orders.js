@@ -164,6 +164,10 @@ exports.orders_create_order = async (req, res, next) => {
     let stockDecremented = false;
 
     try {
+        const quantity = req.body.quantity || 1;
+        const productId = req.body.productId;
+
+    try {
         // Validate productId to prevent injection and malformed ObjectId usage
         if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({

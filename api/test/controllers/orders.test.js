@@ -174,4 +174,4 @@ describe('Orders Controller', () => {
             expect(res.status.calledWith(404)).to.be.true;
         });
     });
-}); 
+});
