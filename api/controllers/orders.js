@@ -161,7 +161,16 @@ exports.orders_get_order = (req, res, next) => {
 exports.orders_create_order = async (req, res, next) => {
     try {
         const quantity = req.body.quantity || 1;
-        const product = await Product.findById(req.body.productId);
+        const productId = req.body.productId;
+
+        // Validate productId to prevent injection and malformed ObjectId usage
+        if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({
+                message: "Invalid productId"
+            });
+        }
+
+        const product = await Product.findById(productId);
         if (!product) {
             return res.status(404).json({
                 message: "Product not found"
@@ -172,7 +181,7 @@ exports.orders_create_order = async (req, res, next) => {
         // Only enforced when the product has a stock field defined.
         if (product.stock !== undefined) {
             const updated = await Product.findOneAndUpdate(
-                { _id: req.body.productId, stock: { $gte: quantity } },
+                { _id: productId, stock: { $gte: quantity } },
                 { $inc: { stock: -quantity } },
                 { new: true }
             );
@@ -191,7 +200,7 @@ exports.orders_create_order = async (req, res, next) => {
         const order = new Order ({
             _id: new mongoose.Types.ObjectId(),
             quantity,
-            product: req.body.productId,
+            product: productId,
             userId: req.userData ? req.userData.userId : undefined,
             totalAmount,
             currency: req.body.currency || 'USD',
