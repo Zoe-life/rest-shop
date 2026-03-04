@@ -177,10 +177,10 @@ exports.user_login = async (req, res, next) => {
                 message: 'Invalid credentials'
             });
         }
-        // normalize email to a trimmed string to avoid passing non-primitive values into the query
-        req.body.email = email.trim();
+        // normalize email to a trimmed string and ensure only a primitive is used in queries
+        const normalizedEmail = email.trim();
 
-        const user = await User.findOne({ email: req.body.email }).exec();
+        const user = await User.findOne({ email: { $eq: normalizedEmail } }).exec();
         if (!user) {
             return res.status(401).json({
                 message: 'Auth failed'
@@ -189,7 +189,7 @@ exports.user_login = async (req, res, next) => {
         bcrypt.compare(req.body.password, user.password, (err, result) => {
             if (err || !result) {
                 logAuthFailure({
-                    email: req.body.email,
+                    email: normalizedEmail,
                     ipAddress: getClientIp(req),
                     userAgent: getUserAgent(req),
                     outcome: 'failure',
