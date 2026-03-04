@@ -79,6 +79,90 @@ describe('Orders Controller', () => {
             expect(saveStub.calledOnce).to.be.true;
         });
 
+        it('should atomically decrement stock and create order', async () => {
+            req.body = {
+                productId: new mongoose.Types.ObjectId(),
+                quantity: 2
+            };
+
+            sinon.stub(Product, 'findById').resolves({
+                _id: req.body.productId,
+                name: 'Test Product',
+                price: 100,
+                stock: 10
+            });
+
+            const findOneAndUpdateStub = sinon.stub(Product, 'findOneAndUpdate').resolves({
+                _id: req.body.productId,
+                stock: 8
+            });
+
+            const saveStub = sinon.stub(Order.prototype, 'save').resolves({
+                _id: new mongoose.Types.ObjectId(),
+                product: req.body.productId,
+                quantity: req.body.quantity
+            });
+
+            await OrdersController.orders_create_order(req, res, next);
+
+            expect(res.status.calledWith(201)).to.be.true;
+            expect(findOneAndUpdateStub.calledOnce).to.be.true;
+            expect(saveStub.calledOnce).to.be.true;
+        });
+
+        it('should return 400 when stock is insufficient', async () => {
+            req.body = {
+                productId: new mongoose.Types.ObjectId(),
+                quantity: 5
+            };
+
+            sinon.stub(Product, 'findById').resolves({
+                _id: req.body.productId,
+                name: 'Test Product',
+                price: 100,
+                stock: 3
+            });
+
+            // findOneAndUpdate returns null when stock condition is not met
+            sinon.stub(Product, 'findOneAndUpdate').resolves(null);
+
+            await OrdersController.orders_create_order(req, res, next);
+
+            expect(res.status.calledWith(400)).to.be.true;
+        });
+
+        it('should restore stock if order.save() fails', async () => {
+            req.body = {
+                productId: new mongoose.Types.ObjectId(),
+                quantity: 2
+            };
+
+            sinon.stub(Product, 'findById').resolves({
+                _id: req.body.productId,
+                name: 'Test Product',
+                price: 100,
+                stock: 10
+            });
+
+            const findOneAndUpdateStub = sinon.stub(Product, 'findOneAndUpdate');
+            // First call: decrement stock
+            findOneAndUpdateStub.onFirstCall().resolves({ _id: req.body.productId, stock: 8 });
+            // Second call: restore stock
+            findOneAndUpdateStub.onSecondCall().resolves({ _id: req.body.productId, stock: 10 });
+
+            sinon.stub(Order.prototype, 'save').rejects(new Error('DB write failed'));
+
+            await OrdersController.orders_create_order(req, res, next);
+
+            expect(res.status.calledWith(500)).to.be.true;
+            // Verify stock was restored (findOneAndUpdate called twice: decrement + restore)
+            expect(findOneAndUpdateStub.calledTwice).to.be.true;
+            const decrementCall = findOneAndUpdateStub.getCall(0);
+            expect(decrementCall.args[1]).to.deep.equal({ $inc: { stock: -2 } });
+            const restoreCall = findOneAndUpdateStub.getCall(1);
+            expect(restoreCall.args[1]).to.deep.equal({ $inc: { stock: 2 } });
+        });
+
         it('should handle non-existent product', async () => {
             req.body = {
                 productId: new mongoose.Types.ObjectId(),
@@ -92,4 +176,4 @@ describe('Orders Controller', () => {
             expect(res.status.calledWith(404)).to.be.true;
         });
     });
-}); 
+});

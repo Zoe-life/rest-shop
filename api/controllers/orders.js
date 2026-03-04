@@ -159,10 +159,11 @@ exports.orders_get_order = (req, res, next) => {
  * @throws {500} - If server error occurs
  */
 exports.orders_create_order = async (req, res, next) => {
-    try {
-        const quantity = req.body.quantity || 1;
-        const productId = req.body.productId;
+    const quantity = req.body.quantity || 1;
+    const productId = req.body.productId;
+    let stockDecremented = false;
 
+    try {
         // Validate productId to prevent injection and malformed ObjectId usage
         if (!productId || !mongoose.Types.ObjectId.isValid(productId)) {
             return res.status(400).json({
@@ -192,6 +193,7 @@ exports.orders_create_order = async (req, res, next) => {
                     requested: quantity
                 });
             }
+            stockDecremented = true;
         }
 
         // Calculate total amount
@@ -229,6 +231,17 @@ exports.orders_create_order = async (req, res, next) => {
             }
         });
     } catch (err) {
+        // Restore stock if it was decremented but the order failed to save
+        if (stockDecremented) {
+            try {
+                await Product.findOneAndUpdate(
+                    { _id: productId },
+                    { $inc: { stock: quantity } }
+                );
+            } catch (restoreErr) {
+                logError('Failed to restore stock after order creation failure', { restoreErr, productId, quantity });
+            }
+        }
         logError('Failed to create order', err);
         res.status(500).json({
             message: 'Server error occurred while creating order'
