@@ -159,6 +159,10 @@ exports.orders_get_order = (req, res, next) => {
  * @throws {500} - If server error occurs
  */
 exports.orders_create_order = async (req, res, next) => {
+    const quantity = req.body.quantity || 1;
+    const productId = req.body.productId;
+    let stockDecremented = false;
+
     try {
         const quantity = req.body.quantity || 1;
         const productId = req.body.productId;
@@ -170,7 +174,10 @@ exports.orders_create_order = async (req, res, next) => {
             });
         }
 
-        const product = await Product.findById(productId);
+        // Use a validated ObjectId instance for all subsequent queries
+        const productObjectId = new mongoose.Types.ObjectId(productId);
+
+        const product = await Product.findById(productObjectId);
         if (!product) {
             return res.status(404).json({
                 message: "Product not found"
@@ -181,7 +188,7 @@ exports.orders_create_order = async (req, res, next) => {
         // Only enforced when the product has a stock field defined.
         if (product.stock !== undefined) {
             const updated = await Product.findOneAndUpdate(
-                { _id: productId, stock: { $gte: quantity } },
+                { _id: productObjectId, stock: { $gte: quantity } },
                 { $inc: { stock: -quantity } },
                 { new: true }
             );
@@ -192,6 +199,8 @@ exports.orders_create_order = async (req, res, next) => {
                     requested: quantity
                 });
             }
+            // Only mark as decremented when the update succeeds
+            stockDecremented = true;
         }
 
         // Calculate total amount
@@ -200,7 +209,7 @@ exports.orders_create_order = async (req, res, next) => {
         const order = new Order ({
             _id: new mongoose.Types.ObjectId(),
             quantity,
-            product: productId,
+            product: productObjectId,
             userId: req.userData ? req.userData.userId : undefined,
             totalAmount,
             currency: req.body.currency || 'USD',
@@ -229,6 +238,19 @@ exports.orders_create_order = async (req, res, next) => {
             }
         });
     } catch (err) {
+        // Restore stock if it was decremented but the order failed to save
+        if (stockDecremented) {
+            try {
+                // productId has already been validated and converted earlier
+                const productObjectId = new mongoose.Types.ObjectId(productId);
+                await Product.findOneAndUpdate(
+                    { _id: productObjectId },
+                    { $inc: { stock: quantity } }
+                );
+            } catch (restoreErr) {
+                logError('Failed to restore stock after order creation failure', restoreErr);
+            }
+        }
         logError('Failed to create order', err);
         res.status(500).json({
             message: 'Server error occurred while creating order'
