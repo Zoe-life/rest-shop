@@ -32,8 +32,8 @@ describe('User Controller', () => {
     describe('user_signup', () => {
         it('should create a new user successfully', async () => {
             const userId = new mongoose.Types.ObjectId();
-            sinon.stub(User, 'find').returns({
-                exec: sinon.stub().resolves([])
+            sinon.stub(User, 'findOne').returns({
+                exec: sinon.stub().resolves(null)
             });
             sinon.stub(bcrypt, 'hash').yields(null, 'hashedpassword');
             sinon.stub(User.prototype, 'save').resolves({ 
@@ -53,8 +53,8 @@ describe('User Controller', () => {
         });
 
         it('should return 409 if user already exists', async () => {
-            sinon.stub(User, 'find').returns({
-                exec: sinon.stub().resolves([{ email: 'test@test.com' }])
+            sinon.stub(User, 'findOne').returns({
+                exec: sinon.stub().resolves({ email: 'test@test.com' })
             });
 
             await UserController.user_signup(req, res, next);
@@ -68,13 +68,13 @@ describe('User Controller', () => {
         it('should login successfully with correct credentials', async () => {
             const userId = new mongoose.Types.ObjectId();
             const hashedPassword = await bcrypt.hash('testpassword', 10);
-            sinon.stub(User, 'find').returns({
-                exec: sinon.stub().resolves([{
+            sinon.stub(User, 'findOne').returns({
+                exec: sinon.stub().resolves({
                     email: 'test@test.com',
                     password: hashedPassword,
                     _id: userId,
                     role: 'user'
-                }])
+                })
             });
             sinon.stub(bcrypt, 'compare').yields(null, true);
 
@@ -91,11 +91,11 @@ describe('User Controller', () => {
             req.body.password = 'wrongpassword';
             const hashedPassword = await bcrypt.hash('testpassword', 10);
             
-            sinon.stub(User, 'find').returns({
-                exec: sinon.stub().resolves([{
+            sinon.stub(User, 'findOne').returns({
+                exec: sinon.stub().resolves({
                     email: 'test@test.com',
                     password: hashedPassword
-                }])
+                })
             });
             sinon.stub(bcrypt, 'compare').yields(null, false);
 

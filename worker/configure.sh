@@ -12,7 +12,7 @@ echo ""
 
 # Check if wrangler is installed
 if ! command -v wrangler &> /dev/null; then
-    echo "❌ Wrangler CLI is not installed"
+    echo "[ERROR] Wrangler CLI is not installed"
     echo ""
     echo "Install it with:"
     echo "  npm install -g wrangler"
@@ -20,12 +20,12 @@ if ! command -v wrangler &> /dev/null; then
     exit 1
 fi
 
-echo "✅ Wrangler CLI is installed"
+echo "[OK] Wrangler CLI is installed"
 echo ""
 
 # Check if we're in the worker directory
 if [ ! -f "wrangler.toml" ]; then
-    echo "❌ wrangler.toml not found"
+    echo "[ERROR] wrangler.toml not found"
     echo "Please run this script from the worker directory:"
     echo "  cd worker"
     echo "  ./configure.sh"
@@ -33,7 +33,7 @@ if [ ! -f "wrangler.toml" ]; then
     exit 1
 fi
 
-echo "✅ Found wrangler.toml"
+echo "[OK] Found wrangler.toml"
 echo ""
 
 # Display current configuration
@@ -58,7 +58,7 @@ read -p "Enter your backend URL: " BACKEND_URL
 
 # Validate URL
 if [ -z "$BACKEND_URL" ]; then
-    echo "❌ Backend URL cannot be empty"
+    echo "[ERROR] Backend URL cannot be empty"
     exit 1
 fi
 
@@ -75,10 +75,10 @@ echo ""
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$BACKEND_URL/health" || echo "000")
 
 if [ "$HTTP_CODE" = "200" ]; then
-    echo "✅ Backend is accessible and healthy!"
+    echo "[OK] Backend is accessible and healthy!"
     echo ""
 else
-    echo "⚠️  Warning: Could not reach backend (HTTP $HTTP_CODE)"
+    echo "[WARNING] Could not reach backend (HTTP $HTTP_CODE)"
     echo ""
     echo "This might be because:"
     echo "  - Backend is not running yet"
@@ -105,11 +105,11 @@ echo "$BACKEND_URL" | wrangler secret put BACKEND_API_URL
 
 if [ $? -eq 0 ]; then
     echo ""
-    echo "✅ BACKEND_API_URL has been configured!"
+    echo "[OK] BACKEND_API_URL has been configured!"
     echo ""
 else
     echo ""
-    echo "❌ Failed to set BACKEND_API_URL"
+    echo "[ERROR] Failed to set BACKEND_API_URL"
     echo ""
     exit 1
 fi
@@ -128,7 +128,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
     
     if [ $? -eq 0 ]; then
         echo ""
-        echo "✅ Worker deployed successfully!"
+        echo "[OK] Worker deployed successfully!"
         echo ""
         
         # Get worker URL from wrangler.toml
@@ -146,7 +146,7 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
         echo ""
     else
         echo ""
-        echo "❌ Deployment failed"
+        echo "[ERROR] Deployment failed"
         echo ""
         exit 1
     fi
