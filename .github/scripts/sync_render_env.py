@@ -7,6 +7,14 @@ keys = [
     'ALLOWED_ORIGINS', 'FRONTEND_URL',
     # ── Admin account (used by scripts/create-admin.js on first deploy) ───────
     'ADMIN_EMAIL', 'ADMIN_PASSWORD',
+    # ── MongoDB (alternative Atlas connection) ────────────────────────────────
+    'MONGO_ATLAS_URI', 'MONGO_ATLAS_PW',
+    # ── JWT ───────────────────────────────────────────────────────────────────
+    # NOTE: the codebase reads JWT_EXPIRATION in controllers/user.js and JWT_EXPIRY
+    # in config/config.js. Both are synced until the source is consolidated.
+    'JWT_EXPIRATION', 'JWT_EXPIRY',
+    # ── API URLs ──────────────────────────────────────────────────────────────
+    'API_BASE_URL',
     # ── Email / SMTP ──────────────────────────────────────────────────────────
     'SMTP_HOST', 'SMTP_PORT', 'SMTP_SECURE', 'SMTP_USER', 'SMTP_PASS',
     'EMAIL_FROM',
@@ -25,6 +33,11 @@ keys = [
     'MPESA_SHORTCODE', 'MPESA_PASSKEY', 'MPESA_ENVIRONMENT', 'MPESA_ALLOWED_IPS',
     # ── Cloudinary file storage ───────────────────────────────────────────────
     'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET',
+    # ── Server / security configuration ──────────────────────────────────────
+    'TRUST_PROXY', 'MAX_FILE_SIZE',
+    'LOGIN_WINDOW_MS', 'MAX_LOGIN_ATTEMPTS',
+    # ── Logging ───────────────────────────────────────────────────────────────
+    'LOG_LEVEL', 'APP_LOG_DIR', 'AUDIT_LOG_DIR',
     # ── SRE Monitoring ────────────────────────────────────────────────────────
     'METRICS_TOKEN',
 ]

@@ -204,6 +204,14 @@ jobs:
           # ── Admin account ─────────────────────────────────────────────────────────
           ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
           ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          # ── MongoDB (alternative Atlas connection) ────────────────────────────────
+          MONGO_ATLAS_URI: ${{ secrets.MONGO_ATLAS_URI }}
+          MONGO_ATLAS_PW: ${{ secrets.MONGO_ATLAS_PW }}
+          # ── JWT ───────────────────────────────────────────────────────────────────
+          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+          JWT_EXPIRY: ${{ secrets.JWT_EXPIRY }}
+          # ── API URLs ──────────────────────────────────────────────────────────────
+          API_BASE_URL: ${{ secrets.API_BASE_URL }}
           # ── Email / SMTP ──────────────────────────────────────────────────────────
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_PORT: ${{ secrets.SMTP_PORT }}
@@ -242,6 +250,15 @@ jobs:
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          # ── Server / security configuration ──────────────────────────────────────
+          TRUST_PROXY: ${{ secrets.TRUST_PROXY }}
+          MAX_FILE_SIZE: ${{ secrets.MAX_FILE_SIZE }}
+          LOGIN_WINDOW_MS: ${{ secrets.LOGIN_WINDOW_MS }}
+          MAX_LOGIN_ATTEMPTS: ${{ secrets.MAX_LOGIN_ATTEMPTS }}
+          # ── Logging ───────────────────────────────────────────────────────────────
+          LOG_LEVEL: ${{ secrets.LOG_LEVEL }}
+          APP_LOG_DIR: ${{ secrets.APP_LOG_DIR }}
+          AUDIT_LOG_DIR: ${{ secrets.AUDIT_LOG_DIR }}
           # ── SRE Monitoring – Prometheus /metrics bearer token ─────────────────────
           METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
       - name: Deploy to Render
