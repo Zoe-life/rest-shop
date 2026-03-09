@@ -81,15 +81,17 @@ function normaliseRoute(req) {
         return base + req.route.path;
     }
 
-    const rawPath = req.path || req.url || 'unknown';
+    const fullPath = (req.originalUrl || '').split('?')[0]
+        || ((req.baseUrl || '') + (req.path || req.url || ''))
+        || 'unknown';
 
     // Collapse static-file upload paths to avoid per-filename time series
-    if (rawPath.startsWith('/uploads/')) {
+    if (fullPath.startsWith('/uploads/')) {
         return '/uploads/:filename';
     }
 
     // Fall back to the raw URL path with IDs replaced
-    return rawPath
+    return fullPath
         .replace(/\/[0-9a-f]{24}/gi, '/:id')   // MongoDB ObjectIds
         .replace(/\/\d+/g, '/:id');             // Numeric IDs
 }
@@ -133,4 +135,4 @@ function metricsMiddleware(req, res, next) {
     next();
 }
 
-module.exports = { metricsMiddleware, register };
+module.exports = { metricsMiddleware, normaliseRoute, register };

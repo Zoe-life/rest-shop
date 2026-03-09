@@ -8,9 +8,87 @@ const sinon = require('sinon');
 
 describe('Metrics Middleware', () => {
     let metricsMiddleware;
+    let normaliseRoute;
 
     before(() => {
-        ({ metricsMiddleware } = require('../../middleware/metrics'));
+        ({ metricsMiddleware, normaliseRoute } = require('../../middleware/metrics'));
+    });
+
+    // -------------------------------------------------------------------
+    // normaliseRoute – full-path resolution tests
+    // -------------------------------------------------------------------
+
+    describe('normaliseRoute', () => {
+        it('returns the matched route pattern when req.route is present', () => {
+            const req = { baseUrl: '/api', route: { path: '/products/:id' } };
+            expect(normaliseRoute(req)).to.equal('/api/products/:id');
+        });
+
+        it('collapses /uploads/<filename> to /uploads/:filename (originalUrl present)', () => {
+            const req = {
+                originalUrl: '/uploads/photo.jpg',
+                path: '/photo.jpg',
+            };
+            expect(normaliseRoute(req)).to.equal('/uploads/:filename');
+        });
+
+        it('collapses /uploads/<filename> when mounted middleware sets baseUrl="/uploads" (the bug scenario)', () => {
+            // Express sets req.baseUrl='/uploads', req.path='/<file>' for
+            // app.use('/uploads', express.static(...)). Without the fix,
+            // rawPath would be '/photo.jpg' and the guard would not fire.
+            const req = {
+                originalUrl: '/uploads/photo.jpg',
+                baseUrl: '/uploads',
+                path: '/photo.jpg',
+            };
+            expect(normaliseRoute(req)).to.equal('/uploads/:filename');
+        });
+
+        it('strips query strings before checking /uploads/ prefix', () => {
+            const req = {
+                originalUrl: '/uploads/photo.jpg?v=2',
+                baseUrl: '/uploads',
+                path: '/photo.jpg',
+            };
+            expect(normaliseRoute(req)).to.equal('/uploads/:filename');
+        });
+
+        it('replaces MongoDB ObjectIds with :id', () => {
+            const req = {
+                originalUrl: '/products/64abc12345ef678901234567',
+                path: '/products/64abc12345ef678901234567',
+            };
+            expect(normaliseRoute(req)).to.equal('/products/:id');
+        });
+
+        it('replaces numeric IDs with :id', () => {
+            const req = {
+                originalUrl: '/orders/42',
+                path: '/orders/42',
+            };
+            expect(normaliseRoute(req)).to.equal('/orders/:id');
+        });
+
+        it('strips query strings before applying ID replacement', () => {
+            const req = {
+                originalUrl: '/products/64abc12345ef678901234567?foo=bar',
+                path: '/products/64abc12345ef678901234567',
+            };
+            expect(normaliseRoute(req)).to.equal('/products/:id');
+        });
+
+        it('falls back to baseUrl + path when originalUrl is absent', () => {
+            const req = {
+                baseUrl: '/uploads',
+                path: '/photo.jpg',
+            };
+            expect(normaliseRoute(req)).to.equal('/uploads/:filename');
+        });
+
+        it('returns "unknown" when no path information is available', () => {
+            const req = {};
+            expect(normaliseRoute(req)).to.equal('unknown');
+        });
     });
 
     it('should call next() for normal requests', () => {
