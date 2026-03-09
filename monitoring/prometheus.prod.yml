@@ -1,0 +1,30 @@
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+  external_labels:
+    environment: production
+    service: rest-shop-api
+
+# Load alerting rules
+rule_files:
+  - /etc/prometheus/rules.yml
+
+# Alertmanager configuration (optional – wire up if you run Alertmanager)
+# alerting:
+#   alertmanagers:
+#     - static_configs:
+#         - targets: ['alertmanager:9093']
+
+scrape_configs:
+  - job_name: 'rest-shop-api'
+    # Replace with your actual Render.com host, e.g. rest-shop-api.onrender.com
+    # The METRICS_TOKEN must match the METRICS_TOKEN env var set on Render.com.
+    static_configs:
+      - targets: ['${RENDER_HOST}']
+    scheme: https
+    metrics_path: '/metrics'
+    authorization:
+      type: Bearer
+      credentials: '${METRICS_TOKEN}'
+    # Render.com free tier may take a moment to wake up, so allow a generous timeout
+    scrape_timeout: 30s

@@ -1,0 +1,49 @@
+# Local SRE monitoring stack: Prometheus + Grafana
+#
+# Usage:
+#   docker compose -f docker-compose.monitoring.yml up -d
+#
+# Then open:
+#   Grafana   → http://localhost:3000  (admin / admin)
+#   Prometheus → http://localhost:9090
+#
+# The API must be running separately (npm start inside /api) on port 3001.
+# Prometheus is configured to scrape http://host.docker.internal:3001/metrics
+# so Docker containers can reach the host machine's API server.
+
+services:
+  prometheus:
+    image: prom/prometheus:v2.51.2
+    container_name: rest-shop-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.local.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--storage.tsdb.retention.time=15d'
+      - '--web.enable-lifecycle'
+
+  grafana:
+    image: grafana/grafana:10.4.2
+    container_name: rest-shop-grafana
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ./monitoring/grafana/dashboards:/etc/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+
+volumes:
+  prometheus_data:
+  grafana_data:

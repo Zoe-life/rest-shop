@@ -1,0 +1,96 @@
+name: Production Health Check
+
+on:
+  # Run every 15 minutes
+  schedule:
+    - cron: '*/15 * * * *'
+  # Allow manual triggers
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Check Production Endpoints
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Validate required secrets
+        run: |
+          if [ -z "$BACKEND_API_URL" ]; then
+            echo "WARNING: BACKEND_API_URL secret not set – skipping health checks."
+            echo "Set BACKEND_API_URL in GitHub repository secrets to enable production monitoring."
+            exit 0
+          fi
+        env:
+          BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+
+      - name: Health endpoint check
+        id: health
+        run: |
+          BACKEND="${BACKEND_API_URL%/}"
+          ENDPOINT="$BACKEND/health"
+          echo "Checking: $ENDPOINT"
+          HTTP_CODE=$(curl -s -o /tmp/health_body.txt -w "%{http_code}" --max-time 30 "$ENDPOINT")
+          BODY=$(cat /tmp/health_body.txt)
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response body: $BODY"
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "health_ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Health check returned HTTP $HTTP_CODE"
+          else
+            echo "health_ok=true" >> "$GITHUB_OUTPUT"
+            echo "Health check passed (HTTP 200)"
+          fi
+          echo "health_code=$HTTP_CODE" >> "$GITHUB_OUTPUT"
+        env:
+          BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+
+      - name: Metrics endpoint check
+        id: metrics
+        run: |
+          BACKEND="${BACKEND_API_URL%/}"
+          ENDPOINT="$BACKEND/metrics"
+          echo "Checking: $ENDPOINT"
+          if [ -n "$METRICS_TOKEN" ]; then
+            HTTP_CODE=$(curl -s -o /tmp/metrics_body.txt -w "%{http_code}" --max-time 30 \
+              -H "Authorization: Bearer $METRICS_TOKEN" "$ENDPOINT")
+          else
+            HTTP_CODE=$(curl -s -o /tmp/metrics_body.txt -w "%{http_code}" --max-time 30 "$ENDPOINT")
+          fi
+          echo "HTTP status: $HTTP_CODE"
+          echo "Response preview (first 5 lines):"
+          head -5 /tmp/metrics_body.txt
+          if [ "$HTTP_CODE" != "200" ]; then
+            echo "metrics_ok=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::Metrics endpoint returned HTTP $HTTP_CODE"
+          else
+            echo "metrics_ok=true" >> "$GITHUB_OUTPUT"
+            echo "Metrics endpoint check passed (HTTP 200)"
+          fi
+          echo "metrics_code=$HTTP_CODE" >> "$GITHUB_OUTPUT"
+        env:
+          BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
+
+      - name: Report status summary
+        run: |
+          HEALTH_OK="${{ steps.health.outputs.health_ok }}"
+          METRICS_OK="${{ steps.metrics.outputs.metrics_ok }}"
+          HEALTH_CODE="${{ steps.health.outputs.health_code }}"
+          METRICS_CODE="${{ steps.metrics.outputs.metrics_code }}"
+
+          echo "## Production Health Check Results"
+          echo "| Endpoint | Status | HTTP Code |"
+          echo "|----------|--------|-----------|"
+          echo "| /health  | ${HEALTH_OK:-unknown} | ${HEALTH_CODE:-n/a} |"
+          echo "| /metrics | ${METRICS_OK:-unknown} | ${METRICS_CODE:-n/a} |"
+
+          if [ "$HEALTH_OK" = "false" ] || [ "$METRICS_OK" = "false" ]; then
+            echo ""
+            echo "One or more production endpoints failed. Check the logs above for details."
+            exit 1
+          fi
+
+          echo ""
+          echo "All production endpoints are healthy."

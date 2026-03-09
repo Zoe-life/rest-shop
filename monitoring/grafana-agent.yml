@@ -1,0 +1,60 @@
+# Grafana Agent configuration
+#
+# Grafana Agent scrapes the REST Shop API's /metrics endpoint on Render.com
+# and remote-writes the data to Grafana Cloud (or any Prometheus-compatible
+# remote-write endpoint).
+#
+# This is the recommended production setup for Render.com deployments because:
+#  - Render.com does NOT support running sidecar containers.
+#  - Grafana Agent runs on a cheap VPS, Docker host, or even a Raspberry Pi.
+#  - It pulls metrics from the public /metrics URL and pushes to Grafana Cloud.
+#
+# Prerequisites:
+#   1. Install Grafana Agent:  https://grafana.com/docs/agent/latest/install/
+#      OR run as Docker:
+#        docker run -v $(pwd)/monitoring/grafana-agent.yml:/etc/agent/agent.yml \
+#               grafana/agent:latest --config.file=/etc/agent/agent.yml
+#   2. Replace the placeholders below with real values.
+#   3. Set the METRICS_TOKEN and GRAFANA_CLOUD_* variables as environment
+#      variables (or use a secrets manager). Do NOT commit real tokens.
+#
+# Environment variables required:
+#   RENDER_HOST              – e.g. rest-shop-api.onrender.com
+#   METRICS_TOKEN            – matches METRICS_TOKEN on Render.com
+#   GRAFANA_CLOUD_PROM_URL   – e.g. https://prometheus-prod-01-eu-west-0.grafana.net/api/prom/push
+#   GRAFANA_CLOUD_USER       – Grafana Cloud Prometheus user ID (numeric)
+#   GRAFANA_CLOUD_API_KEY    – Grafana Cloud API key with MetricsPublisher role
+
+metrics:
+  global:
+    scrape_interval: 15s
+    external_labels:
+      environment: production
+      service: rest-shop-api
+
+  configs:
+    - name: rest-shop-production
+      scrape_configs:
+        - job_name: rest-shop-api
+          scheme: https
+          metrics_path: /metrics
+          authorization:
+            type: Bearer
+            credentials: "${METRICS_TOKEN}"
+          static_configs:
+            - targets:
+                - "${RENDER_HOST}"
+          scrape_timeout: 30s
+
+      # Push collected metrics to Grafana Cloud
+      remote_write:
+        - url: "${GRAFANA_CLOUD_PROM_URL}"
+          basic_auth:
+            username: "${GRAFANA_CLOUD_USER}"
+            password: "${GRAFANA_CLOUD_API_KEY}"
+          queue_config:
+            capacity: 2500
+            max_shards: 200
+            min_shards: 1
+            max_samples_per_send: 500
+            batch_send_deadline: 5s

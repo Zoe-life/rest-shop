@@ -28,6 +28,44 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      # Admin account (used by scripts/create-admin.js on first deploy)
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # MongoDB (alternative Atlas connection)
+      - key: MONGO_ATLAS_URI
+        sync: false
+      - key: MONGO_ATLAS_PW
+        sync: false
+      # JWT
+      # NOTE: controllers/user.js reads JWT_EXPIRATION; config/config.js reads JWT_EXPIRY.
+      # Both are synced until the source is consolidated to a single variable name.
+      - key: JWT_EXPIRATION
+        sync: false
+      - key: JWT_EXPIRY
+        sync: false
+      # API URLs
+      - key: API_BASE_URL
+        sync: false
+      # Email / SMTP
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
+      # Redis caching (optional)
+      - key: REDIS_URL
+        sync: false
+      - key: REDIS_HOST
+        sync: false
       # Cloudinary (file uploads)
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
@@ -40,10 +78,14 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
       # Microsoft OAuth
       - key: MICROSOFT_CLIENT_ID
         sync: false
       - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+      - key: MICROSOFT_CALLBACK_URL
         sync: false
       # Stripe (optional - only needed if using Stripe payments)
       - key: STRIPE_SECRET_KEY
@@ -57,10 +99,39 @@ services:
         sync: false
       - key: PAYPAL_CLIENT_SECRET
         sync: false
+      - key: PAYPAL_ENVIRONMENT
+        sync: false
       # M-Pesa (optional - only needed if using M-Pesa payments)
       - key: MPESA_CONSUMER_KEY
         sync: false
       - key: MPESA_CONSUMER_SECRET
         sync: false
       - key: MPESA_CALLBACK_URL
+        sync: false
+      - key: MPESA_SHORTCODE
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_ENVIRONMENT
+        sync: false
+      - key: MPESA_ALLOWED_IPS
+        sync: false
+      # Server / security configuration
+      - key: TRUST_PROXY
+        sync: false
+      - key: MAX_FILE_SIZE
+        sync: false
+      - key: LOGIN_WINDOW_MS
+        sync: false
+      - key: MAX_LOGIN_ATTEMPTS
+        sync: false
+      # Logging
+      - key: LOG_LEVEL
+        sync: false
+      - key: APP_LOG_DIR
+        sync: false
+      - key: AUDIT_LOG_DIR
+        sync: false
+      # SRE Monitoring – protects the /metrics Prometheus scrape endpoint
+      - key: METRICS_TOKEN
         sync: false

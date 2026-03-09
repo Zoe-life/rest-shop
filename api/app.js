@@ -8,6 +8,8 @@ const path = require('path');
 const passport = require('./config/passport');
 const { helmetConfig, apiLimiter, sanitizeInput } = require('./middleware/security');
 const { logInfo, logWarn, logError } = require('./utils/logger');
+const { metricsMiddleware } = require('./middleware/metrics');
+const metricsRoutes = require('./routes/metrics');
 
 const productRoutes = require('./routes/products');
 const orderRoutes = require('./routes/orders');
@@ -21,6 +23,7 @@ app.set('trust proxy', 1);
 // 1. Security & Standard Middleware
 app.use(helmetConfig);
 app.use(morgan('dev'));
+app.use(metricsMiddleware);
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 app.use(cookieParser());
@@ -57,6 +60,9 @@ app.use((req, res, next) => {
 
 // 3. Root route (Render health-check ping returns 200 instead of 404)
 app.get('/', (req, res) => res.send('OK'));
+
+// Prometheus metrics endpoint (secured – see routes/metrics.js)
+app.use('/metrics', metricsRoutes);
 
 // Health Check (Simplified for Serverless)
 app.get('/health', (req, res) => {
