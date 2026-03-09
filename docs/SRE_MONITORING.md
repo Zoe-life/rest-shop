@@ -67,10 +67,12 @@ The following **Service-Level Indicators (SLIs)** are now collected:
 | SLO | Target | Alert threshold |
 |-----|--------|-----------------|
 | Availability | ≥ 99.5% (monthly) | Error rate > 0.5% for 5 min |
-| Latency (p99) | < 1 000 ms | p99 > 800 ms for 5 min |
-| Latency (p50) | < 200 ms | p50 > 150 ms for 5 min |
+| Latency (p99) | < 1 000 ms | p99 > 1 s for 5 min |
+| Latency (p50) | < 200 ms | p50 > 250 ms for 5 min |
 | DB connectivity | ≥ 99.9% | `mongodb_connection_state != 1` for 1 min |
 | Error rate (5xx) | < 1% | 5xx rate > 1% for 5 min |
+
+All SLO alert rules are defined in [`monitoring/prometheus.rules.yml`](../monitoring/prometheus.rules.yml).
 
 ---
 
@@ -90,15 +92,37 @@ Authorization: Bearer <METRICS_TOKEN>
 | Development (no `METRICS_TOKEN`) | Open access (convenient for local work) |
 | Production | `METRICS_TOKEN` **must** be set; requests without a matching bearer token receive `401` |
 
-Set `METRICS_TOKEN` in Render.com → Environment → Add variable.
+`METRICS_TOKEN` is automatically synced to Render.com on every deploy (via `ci-cd.yml` → `sync_render_env.py`). Add it as a GitHub Secret named `METRICS_TOKEN`.
+
+Generate a token:
+```bash
+openssl rand -hex 32
+```
 
 ---
 
-## 5. Local Development Setup
+## 5. Monitoring Files at a Glance
+
+| File | Purpose |
+|------|---------|
+| `monitoring/prometheus.yml` | Prometheus config – scrapes the **production** Render.com API (HTTPS + bearer token) |
+| `monitoring/prometheus.local.yml` | Prometheus config – scrapes the API running locally (`host.docker.internal:3001`) |
+| `monitoring/prometheus.prod.yml` | Prometheus config for `docker-compose.prod-monitoring.yml` (env-var substitution) |
+| `monitoring/prometheus.rules.yml` | Alert rules: availability, latency, database, saturation |
+| `monitoring/grafana-agent.yml` | Grafana Agent config – scrapes Render.com API and pushes to Grafana Cloud |
+| `monitoring/grafana/dashboards/rest-shop.json` | Pre-built Grafana SRE overview dashboard |
+| `monitoring/grafana/provisioning/` | Auto-provisioning configs for Grafana |
+| `docker-compose.monitoring.yml` | **Local dev** – Prometheus + Grafana (API runs separately on port 3001) |
+| `docker-compose.prod-monitoring.yml` | **Production self-hosted** – external Prometheus + Grafana pointing at Render.com |
+| `.github/workflows/production-health-check.yml` | Scheduled GitHub Actions health check (every 15 min) |
+
+---
+
+## 6. Local Development Setup
 
 ### Prerequisites
 
-- Docker + Docker Compose  
+- Docker + Docker Compose
 - API running locally (`cd api && npm start`)
 
 ### Start the monitoring stack
@@ -122,37 +146,92 @@ The pre-built **REST Shop – SRE Overview** dashboard is auto-provisioned in Gr
 
 ---
 
-## 6. Production Setup (Grafana Cloud)
+## 7. Production Setup
 
-### Option A – Grafana Cloud (recommended, free tier)
+### Option A – Grafana Cloud with Grafana Agent (recommended, free tier)
 
-1. Sign up at https://grafana.com/auth/sign-up/create-user
-2. Create a stack (free tier includes Prometheus, Loki, Tempo).
-3. In **Connections → Add new connection → Prometheus**, click **Send metrics from your app**.
-4. Follow the Grafana Agent or remote-write setup (or use the Prometheus remote-write endpoint).
-5. Set the scrape URL and bearer token from Grafana Cloud in your environment.
+Grafana Cloud manages Prometheus, Grafana, and alerting with no infrastructure to run. Grafana Agent runs anywhere (cheap VPS, home server, even GitHub Codespaces) and pushes metrics to the cloud.
 
-Alternatively, use Grafana Cloud's **HTTP metrics ingest API** with the `prom-client` remote-write option.
+**Step 1 – Sign up for Grafana Cloud**
 
-### Option B – Self-hosted Prometheus on a VPS / Docker
+1. Go to https://grafana.com/auth/sign-up/create-user (free tier: 10 000 series, 50 GB logs).
+2. Create a stack. Note your **Prometheus remote-write URL**, **user ID**, and **API key**.
 
-Update `monitoring/prometheus.yml`:
+**Step 2 – Configure secrets**
+
+Add these as GitHub Secrets (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+|--------|-------|
+| `METRICS_TOKEN` | Output of `openssl rand -hex 32` |
+| `BACKEND_API_URL` | Your Render.com API URL, e.g. `https://rest-shop-api.onrender.com` |
+
+**Step 3 – Run Grafana Agent**
+
+Edit `monitoring/grafana-agent.yml` with your Grafana Cloud credentials, then run:
+
+```bash
+# Export required variables
+export RENDER_HOST=rest-shop-api.onrender.com
+export METRICS_TOKEN=<your-metrics-token>
+export GRAFANA_CLOUD_PROM_URL=https://prometheus-prod-xx.grafana.net/api/prom/push
+export GRAFANA_CLOUD_USER=<numeric-user-id>
+export GRAFANA_CLOUD_API_KEY=<api-key>
+
+# Run with Docker
+docker run --rm \
+  -e RENDER_HOST -e METRICS_TOKEN \
+  -e GRAFANA_CLOUD_PROM_URL -e GRAFANA_CLOUD_USER -e GRAFANA_CLOUD_API_KEY \
+  -v "$(pwd)/monitoring/grafana-agent.yml:/etc/agent/agent.yml" \
+  grafana/agent:latest \
+  --config.file=/etc/agent/agent.yml
+```
+
+**Step 4 – Import the dashboard**
+
+In Grafana Cloud, go to **Dashboards → Import** and upload `monitoring/grafana/dashboards/rest-shop.json`.
+
+---
+
+### Option B – Self-hosted Prometheus + Grafana on a VPS
+
+Use `docker-compose.prod-monitoring.yml` to run Prometheus and Grafana on any machine with Docker. Prometheus scrapes the Render.com API over HTTPS.
+
+```bash
+# Set required environment variables
+export METRICS_TOKEN=<your-metrics-token>
+export RENDER_HOST=rest-shop-api.onrender.com
+export GF_SECURITY_ADMIN_PASSWORD=<strong-password>
+
+# Start the stack
+docker compose -f docker-compose.prod-monitoring.yml up -d
+```
+
+Open Grafana at `http://<your-vps-ip>:3000` (bind behind Nginx/Caddy with TLS in real production).
+
+The `monitoring/prometheus.prod.yml` config uses environment variable substitution for the host and token.
+
+---
+
+### Option C – Self-hosted via `monitoring/prometheus.yml`
+
+If you run Prometheus directly (no Docker Compose), edit `monitoring/prometheus.yml`:
 
 ```yaml
 scrape_configs:
   - job_name: 'rest-shop-api'
     static_configs:
-      - targets: ['<your-render-host>:443']
+      - targets: ['rest-shop-api.onrender.com']
     scheme: https
-    bearer_token: '<your-METRICS_TOKEN>'
     metrics_path: '/metrics'
+    authorization:
+      type: Bearer
+      credentials: '<your-METRICS_TOKEN>'
 ```
 
-Import `monitoring/grafana/dashboards/rest-shop.json` into your Grafana instance.
+---
 
-### Option C – Datadog (paid)
-
-If you prefer Datadog:
+### Option D – Datadog (paid)
 
 1. Install the Datadog Agent and enable the [Prometheus/OpenMetrics integration](https://docs.datadoghq.com/integrations/guide/prometheus-host-collection/).
 2. Point it at `https://<your-render-host>/metrics` with the bearer token.
@@ -160,48 +239,45 @@ If you prefer Datadog:
 
 ---
 
-## 7. Alerting
+## 8. Automated Production Health Checks (GitHub Actions)
 
-Configure alerting rules in Prometheus (`prometheus.rules.yml`) and route them via **Grafana Alerting** or **Alertmanager** to Slack, PagerDuty, email, etc.
+`.github/workflows/production-health-check.yml` runs **every 15 minutes** and checks:
 
-Example alert rules:
+- `GET /health` – database and app status
+- `GET /metrics` – metrics endpoint availability (with `METRICS_TOKEN` if configured)
 
-```yaml
-# monitoring/prometheus.rules.yml
-groups:
-  - name: rest-shop.rules
-    rules:
-      - alert: HighErrorRate
-        expr: |
-          100 * sum(rate(http_requests_total{status_code=~"5.."}[5m]))
-            / sum(rate(http_requests_total[5m])) > 1
-        for: 5m
-        labels:
-          severity: critical
-        annotations:
-          summary: "High 5xx error rate ({{ $value | printf \"%.1f\" }}%)"
+The workflow fails (visible in the GitHub Actions tab) if either endpoint returns a non-200 status. No additional infrastructure is required.
 
-      - alert: HighLatencyP99
-        expr: |
-          histogram_quantile(0.99, sum(rate(http_request_duration_seconds_bucket[5m])) by (le)) > 1
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "p99 latency above 1 second ({{ $value | printf \"%.2f\" }}s)"
+**GitHub Secrets required:**
 
-      - alert: DatabaseDisconnected
-        expr: mongodb_connection_state != 1
-        for: 1m
-        labels:
-          severity: critical
-        annotations:
-          summary: "MongoDB disconnected (state={{ $value }})"
-```
+| Secret | Required |
+|--------|----------|
+| `BACKEND_API_URL` | Yes |
+| `METRICS_TOKEN` | Optional (skips auth if not set) |
 
 ---
 
-## 8. Log Aggregation
+## 9. Alerting Rules
+
+All alerting rules are in [`monitoring/prometheus.rules.yml`](../monitoring/prometheus.rules.yml):
+
+| Alert | Severity | Condition |
+|-------|----------|-----------|
+| `APIDown` | critical | Prometheus cannot scrape `/metrics` for 2 min |
+| `HighErrorRate` | critical | 5xx rate > 1% for 5 min |
+| `HighClientErrorRate` | warning | 4xx rate > 10% for 10 min |
+| `HighLatencyP99` | warning | p99 > 1 s for 5 min |
+| `HighLatencyP50` | warning | p50 > 250 ms for 5 min |
+| `DatabaseDisconnected` | critical | `mongodb_connection_state != 1` for 1 min |
+| `HighMemoryUsage` | warning | RSS > 400 MiB for 5 min |
+| `HighEventLoopLag` | warning | Event loop lag > 100 ms for 5 min |
+| `HighInFlightRequests` | warning | In-flight > 50 for 5 min |
+
+To route alerts to Slack or PagerDuty, configure Grafana Alerting (cloud or self-hosted) or Alertmanager.
+
+---
+
+## 10. Log Aggregation
 
 The application already writes structured JSON error logs to `logs/app-error.log`.
 
@@ -209,15 +285,15 @@ For centralised log aggregation:
 
 | Tool | Notes |
 |------|-------|
-| **Grafana Loki** | Free tier on Grafana Cloud; tail the log file with Promtail |
+| **Grafana Loki** | Free tier on Grafana Cloud; use Promtail to tail the log file |
 | **Datadog Logs** | Datadog Agent can tail log files automatically |
-| **Render.com Logs** | Available directly in the Render dashboard; exportable via log drains |
+| **Render.com Logs** | Available in the Render dashboard; exportable via log drains |
 
 To send Render.com logs to an external system, configure a **Log Drain** in the Render dashboard under your service → **Log Streams**.
 
 ---
 
-## 9. Future Enhancements (OpenTelemetry)
+## 11. Future Enhancements (OpenTelemetry)
 
 For distributed tracing (useful once the system has multiple services):
 

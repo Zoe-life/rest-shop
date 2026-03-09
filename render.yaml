@@ -64,3 +64,6 @@ services:
         sync: false
       - key: MPESA_CALLBACK_URL
         sync: false
+      # SRE Monitoring – protects the /metrics Prometheus scrape endpoint
+      - key: METRICS_TOKEN
+        sync: false

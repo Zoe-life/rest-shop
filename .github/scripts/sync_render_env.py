@@ -11,6 +11,7 @@ keys = [
     'PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET',
     'MPESA_CONSUMER_KEY', 'MPESA_CONSUMER_SECRET', 'MPESA_CALLBACK_URL',
     'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET',
+    'METRICS_TOKEN',
 ]
 env_vars = [{'key': k, 'value': os.environ[k]} for k in keys if k in os.environ and os.environ[k]]
 env_vars += [{'key': 'NODE_ENV', 'value': 'production'}, {'key': 'PORT', 'value': '3001'}]

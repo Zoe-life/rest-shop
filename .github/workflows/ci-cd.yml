@@ -225,6 +225,8 @@ jobs:
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
           CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+          # ── SRE Monitoring – Prometheus /metrics bearer token ─────────────────────
+          METRICS_TOKEN: ${{ secrets.METRICS_TOKEN }}
       - name: Deploy to Render
         run: |
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then

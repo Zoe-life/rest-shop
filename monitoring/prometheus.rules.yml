@@ -1,0 +1,109 @@
+groups:
+  - name: rest-shop-availability
+    interval: 1m
+    rules:
+      # ── Availability ──────────────────────────────────────────────────────────
+      - alert: APIDown
+        expr: up{job="rest-shop-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "REST Shop API is unreachable"
+          description: "Prometheus cannot scrape the /metrics endpoint for {{ $labels.instance }}. The API may be down or sleeping (Render.com free tier)."
+
+      - alert: HighErrorRate
+        expr: |
+          100 * sum(rate(http_requests_total{job="rest-shop-api",status_code=~"5.."}[5m]))
+            / sum(rate(http_requests_total{job="rest-shop-api"}[5m])) > 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High 5xx error rate: {{ $value | printf \"%.1f\" }}%"
+          description: "More than 1% of requests are returning 5xx errors over the last 5 minutes."
+
+      - alert: HighClientErrorRate
+        expr: |
+          100 * sum(rate(http_requests_total{job="rest-shop-api",status_code=~"4.."}[5m]))
+            / sum(rate(http_requests_total{job="rest-shop-api"}[5m])) > 10
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Elevated 4xx error rate: {{ $value | printf \"%.1f\" }}%"
+          description: "More than 10% of requests are returning 4xx errors. May indicate a client-side issue or attack."
+
+  - name: rest-shop-latency
+    interval: 1m
+    rules:
+      # ── Latency ───────────────────────────────────────────────────────────────
+      - alert: HighLatencyP99
+        expr: |
+          histogram_quantile(0.99,
+            sum(rate(http_request_duration_seconds_bucket{job="rest-shop-api"}[5m])) by (le)
+          ) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p99 latency above 1 s: {{ $value | printf \"%.2f\" }}s"
+          description: "The 99th percentile request latency has exceeded 1 second for 5 minutes."
+
+      - alert: HighLatencyP50
+        expr: |
+          histogram_quantile(0.50,
+            sum(rate(http_request_duration_seconds_bucket{job="rest-shop-api"}[5m])) by (le)
+          ) > 0.25
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Median latency above 250 ms: {{ $value | printf \"%.2f\" }}s"
+          description: "The median request latency has exceeded 250 ms for 5 minutes (SLO target: < 200 ms)."
+
+  - name: rest-shop-database
+    interval: 30s
+    rules:
+      # ── Database ──────────────────────────────────────────────────────────────
+      - alert: DatabaseDisconnected
+        expr: mongodb_connection_state{job="rest-shop-api"} != 1
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MongoDB disconnected (state={{ $value }})"
+          description: "The API has lost its MongoDB connection. DB-dependent routes will return errors. State codes: 0=disconnected, 2=connecting, 3=disconnecting."
+
+  - name: rest-shop-saturation
+    interval: 1m
+    rules:
+      # ── Saturation ────────────────────────────────────────────────────────────
+      - alert: HighMemoryUsage
+        expr: |
+          process_resident_memory_bytes{job="rest-shop-api"} / 1024 / 1024 > 400
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage: {{ $value | printf \"%.0f\" }} MiB RSS"
+          description: "The API process RSS memory has exceeded 400 MiB for 5 minutes."
+
+      - alert: HighEventLoopLag
+        expr: |
+          nodejs_eventloop_lag_seconds{job="rest-shop-api"} > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Node.js event loop lag: {{ $value | printf \"%.3f\" }}s"
+          description: "The event loop lag has exceeded 100 ms for 5 minutes, which may degrade request handling."
+
+      - alert: HighInFlightRequests
+        expr: http_requests_in_flight{job="rest-shop-api"} > 50
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High in-flight requests: {{ $value }}"
+          description: "More than 50 requests are being processed concurrently for 5 minutes."
