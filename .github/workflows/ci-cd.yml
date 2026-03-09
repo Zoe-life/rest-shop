@@ -201,15 +201,27 @@ jobs:
           BACKEND_API_URL: ${{ secrets.BACKEND_API_URL }}
           ALLOWED_ORIGINS: ${{ secrets.ALLOWED_ORIGINS }}
           FRONTEND_URL: ${{ secrets.FRONTEND_URL }}
+          # ── Admin account ─────────────────────────────────────────────────────────
+          ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          # ── Email / SMTP ──────────────────────────────────────────────────────────
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
           # ── Optional: Redis caching (app works without it) ────────────────────────
           REDIS_URL: ${{ secrets.REDIS_URL }}
           REDIS_HOST: ${{ secrets.REDIS_HOST }}
           # ── Optional: Google OAuth ────────────────────────────────────────────────
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          GOOGLE_CALLBACK_URL: ${{ secrets.GOOGLE_CALLBACK_URL }}
           # ── Optional: Microsoft OAuth ─────────────────────────────────────────────
           MICROSOFT_CLIENT_ID: ${{ secrets.MICROSOFT_CLIENT_ID }}
           MICROSOFT_CLIENT_SECRET: ${{ secrets.MICROSOFT_CLIENT_SECRET }}
+          MICROSOFT_CALLBACK_URL: ${{ secrets.MICROSOFT_CALLBACK_URL }}
           # ── Optional: Stripe payments ─────────────────────────────────────────────
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_PUBLISHABLE_KEY: ${{ secrets.STRIPE_PUBLISHABLE_KEY }}
@@ -217,10 +229,15 @@ jobs:
           # ── Optional: PayPal payments ─────────────────────────────────────────────
           PAYPAL_CLIENT_ID: ${{ secrets.PAYPAL_CLIENT_ID }}
           PAYPAL_CLIENT_SECRET: ${{ secrets.PAYPAL_CLIENT_SECRET }}
+          PAYPAL_ENVIRONMENT: ${{ secrets.PAYPAL_ENVIRONMENT }}
           # ── Optional: M-Pesa payments ─────────────────────────────────────────────
           MPESA_CONSUMER_KEY: ${{ secrets.MPESA_CONSUMER_KEY }}
           MPESA_CONSUMER_SECRET: ${{ secrets.MPESA_CONSUMER_SECRET }}
           MPESA_CALLBACK_URL: ${{ secrets.MPESA_CALLBACK_URL }}
+          MPESA_SHORTCODE: ${{ secrets.MPESA_SHORTCODE }}
+          MPESA_PASSKEY: ${{ secrets.MPESA_PASSKEY }}
+          MPESA_ENVIRONMENT: ${{ secrets.MPESA_ENVIRONMENT }}
+          MPESA_ALLOWED_IPS: ${{ secrets.MPESA_ALLOWED_IPS }}
           # ── Optional: Cloudinary file storage ────────────────────────────────────
           CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
           CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}

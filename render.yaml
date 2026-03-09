@@ -28,6 +28,24 @@ services:
         sync: false
       - key: FRONTEND_URL
         sync: false
+      # Admin account (used by scripts/create-admin.js on first deploy)
+      - key: ADMIN_EMAIL
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Email / SMTP
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_SECURE
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: EMAIL_FROM
+        sync: false
       # Cloudinary (file uploads)
       - key: CLOUDINARY_CLOUD_NAME
         sync: false
@@ -40,10 +58,14 @@ services:
         sync: false
       - key: GOOGLE_CLIENT_SECRET
         sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
       # Microsoft OAuth
       - key: MICROSOFT_CLIENT_ID
         sync: false
       - key: MICROSOFT_CLIENT_SECRET
+        sync: false
+      - key: MICROSOFT_CALLBACK_URL
         sync: false
       # Stripe (optional - only needed if using Stripe payments)
       - key: STRIPE_SECRET_KEY
@@ -57,12 +79,22 @@ services:
         sync: false
       - key: PAYPAL_CLIENT_SECRET
         sync: false
+      - key: PAYPAL_ENVIRONMENT
+        sync: false
       # M-Pesa (optional - only needed if using M-Pesa payments)
       - key: MPESA_CONSUMER_KEY
         sync: false
       - key: MPESA_CONSUMER_SECRET
         sync: false
       - key: MPESA_CALLBACK_URL
+        sync: false
+      - key: MPESA_SHORTCODE
+        sync: false
+      - key: MPESA_PASSKEY
+        sync: false
+      - key: MPESA_ENVIRONMENT
+        sync: false
+      - key: MPESA_ALLOWED_IPS
         sync: false
       # SRE Monitoring – protects the /metrics Prometheus scrape endpoint
       - key: METRICS_TOKEN
