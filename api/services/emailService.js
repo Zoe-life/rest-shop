@@ -40,7 +40,7 @@ const createTransporter = () => {
     // In production, use actual SMTP credentials
     // For development/testing, use ethereal email or console logging
     if (process.env.NODE_ENV === 'production' && process.env.SMTP_HOST) {
-        _transporter = nodemailer.createTransporter({
+        _transporter = nodemailer.createTransport({
             host: process.env.SMTP_HOST,
             port: parseInt(process.env.SMTP_PORT) || 587,
             secure: process.env.SMTP_SECURE === 'true',

@@ -68,6 +68,9 @@ const dbConnectionState = new client.Gauge({
  *   /products/64abc123  →  /products/:id
  *   /user/me            →  /user/me   (unchanged)
  *
+ * Static-asset paths (e.g. /uploads/<filename>) are collapsed to a single
+ * generic label to prevent an unbounded number of Prometheus time series.
+ *
  * @param {import('express').Request} req
  * @returns {string}
  */
@@ -77,8 +80,16 @@ function normaliseRoute(req) {
         const base = req.baseUrl || '';
         return base + req.route.path;
     }
+
+    const rawPath = req.path || req.url || 'unknown';
+
+    // Collapse static-file upload paths to avoid per-filename time series
+    if (rawPath.startsWith('/uploads/')) {
+        return '/uploads/:filename';
+    }
+
     // Fall back to the raw URL path with IDs replaced
-    return (req.path || req.url || 'unknown')
+    return rawPath
         .replace(/\/[0-9a-f]{24}/gi, '/:id')   // MongoDB ObjectIds
         .replace(/\/\d+/g, '/:id');             // Numeric IDs
 }
