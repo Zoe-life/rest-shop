@@ -11,6 +11,10 @@ This document contains two articles about how rest-shop handles authentication t
 
 ### We Found a Silent Security Risk in Our App — Here's How We Fixed It
 
+*This is a follow-up to [my previous post](https://www.linkedin.com/posts/activity-previous-oauth-post) about getting OAuth authentication working across domains. In that post, I shared how three weeks of 401 errors finally ended when I stopped fighting cross-domain cookies and instead passed the JWT directly in the redirect URL — `res.redirect(\`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}\`)`. It felt like an elegant, pragmatic win. Today I want to share what we discovered next: that solution had a silent security risk hiding inside it, and here is how we fixed it.*
+
+---
+
 Every time a user logs in with Google or Microsoft, a digital key is created for them — a small piece of data that proves who they are and keeps them signed in as they browse. In our e-commerce platform, we discovered that this key was quietly leaking into places it should never be: **browser history, server logs, and even the invisible headers sent to third-party tools like analytics and fonts.**
 
 No alarm went off. No hacker was actively intercepting anything. But the vulnerability was real, and in the wrong situation it could have allowed someone to take over a session just by looking at a URL.
