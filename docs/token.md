@@ -11,71 +11,63 @@ This document contains two articles about how rest-shop handles authentication t
 
 ### We Found a Silent Security Risk in Our App — Here's How We Fixed It
 
-*This is a follow-up to [my previous post](https://www.linkedin.com/posts/activity-previous-oauth-post) about getting OAuth authentication working across domains. In that post, I shared how three weeks of 401 errors finally ended when I stopped fighting cross-domain cookies and instead passed the JWT directly in the redirect URL — `res.redirect(\`${frontendUrl}/auth/success?token=${encodeURIComponent(token)}\`)`. It felt like an elegant, pragmatic win. Today I want to share what we discovered next: that solution had a silent security risk hiding inside it, and here is how we fixed it.*
+*After shipping OAuth login, we discovered our implementation had a silent security flaw — the user's login key was leaking through the URL. Here is what we found and how we fixed it.*
 
 ---
 
-Every time a user logs in with Google or Microsoft, a digital key is created for them — a small piece of data that proves who they are and keeps them signed in as they browse. In our e-commerce platform, we discovered that this key was quietly leaking into places it should never be: **browser history, server logs, and even the invisible headers sent to third-party tools like analytics and fonts.**
+Every time a user logs in with Google or Microsoft, our platform creates a digital key that keeps them signed in. We discovered that key was quietly leaking into places it should never reach: **browser history, server logs, and even headers sent to third-party tools like analytics and fonts.**
 
-No alarm went off. No hacker was actively intercepting anything. But the vulnerability was real, and in the wrong situation it could have allowed someone to take over a session just by looking at a URL.
-
-Here is the story of how we found it, understood it, and fixed it — without changing what the experience looks and feels like for users.
+No alarm went off. No hacker was intercepting anything. But the vulnerability was real — and in the wrong hands, that URL could let someone hijack a session.
 
 ---
 
-#### The Problem: Your Login Key Was in the Web Address
+#### The Problem: The Login Key Was in the Web Address
 
-When you click "Sign in with Google," a behind-the-scenes conversation happens between your browser, our servers, and Google. At the end of that conversation, Google hands our server confirmation that you are who you say you are. Our server then needs to give your browser a key so that future requests — loading your cart, your order history, your profile — are trusted.
-
-The simplest way to do this is to put the key directly in the web address that your browser is sent to:
+When OAuth completes, our server redirects the browser to a success page. The easiest way to hand over the key is to embed it directly in the URL:
 
 ```
 https://app.rest-shop.com/auth/success?token=eyJhbGciOiJIUzI1NiIs...
 ```
 
-That long string after `?token=` is the key. The problem? **A URL is not a secret.** It gets saved in at least three places the moment your browser visits it:
+**A URL is not a secret.** It gets saved in at least three places the moment your browser visits it:
 
-1. **Your browser's history.** Anyone who picks up your unlocked phone or shares your computer can open the history and copy that URL — and with it, your key.
-2. **Our server logs.** Every web server records the full URLs of every request it handles. Those logs are often shared with DevOps teams, piped into monitoring dashboards, and stored for weeks. A key sitting in a log file is a key that many people can see.
-3. **Third-party request headers.** When a page loads, it typically pulls in resources from other services — fonts, analytics, chat widgets. Browsers automatically attach the current URL to those requests as a "Referer" header. That means our login key was being silently sent to every external service our page loaded.
+1. **Browser history** — visible to anyone with access to your device.
+2. **Server logs** — recorded automatically and often shared across teams for weeks.
+3. **Referer headers** — browsers silently forward the current URL to every external resource a page loads (fonts, analytics, chat widgets).
 
-A login key is typically valid for an hour. That is a long window for someone to find it in any one of those places and use it.
+A login key is typically valid for an hour. That is a long window.
 
 ---
 
 #### The Fix: A Claim-Ticket System
 
-Think of it like a coat check at a restaurant. When you hand over your coat, you get a small, numbered ticket — not a description of your coat, not your name, just a number. When you come back, you hand in the ticket, and only then do you get your coat. The ticket itself is worthless to anyone who finds it after you have already claimed your coat, because it is single-use.
+Think of a coat check: you receive a numbered ticket, not tied to your name or your coat. When you claim your coat, the ticket is gone — single-use and worthless to anyone who finds it afterward.
 
-Or, if you have ever walked into an Equity Bank or KCB branch in Kenya, you know the numbered queue slip you collect from the machine by the door. It says something like B047. That number tells the teller nothing — not your name, not your account, not what you came to do. It is simply a placeholder that reserves your turn. When B047 appears on the screen and you walk to the counter, only then do you prove your identity and conduct your business. The moment your number has been served, that slip is worthless to anyone who picks it up off the floor. The same principle holds across the continent: whether it is a government Huduma Centre in Nairobi, a microfinance branch in Kampala, or a bank queue in Lagos, the numbered slip keeps the system moving without exposing anything about you.
+We applied the same idea to authentication.
 
-We applied exactly this idea to authentication.
+Instead of putting the real login key in the URL, the server now places a **temporary claim ticket** there — a short random string with no personal data attached. It is valid for 30 seconds and can only be used once.
 
-Instead of putting the real login key in the URL, our server now puts a **temporary claim ticket** there. It is a short, random string of characters that means nothing on its own — it does not contain your email address, your user ID, or any personal information. It is valid for exactly 30 seconds, and it can only be used once.
+The moment the browser loads the success page, the app reads the ticket, strips it from the URL, and exchanges it through a secure channel for the real key. The ticket is then destroyed.
 
-The moment your browser arrives at the success page, our app reads the ticket, immediately removes it from the URL (so it disappears from your browser history), and sends it directly to our server through a private channel — the same kind of secure, non-URL channel used for all other data in the app. The server trades in the ticket for the real login key and returns it. The ticket is destroyed the instant it is read.
-
-What ends up in browser history, server logs, and third-party headers is just a 30-second, already-consumed, meaningless string of characters.
+What ends up in logs and history is a 30-second, already-consumed, meaningless string.
 
 ---
 
 #### Why This Matters Beyond Our App
 
-This is not a problem unique to us. The pattern of putting credentials in URLs is common, sometimes because it is the easiest option, sometimes because developers are unaware of the risks. Many OAuth implementations — the technology behind "Sign in with Google" buttons everywhere — have historically done exactly what we were doing.
+This pattern is not unique to us. Many OAuth implementations pass credentials through URLs because it is the easiest option — but **secrets belong in request bodies and headers, not in URLs.** URLs are designed to be shared, logged, and forwarded. Secrets are not.
 
-The fix requires a bit more engineering effort, but the principle is simple: **secrets belong in request bodies and headers, not in URLs.** URLs are designed to be shared, logged, and forwarded. Secrets are not.
-
-For any team building a product where users log in with a third-party provider, this is worth checking. A few hours of engineering work can close a category of vulnerability that is easy to overlook precisely because nothing visibly breaks.
+A few hours of engineering work can close a vulnerability that is easy to miss precisely because nothing visibly breaks.
 
 ---
 
 #### What Changed for Users
 
-Nothing. The login flow looks and works exactly the same. The entire exchange happens in the fraction of a second between clicking the button and landing on the products page. The only difference is that the journey is now more secure.
+Nothing. The login flow looks and works exactly the same. The only difference is that the journey is now more secure.
 
 ---
 
-*Interested in the technical details of how we implemented this? See [Part B](#part-b--medium-article) below for a full engineering deep-dive.*
+*For the full technical deep-dive, see [Part B](#part-b--medium-article) below.*
 
 ---
 ---
