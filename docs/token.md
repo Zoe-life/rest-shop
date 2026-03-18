@@ -47,6 +47,8 @@ A login key is typically valid for an hour. That is a long window for someone to
 
 Think of it like a coat check at a restaurant. When you hand over your coat, you get a small, numbered ticket — not a description of your coat, not your name, just a number. When you come back, you hand in the ticket, and only then do you get your coat. The ticket itself is worthless to anyone who finds it after you have already claimed your coat, because it is single-use.
 
+Or, if you have ever walked into an Equity Bank or KCB branch in Kenya, you know the numbered queue slip you collect from the machine by the door. It says something like B047. That number tells the teller nothing — not your name, not your account, not what you came to do. It is simply a placeholder that reserves your turn. When B047 appears on the screen and you walk to the counter, only then do you prove your identity and conduct your business. The moment your number has been served, that slip is worthless to anyone who picks it up off the floor. The same principle holds across the continent: whether it is a government Huduma Centre in Nairobi, a microfinance branch in Kampala, or a bank queue in Lagos, the numbered slip keeps the system moving without exposing anything about you.
+
 We applied exactly this idea to authentication.
 
 Instead of putting the real login key in the URL, our server now puts a **temporary claim ticket** there. It is a short, random string of characters that means nothing on its own — it does not contain your email address, your user ID, or any personal information. It is valid for exactly 30 seconds, and it can only be used once.
