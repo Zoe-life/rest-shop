@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  NODE_VERSION: "20.x" # Updated for better Cloudflare compatibility
+  NODE_VERSION: "22.x" # Wrangler v4 requires Node.js >= 22
 
 jobs:
   # Job 1: Code Quality and Linting
